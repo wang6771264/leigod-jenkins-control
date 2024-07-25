@@ -1,5 +1,7 @@
 package org.codinjutsu.tools.jenkins.model;
 
+import org.codinjutsu.tools.jenkins.model.jenkins.BuildInJobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.*;

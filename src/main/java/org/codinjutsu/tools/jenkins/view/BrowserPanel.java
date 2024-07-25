@@ -31,8 +31,10 @@ import com.intellij.ui.PopupHandler;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.codinjutsu.tools.jenkins.*;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.logic.*;
-import org.codinjutsu.tools.jenkins.model.*;
+import org.codinjutsu.tools.jenkins.model.jenkins.*;
 import org.codinjutsu.tools.jenkins.util.CollectionUtil;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
 import org.codinjutsu.tools.jenkins.view.action.*;
@@ -370,9 +372,9 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         popupGroup.add(ActionManager.getInstance().getAction(RunBuildAction.ACTION_ID));
         popupGroup.add(ActionManager.getInstance().getAction(StopBuildAction.ACTION_ID));
         popupGroup.addSeparator();
-        popupGroup.add(new ShowLogAction(BuildType.LAST));
-        popupGroup.add(new ShowLogAction(BuildType.LAST_SUCCESSFUL));
-        popupGroup.add(new ShowLogAction(BuildType.LAST_FAILED));
+        popupGroup.add(new ShowLogAction(BuildTypeEnum.LAST));
+        popupGroup.add(new ShowLogAction(BuildTypeEnum.LAST_SUCCESSFUL));
+        popupGroup.add(new ShowLogAction(BuildTypeEnum.LAST_FAILED));
         popupGroup.add(new ShowBuildLogAction());
         popupGroup.addSeparator();
         popupGroup.add(new SetJobAsFavoriteAction(this));
@@ -540,6 +542,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
                     return;
                 }
                 currentSelectedView = viewToLoad;
+                //view加载构建任务
                 loadJobs();
             } finally {
                 setTreeBusy(false);

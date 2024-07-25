@@ -1,10 +1,8 @@
 package org.codinjutsu.tools.jenkins.exception;
 
 import org.assertj.core.api.Assertions;
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class NoJobFoundExceptionTest {
 

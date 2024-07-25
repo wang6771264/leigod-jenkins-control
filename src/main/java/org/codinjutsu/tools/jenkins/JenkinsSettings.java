@@ -18,29 +18,29 @@ package org.codinjutsu.tools.jenkins;
 
 import com.intellij.credentialStore.CredentialAttributes;
 import com.intellij.ide.passwordSafe.PasswordSafe;
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.xmlb.XmlSerializerUtil;
-import com.intellij.util.xmlb.annotations.Attribute;
-import com.intellij.util.xmlb.annotations.Tag;
-import lombok.*;
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.model.FavoriteJob;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
+import org.codinjutsu.tools.jenkins.state.ProjectState;
 import org.codinjutsu.tools.jenkins.util.JobUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Predicate;
 
 @State(name = "Jenkins.Settings", storages = {
         @Storage(value = "jenkins_setting.xml", roamingType = RoamingType.PER_OS)
 })
-public class JenkinsSettings implements PersistentStateComponent<JenkinsSettings.State> {
+public class JenkinsSettings implements PersistentStateComponent<ProjectState> {
 
     public static final String JENKINS_SETTINGS_PASSWORD_KEY = "JENKINS_SETTINGS_PASSWORD_KEY";
-    private final State myState = new State();
+    private final ProjectState myState = new ProjectState();
 
     public static JenkinsSettings getSafeInstance(Project project) {
         JenkinsSettings settings = project.getService(JenkinsSettings.class);
@@ -48,12 +48,12 @@ public class JenkinsSettings implements PersistentStateComponent<JenkinsSettings
     }
 
     @Override
-    public State getState() {
+    public ProjectState getState() {
         return myState;
     }
 
     @Override
-    public void loadState(@NotNull State state) {
+    public void loadState(@NotNull ProjectState state) {
         XmlSerializerUtil.copyBean(state, myState);
     }
 
@@ -153,50 +153,4 @@ public class JenkinsSettings implements PersistentStateComponent<JenkinsSettings
         myState.setConnectionTimeout(timeoutInSeconds);
     }
 
-    @Data
-    public static class State {
-        public static final String RESET_STR_VALUE = "";
-
-        private static final int DEFAULT_CONNECTION_TIMEOUT = 10;
-
-        private String username = RESET_STR_VALUE;
-
-        private String crumbData = RESET_STR_VALUE;
-
-        private String lastSelectedView;
-
-        private List<FavoriteJob> favoriteJobs = new LinkedList<>();
-
-        private JenkinsVersion jenkinsVersion = JenkinsVersion.VERSION_1;
-
-        private int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
-        private @NotNull String jenkinsUrl = RESET_STR_VALUE;
-
-        public void clearFavoriteJobs() {
-            favoriteJobs.clear();
-        }
-
-        public void addFavoriteJobs(FavoriteJob favoriteJob) {
-            favoriteJobs.add(favoriteJob);
-        }
-
-        public void removeFavoriteJob(Predicate<? super FavoriteJob> filter) {
-            favoriteJobs.removeIf(filter);
-        }
-    }
-
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Data
-    @Tag("favorite")
-    public static class FavoriteJob {
-
-        @Setter(value = AccessLevel.NONE)
-        @Attribute("name")
-        private String name;
-
-        @Setter(value = AccessLevel.NONE)
-        @Attribute("url")
-        private String url;
-    }
 }

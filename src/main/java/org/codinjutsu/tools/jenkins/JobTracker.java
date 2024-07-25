@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.codinjutsu.tools.jenkins.model.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 
 public class JobTracker {
     private static JobTracker ourInstance = new JobTracker();

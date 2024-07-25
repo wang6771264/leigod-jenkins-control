@@ -5,8 +5,8 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import icons.JenkinsControlIcons;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
-import org.codinjutsu.tools.jenkins.model.BuildStatusEnum;
-import org.codinjutsu.tools.jenkins.model.Color;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.enums.ColorEnum;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -42,7 +42,7 @@ public final class BuildStatusEnumRenderer implements BuildStatusRenderer {
     @NotNull
     @Override
     public Icon renderBuildStatus(@NotNull BuildStatusEnum buildStatus) {
-        if (buildStatus.getColor() == Color.BLUE && jenkinsAppSettings.isUseGreenColor()) {
+        if (buildStatus.getColorEnum() == ColorEnum.BLUE && jenkinsAppSettings.isUseGreenColor()) {
             return JenkinsControlIcons.Job.GREEN;
         }
         return iconByBuildStatus.getOrDefault(buildStatus, JenkinsControlIcons.Job.GREY);

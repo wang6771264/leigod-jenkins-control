@@ -17,9 +17,7 @@
 package org.codinjutsu.tools.jenkins.util;
 
 import org.assertj.core.api.Assertions;
-import org.codinjutsu.tools.jenkins.model.BuildStatusEnum;
-import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

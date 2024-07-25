@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.enums;
 
 import com.intellij.icons.AllIcons;
 import icons.JenkinsControlIcons;
@@ -7,12 +7,12 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.util.EnumMap;
 
-public enum JobType {
+public enum JobTypeEnum {
     JOB,
     FOLDER,
     MULTI_BRANCH;
 
-    private static final EnumMap<JobType, Icon> ICON_BY_TYPE = new EnumMap<>(JobType.class);
+    private static final EnumMap<JobTypeEnum, Icon> ICON_BY_TYPE = new EnumMap<>(JobTypeEnum.class);
 
     static {
         ICON_BY_TYPE.put(JOB, JenkinsControlIcons.Job.GREY);
@@ -26,6 +26,6 @@ public enum JobType {
     }
 
     public boolean containNestedJobs() {
-        return this == JobType.FOLDER || this == JobType.MULTI_BRANCH;
+        return this == JobTypeEnum.FOLDER || this == JobTypeEnum.MULTI_BRANCH;
     }
 }

@@ -27,8 +27,8 @@ import org.assertj.swing.fixture.DialogFixture;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.logic.JobBuilder;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
-import org.codinjutsu.tools.jenkins.model.BuildInJobParameter;
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.BuildInJobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.jetbrains.annotations.NonNls;
 import org.junit.After;
 import org.junit.Before;
@@ -45,7 +45,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 @Ignore("make Test to run headless")
-public class BuildParamDialogTest {
+public class BuildConfigDialogTest {
 
     @Mock
     private RequestManager requestManager;

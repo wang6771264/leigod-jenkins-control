@@ -31,9 +31,9 @@ import org.codinjutsu.tools.jenkins.JobTracker;
 import org.codinjutsu.tools.jenkins.TraceableBuildJob;
 import org.codinjutsu.tools.jenkins.TraceableBuildJobFactory;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
-import org.codinjutsu.tools.jenkins.model.Job;
-import org.codinjutsu.tools.jenkins.model.JobParameter;
-import org.codinjutsu.tools.jenkins.model.ProjectJob;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderers;
 import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
@@ -133,11 +133,11 @@ public class BuildParamDialog extends DialogWrapper {
         final AtomicInteger rows = new AtomicInteger(0);
         for (JobParameter jobParameter : parameters) {
             //跳过测试是必然的
-            if(jobParameter.getName().equals("SKIP_TEST")){
+            if (jobParameter.getName().equals("SKIP_TEST")) {
                 continue;
             }
             final JobParameterRenderer jobParameterRenderer = JobParameterRenderer.findRenderer(jobParameter)
-                    .orElseGet(ErrorRenderer::new);
+                    .orElseGet(DefaultRenderer::new);
             final ProjectJob projectJob = ProjectJob.builder().project(project).job(job).build();
             final JobParameterComponent<?> jobParameterComponent = jobParameterRenderer.render(jobParameter, projectJob);
 
@@ -212,12 +212,12 @@ public class BuildParamDialog extends DialogWrapper {
         void notifyOnError(Job job, Throwable ex);
     }
 
-    public class ErrorRenderer implements JobParameterRenderer {
+    public class DefaultRenderer implements JobParameterRenderer {
 
         @NotNull
         @Override
         public JobParameterComponent<String> render(@NotNull JobParameter jobParameter, @Nullable ProjectJob projectJob) {
-            return JobParameterRenderers.createErrorLabel(jobParameter);
+            return JobParameterRenderers.createTextField(jobParameter, jobParameter.getDefaultValue());
         }
 
         @Override
@@ -260,7 +260,8 @@ public class BuildParamDialog extends DialogWrapper {
         public void run(@NotNull ProgressIndicator indicator) {
             indicator.setIndeterminate(true);
 
-            TraceableBuildJob buildJob = TraceableBuildJobFactory.newBuildJob(job, configuration, paramValueMap, requestManager);
+            TraceableBuildJob buildJob = TraceableBuildJobFactory.newBuildJob(job, configuration,
+                    paramValueMap, requestManager);
 
             JobTracker.getInstance().registerJob(buildJob);
             buildJob.run();

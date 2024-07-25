@@ -1,8 +1,7 @@
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.model.jenkins;
 
 import com.github.cliftonlabs.json_simple.JsonObject;
 import com.intellij.openapi.vfs.VirtualFile;
-import lombok.Getter;
 import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 

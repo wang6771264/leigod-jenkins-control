@@ -28,14 +28,16 @@ import com.offbytwo.jenkins.helper.BuildConsoleStreamListener;
 import com.offbytwo.jenkins.model.*;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.JenkinsSettings;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.exception.*;
-import org.codinjutsu.tools.jenkins.model.Build;
-import org.codinjutsu.tools.jenkins.model.Computer;
-import org.codinjutsu.tools.jenkins.model.Job;
-import org.codinjutsu.tools.jenkins.model.View;
-import org.codinjutsu.tools.jenkins.model.*;
+import org.codinjutsu.tools.jenkins.model.FavoriteJob;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.Computer;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.View;
+import org.codinjutsu.tools.jenkins.model.jenkins.*;
+import org.codinjutsu.tools.jenkins.security.JenkinsSecurityClient;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
-import org.codinjutsu.tools.jenkins.security.SecurityClient;
 import org.codinjutsu.tools.jenkins.security.SecurityClientFactory;
 import org.codinjutsu.tools.jenkins.view.parameter.NodeParameterRenderer;
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +67,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     private final UrlBuilder urlBuilder;
     private final RssParser rssParser = new RssParser();
     private @NotNull JenkinsParser jenkinsParser = new JenkinsJsonParser(UnaryOperator.identity());
-    private SecurityClient securityClient;
+    private JenkinsSecurityClient jenkinsSecurityClient;
     private @Deprecated JenkinsPlateform jenkinsPlateform = JenkinsPlateform.CLASSIC;
     private JenkinsServer jenkinsServer;
 
@@ -80,14 +82,14 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     }
 
     private static boolean canContainNestedJobs(@NotNull Job job) {
-        return job.getJobType().containNestedJobs();
+        return job.getJobTypeEnum().containNestedJobs();
     }
 
     @Override
     public Jenkins loadJenkinsWorkspace(JenkinsAppSettings configuration, JenkinsSettings jenkinsSettings) {
         if (handleNotYetLoggedInState()) return null;
         var url = urlBuilder.createJenkinsWorkspaceUrl(configuration);
-        var jenkinsWorkspaceData = securityClient.execute(url);
+        var jenkinsWorkspaceData = jenkinsSecurityClient.execute(url);
         final var serverUrl = configuration.getServerUrl();
         final var configuredJenkinsUrl = Optional.of(jenkinsSettings.getJenkinsUrl())
                 .filter(StringUtil::isNotEmpty)
@@ -116,7 +118,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         if (handleNotYetLoggedInState()) return Collections.emptyMap();
         URL url = urlBuilder.createRssLatestUrl(configuration.getServerUrl());
 
-        String rssData = securityClient.execute(url);
+        String rssData = jenkinsSecurityClient.execute(url);
 
         return rssParser.loadJenkinsRssLatestBuilds(rssData);
     }
@@ -124,7 +126,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     private List<Job> loadJenkinsView(String viewUrl) {
         if (handleNotYetLoggedInState()) return Collections.emptyList();
         URL url = urlBuilder.createViewUrl(jenkinsPlateform, viewUrl);
-        String jenkinsViewData = securityClient.execute(url);
+        String jenkinsViewData = jenkinsSecurityClient.execute(url);
         final List<Job> jobsFromView;
         if (jenkinsPlateform.equals(JenkinsPlateform.CLASSIC)) {
             jobsFromView = jenkinsParser.createJobs(jenkinsViewData);
@@ -203,7 +205,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     private List<Job> loadNestedJobs(String currentJobUrl) {
         if (handleNotYetLoggedInState()) return Collections.emptyList();
         URL url = urlBuilder.createNestedJobUrl(currentJobUrl);
-        return jenkinsParser.createJobs(securityClient.execute(url));
+        return jenkinsParser.createJobs(jenkinsSecurityClient.execute(url));
     }
 
     private boolean handleNotYetLoggedInState() {
@@ -213,7 +215,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
             logger.warn("RequestManager.handleNotYetLoggedInState called from EDT");
             threadStack = true;
         }
-        if (securityClient == null) {
+        if (jenkinsSecurityClient == null) {
             logger.warn("Not yet logged in, all calls until login will fail");
             threadStack = true;
             result = true;
@@ -227,7 +229,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     private Job loadJob(String jenkinsJobUrl) {
         if (handleNotYetLoggedInState()) return createEmptyJob(jenkinsJobUrl);
         URL url = urlBuilder.createJobUrl(jenkinsJobUrl);
-        String jenkinsJobData = securityClient.execute(url);
+        String jenkinsJobData = jenkinsSecurityClient.execute(url);
         return jenkinsParser.createJob(jenkinsJobData);
     }
 
@@ -240,7 +242,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     private void stopBuild(String jenkinsBuildUrl) {
         if (handleNotYetLoggedInState()) return;
         URL url = urlBuilder.createStopBuildUrl(jenkinsBuildUrl);
-        securityClient.execute(url);
+        jenkinsSecurityClient.execute(url);
     }
 
     @VisibleForTesting
@@ -248,21 +250,21 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     Build loadBuild(String jenkinsBuildUrl) {
         if (handleNotYetLoggedInState()) return Build.NULL;
         URL url = urlBuilder.createBuildUrl(jenkinsBuildUrl);
-        String jenkinsJobData = securityClient.execute(url);
+        String jenkinsJobData = jenkinsSecurityClient.execute(url);
         return jenkinsParser.createBuild(jenkinsJobData);
     }
 
     private List<Build> loadBuilds(String jenkinsBuildUrl, RangeToLoad rangeToLoad) {
         if (handleNotYetLoggedInState()) return Collections.emptyList();
         URL url = urlBuilder.createBuildsUrl(jenkinsBuildUrl, rangeToLoad);
-        String jenkinsJobData = securityClient.execute(url);
+        String jenkinsJobData = jenkinsSecurityClient.execute(url);
         return jenkinsParser.createBuilds(jenkinsJobData);
     }
 
     @Override
     public void runBuild(Job job, JenkinsAppSettings configuration, Map<String, ?> parameters) {
         if (handleNotYetLoggedInState()) return;
-        if (job.hasParameters() && parameters.size() > 0) {
+        if (job.hasParameters() && !parameters.isEmpty()) {
             parameters.keySet().removeIf(key -> !job.hasParameter(key));
         }
         final AtomicInteger fileCount = new AtomicInteger();
@@ -282,7 +284,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     private void runBuild(Job job, JenkinsAppSettings configuration, Collection<RequestData> requestData) {
         if (handleNotYetLoggedInState()) return;
         URL url = urlBuilder.createRunJobUrl(job.getUrl(), configuration);
-        final var response = securityClient.execute(url, requestData);
+        final var response = jenkinsSecurityClient.execute(url, requestData);
         if (response.getStatusCode() != HttpURLConnection.HTTP_CREATED) {
             throw new RunBuildError(Optional.ofNullable(response.getError()).orElse("Unknown"));
         }
@@ -293,17 +295,18 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         SecurityClientFactory.setVersion(jenkinsSettings.getVersion());
         final int connectionTimout = getConnectionTimout(jenkinsSettings.getConnectionTimeout());
         if (jenkinsSettings.isSecurityMode()) {
-            securityClient = SecurityClientFactory.basic(jenkinsSettings.getUsername(), jenkinsSettings.getPassword(),
+            jenkinsSecurityClient = SecurityClientFactory.basic(jenkinsSettings.getUsername(), jenkinsSettings.getPassword(),
                     jenkinsSettings.getCrumbData(), connectionTimout);
         } else {
-            securityClient = SecurityClientFactory.none(jenkinsSettings.getCrumbData(), connectionTimout);
+            jenkinsSecurityClient = SecurityClientFactory.none(jenkinsSettings.getCrumbData(), connectionTimout);
         }
         final String serverUrl = jenkinsAppSettings.getServerUrl();
-        securityClient.connect(urlBuilder.createAuthenticationUrl(serverUrl));
-        setJenkinsServer(new JenkinsServer(new JenkinsClient(urlBuilder.createServerUrl(serverUrl), securityClient)));
+        jenkinsSecurityClient.connect(urlBuilder.createAuthenticationUrl(serverUrl));
+        setJenkinsServer(new JenkinsServer(new JenkinsControlClient(urlBuilder.createServerUrl(serverUrl), jenkinsSecurityClient)));
 
         final var urlMapper = ApplicationManager.getApplication().getService(UrlMapperService.class)
-                .getMapper(jenkinsSettings, serverUrl);;
+                .getMapper(jenkinsSettings, serverUrl);
+        ;
         setJenkinsParser(new JenkinsJsonParser(urlMapper));
     }
 
@@ -313,21 +316,21 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         final var jsonParserWithServerUrls = new JenkinsJsonParser(UnaryOperator.identity());
         SecurityClientFactory.setVersion(version);
         final int connectionTimout = getConnectionTimout(connectionTimoutInSeconds);
-        final SecurityClient securityClientForTest;
+        final JenkinsSecurityClient jenkinsSecurityClientForTest;
         if (org.codinjutsu.tools.jenkins.util.StringUtil.isNotBlank(username)) {
-            securityClientForTest = SecurityClientFactory.basic(username, password, crumbData, connectionTimout);
+            jenkinsSecurityClientForTest = SecurityClientFactory.basic(username, password, crumbData, connectionTimout);
         } else {
-            securityClientForTest = SecurityClientFactory.none(crumbData, connectionTimout);
+            jenkinsSecurityClientForTest = SecurityClientFactory.none(crumbData, connectionTimout);
         }
-        final String serverData = securityClientForTest.connect(urlBuilder.createAuthenticationUrl(serverUrl));
+        final String serverData = jenkinsSecurityClientForTest.connect(urlBuilder.createAuthenticationUrl(serverUrl));
         return jsonParserWithServerUrls.getServerUrl(serverData);
     }
 
     @Override
-    public List<Job> loadFavoriteJobs(List<JenkinsSettings.FavoriteJob> favoriteJobs) {
+    public List<Job> loadFavoriteJobs(List<FavoriteJob> favoriteJobs) {
         if (handleNotYetLoggedInState()) return Collections.emptyList();
         final List<Job> jobs = new LinkedList<>();
-        for (JenkinsSettings.FavoriteJob favoriteJob : favoriteJobs) {
+        for (FavoriteJob favoriteJob : favoriteJobs) {
             jobs.add(loadJob(favoriteJob.getUrl()));
         }
         return withNestedJobs(jobs);
@@ -367,15 +370,15 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     }
 
     @Override
-    public void loadConsoleTextFor(Job job, BuildType buildType,
+    public void loadConsoleTextFor(Job job, BuildTypeEnum buildTypeEnum,
                                    BuildLogConsoleStreamListener buildConsoleStreamListener) {
-        loadConsoleTextFor(getBuildForType(buildType).apply(getJob(job)),
+        loadConsoleTextFor(getBuildForType(buildTypeEnum).apply(getJob(job)),
                 buildConsoleStreamListener, job::getNameToRenderSingleJob);
     }
 
     private void loadConsoleTextFor(com.offbytwo.jenkins.model.Build build,
                                     BuildLogConsoleStreamListener buildConsoleStreamListener,
-                                   @NotNull Supplier<String> logName) {
+                                    @NotNull Supplier<String> logName) {
         try {
             final int pollingInSeconds = 1;
             final int poolingTimeout = Math.toIntExact(TimeUnit.HOURS.toSeconds(1));
@@ -428,9 +431,9 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     }
 
     @NotNull
-    private Function<JobWithDetails, com.offbytwo.jenkins.model.Build> getBuildForType(BuildType buildType) {
+    private Function<JobWithDetails, com.offbytwo.jenkins.model.Build> getBuildForType(BuildTypeEnum buildTypeEnum) {
         final Function<JobWithDetails, com.offbytwo.jenkins.model.Build> buildProvider;
-        switch (buildType) {
+        switch (buildTypeEnum) {
             case LAST_SUCCESSFUL:
                 buildProvider = JobWithDetails::getLastSuccessfulBuild;
                 break;
@@ -462,7 +465,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
 
     @Override
     public List<TestResult> loadTestResultsFor(Job job) {
-        return loadTestResultsFor(getBuildForType(BuildType.LAST).apply(getJob(job)));
+        return loadTestResultsFor(getBuildForType(BuildTypeEnum.LAST).apply(getJob(job)));
     }
 
     @Override
@@ -495,7 +498,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
             return Collections.emptyList();
         }
         final URL url = urlBuilder.createComputerUrl(settings.getServerUrl());
-        return jenkinsParser.createComputers(securityClient.execute(url));
+        return jenkinsParser.createComputers(jenkinsSecurityClient.execute(url));
     }
 
     @NotNull
@@ -510,7 +513,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     @NotNull
     private List<String> getFillValueItems(Job job, String parameterClassName, String parameterName) {
         final URL url = urlBuilder.createFillValueItemsUrl(job.getUrl(), parameterClassName, parameterName);
-        return jenkinsParser.getFillValueItems(securityClient.execute(url));
+        return jenkinsParser.getFillValueItems(jenkinsSecurityClient.execute(url));
     }
 
     @NotNull
@@ -547,8 +550,8 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         return connectionTimoutInSeconds * 1000;
     }
 
-    void setSecurityClient(SecurityClient securityClient) {
-        this.securityClient = securityClient;
+    void setSecurityClient(JenkinsSecurityClient jenkinsSecurityClient) {
+        this.jenkinsSecurityClient = jenkinsSecurityClient;
     }
 
     @VisibleForTesting

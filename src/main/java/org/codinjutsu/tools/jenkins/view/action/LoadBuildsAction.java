@@ -8,8 +8,8 @@ import com.intellij.openapi.project.Project;
 import org.codinjutsu.tools.jenkins.logic.JenkinsBackgroundTask;
 import org.codinjutsu.tools.jenkins.logic.JenkinsBackgroundTaskFactory;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
-import org.codinjutsu.tools.jenkins.model.Job;
-import org.codinjutsu.tools.jenkins.model.JobType;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
 import org.codinjutsu.tools.jenkins.view.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +21,7 @@ public class LoadBuildsAction extends AnAction implements DumbAware {
     public static final String ACTION_ID = "Jenkins.LoadBuilds";
 
     public static boolean isAvailable(@Nullable Job job) {
-        return job != null && job.getJobType() == JobType.JOB;
+        return job != null && job.getJobTypeEnum() == JobTypeEnum.JOB;
     }
 
     @Override

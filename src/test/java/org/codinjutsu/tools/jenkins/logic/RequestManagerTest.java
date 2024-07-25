@@ -27,11 +27,12 @@ import org.assertj.core.api.Assertions;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.exception.ConfigurationException;
-import org.codinjutsu.tools.jenkins.model.BuildType;
-import org.codinjutsu.tools.jenkins.model.Computer;
-import org.codinjutsu.tools.jenkins.model.Jenkins;
-import org.codinjutsu.tools.jenkins.model.Job;
-import org.codinjutsu.tools.jenkins.security.SecurityClient;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Computer;
+import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.security.JenkinsSecurityClient;
 import org.codinjutsu.tools.jenkins.util.IOUtils;
 import org.codinjutsu.tools.jenkins.util.MockUtil;
 import org.jetbrains.annotations.NotNull;
@@ -68,7 +69,7 @@ public class RequestManagerTest {
     private JenkinsSettings jenkinsSettings;
 
     @Mock
-    private SecurityClient securityClientMock;
+    private JenkinsSecurityClient jenkinsSecurityClientMock;
 
     @Mock
     private UrlBuilder urlBuilderMock;
@@ -86,13 +87,13 @@ public class RequestManagerTest {
     @Mock
     private com.offbytwo.jenkins.model.Build lastFailedBuild;
     @Mock
-    private org.codinjutsu.tools.jenkins.model.Build runningBuildModel;
+    private Build runningBuildModel;
     @Mock
-    private org.codinjutsu.tools.jenkins.model.Build lastCompletedBuildModel;
+    private Build lastCompletedBuildModel;
     @Mock
-    private org.codinjutsu.tools.jenkins.model.Build lastSuccessfulBuildModel;
+    private Build lastSuccessfulBuildModel;
     @Mock
-    private org.codinjutsu.tools.jenkins.model.Build lastFailedBuildModel;
+    private Build lastFailedBuildModel;
 
     private AutoCloseable mocks;
 
@@ -105,7 +106,7 @@ public class RequestManagerTest {
                 .thenReturn(urlFromConf);
         when(urlBuilderMock.createViewUrl(any(JenkinsPlateform.class), anyString()))
                 .thenReturn(urlFromJenkins);
-        when(securityClientMock.execute(urlFromConf))
+        when(jenkinsSecurityClientMock.execute(urlFromConf))
                 .thenReturn(IOUtils.toString(getClass().getResourceAsStream("JsonRequestManager_loadJenkinsWorkspaceWithIncorrectPortInTheResponse.json")));
         try {
             requestManager.loadJenkinsWorkspace(configuration, jenkinsSettings);
@@ -124,7 +125,7 @@ public class RequestManagerTest {
                 .thenReturn(urlFromConf);
         when(urlBuilderMock.createViewUrl(any(JenkinsPlateform.class), anyString()))
                 .thenReturn(urlFromJenkins);
-        when(securityClientMock.execute(urlFromConf))
+        when(jenkinsSecurityClientMock.execute(urlFromConf))
                 .thenReturn(IOUtils.toString(getClass().getResourceAsStream("JsonRequestManager_loadJenkinsWorkspaceWithIncorrectHostInTheResponse.json")));
         try {
             requestManager.loadJenkinsWorkspace(configuration, jenkinsSettings);
@@ -147,7 +148,7 @@ public class RequestManagerTest {
                 .thenReturn(urlFromConf);
         when(urlBuilderMock.createViewUrl(any(JenkinsPlateform.class), anyString()))
                 .thenReturn(urlFromJenkins);
-        when(securityClientMock.execute(urlFromConf))
+        when(jenkinsSecurityClientMock.execute(urlFromConf))
                 .thenReturn(IOUtils.toString(getClass().getResourceAsStream("JsonRequestManager_loadJenkinsWorkspaceWithIncorrectPortInTheResponse.json")));
         final Jenkins jenkins = requestManager.loadJenkinsWorkspace(configuration, jenkinsSettings);
         Assertions.assertThat(jenkins.getServerUrl()).isEqualTo(serverUrl);
@@ -159,7 +160,7 @@ public class RequestManagerTest {
         final URL computerUrl = new URL("http://myjenkins:8080/computer");
         setServerUrl(serverUrl);
         when(urlBuilderMock.createComputerUrl(serverUrl)).thenReturn(computerUrl);
-        when(securityClientMock.execute(computerUrl))
+        when(jenkinsSecurityClientMock.execute(computerUrl))
                 .thenReturn(IOUtils.toString(getClass().getResourceAsStream("JsonRequestManager_computer.json")));
         final List<Computer> computers = requestManager.loadComputer(configuration);
         assertThat(computers).hasSize(2);
@@ -168,7 +169,7 @@ public class RequestManagerTest {
     @Test
     public void loadConsoleTextForRunningBuild() {
         final var job = createJobWithBuilds(runningBuild);
-        final var buildOutput = loadConsoleTextFor(job, BuildType.LAST);
+        final var buildOutput = loadConsoleTextFor(job, BuildTypeEnum.LAST);
         assertThat(buildOutput.getLog()).isEqualTo(RUNNING_CONSOLE_OUTPUT);
         assertThat(buildOutput.getBuild()).isEqualTo(runningBuildModel);
     }
@@ -176,7 +177,7 @@ public class RequestManagerTest {
     @Test
     public void loadConsoleTextForLastBuild() {
         final var job = createJobWithBuilds();
-        final var buildOutput = loadConsoleTextFor(job, BuildType.LAST);
+        final var buildOutput = loadConsoleTextFor(job, BuildTypeEnum.LAST);
         assertThat(buildOutput.getLog()).isEqualTo(COMPLETED_CONSOLE_OUTPUT);
         assertThat(buildOutput.getBuild()).isEqualTo(lastCompletedBuildModel);
     }
@@ -184,7 +185,7 @@ public class RequestManagerTest {
     @Test
     public void loadConsoleTextForLastSuccessfulBuild() {
         final var job = createJobWithBuilds();
-        final var buildOutput = loadConsoleTextFor(job, BuildType.LAST_SUCCESSFUL);
+        final var buildOutput = loadConsoleTextFor(job, BuildTypeEnum.LAST_SUCCESSFUL);
         assertThat(buildOutput.getLog()).isEqualTo(SUCCESSFUL_CONSOLE_OUTPUT);
         assertThat(buildOutput.getBuild()).isEqualTo(lastSuccessfulBuildModel);
     }
@@ -192,19 +193,19 @@ public class RequestManagerTest {
     @Test
     public void loadConsoleTextForLastFailedBuild() {
         final var job = createJobWithBuilds();
-        final var buildOutput = loadConsoleTextFor(job, BuildType.LAST_FAILED);
+        final var buildOutput = loadConsoleTextFor(job, BuildTypeEnum.LAST_FAILED);
         assertThat(buildOutput.getLog()).isEqualTo(FAILED_CONSOLE_OUTPUT);
         assertThat(buildOutput.getBuild()).isEqualTo(lastFailedBuildModel);
     }
 
     @SneakyThrows
-    private BuildLogResult loadConsoleTextFor(Job job, BuildType buildType) {
+    private BuildLogResult loadConsoleTextFor(Job job, BuildTypeEnum buildTypeEnum) {
         final var completableFuture = new CompletableFuture<BuildLogResult>();
         final var result = new StringBuilder();
-        final var buildForLog = new AtomicReference<org.codinjutsu.tools.jenkins.model.Build>();
-        requestManager.loadConsoleTextFor(job, buildType, new RequestManager.BuildLogConsoleStreamListener() {
+        final var buildForLog = new AtomicReference<Build>();
+        requestManager.loadConsoleTextFor(job, buildTypeEnum, new RequestManager.BuildLogConsoleStreamListener() {
             @Override
-            public void forBuild(org.codinjutsu.tools.jenkins.model.Build build) {
+            public void forBuild(Build build) {
                 buildForLog.set(build);
             }
 
@@ -260,7 +261,7 @@ public class RequestManagerTest {
 
         project = MockUtil.mockProject(configuration, jenkinsSettings, urlBuilderMock);
         requestManager = Mockito.spy(new RequestManager(project));
-        requestManager.setSecurityClient(securityClientMock);
+        requestManager.setSecurityClient(jenkinsSecurityClientMock);
         requestManager.setJenkinsServer(jenkinsServer);
 
         when(urlBuilderMock.toUrl(anyString())).thenCallRealMethod();
@@ -308,7 +309,7 @@ public class RequestManagerTest {
 
     @Value
     private static class BuildLogResult {
-        private org.codinjutsu.tools.jenkins.model.Build build;
+        private Build build;
         private String log;
 
     }

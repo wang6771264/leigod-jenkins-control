@@ -1,7 +1,7 @@
 package org.codinjutsu.tools.jenkins.view;
 
 import org.codinjutsu.tools.jenkins.JenkinsTree;
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.view.action.JobAction;
 import org.jetbrains.annotations.NotNull;
 

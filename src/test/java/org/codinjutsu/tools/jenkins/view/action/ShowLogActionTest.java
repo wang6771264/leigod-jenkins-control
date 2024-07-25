@@ -5,9 +5,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
-import org.codinjutsu.tools.jenkins.model.BuildType;
-import org.codinjutsu.tools.jenkins.model.Job;
-import org.codinjutsu.tools.jenkins.model.JobType;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
 import org.codinjutsu.tools.jenkins.view.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
@@ -28,28 +28,28 @@ public class ShowLogActionTest {
 
     @Test
     public void getActionTextForLastBuild() {
-        final ShowLogAction.ShowLogActionText lastLog = ShowLogAction.getActionText(BuildType.LAST);
+        final ShowLogAction.ShowLogActionText lastLog = ShowLogAction.getActionText(BuildTypeEnum.LAST);
         assertThat(lastLog.getText()).isEqualTo("Show last log");
         assertThat(lastLog.getDescription()).isEqualTo("Show last build's log");
     }
 
     @Test
     public void getActionTextForLastSuccessfulBuild() {
-        final ShowLogAction.ShowLogActionText lastLog = ShowLogAction.getActionText(BuildType.LAST_SUCCESSFUL);
+        final ShowLogAction.ShowLogActionText lastLog = ShowLogAction.getActionText(BuildTypeEnum.LAST_SUCCESSFUL);
         assertThat(lastLog.getText()).isEqualTo("Show last successful log");
         assertThat(lastLog.getDescription()).isEqualTo("Show last successful build's log");
     }
 
     @Test
     public void getActionTextForLastFailedBuild() {
-        final ShowLogAction.ShowLogActionText lastLog = ShowLogAction.getActionText(BuildType.LAST_FAILED);
+        final ShowLogAction.ShowLogActionText lastLog = ShowLogAction.getActionText(BuildTypeEnum.LAST_FAILED);
         assertThat(lastLog.getText()).isEqualTo("Show last failed log");
         assertThat(lastLog.getDescription()).isEqualTo("Show last failed build's log");
     }
 
     @Test
     public void updateForJobIsInQueue() {
-        final ShowLogAction showLogAction = new ShowLogAction(BuildType.LAST);
+        final ShowLogAction showLogAction = new ShowLogAction(BuildTypeEnum.LAST);
         final Job jobInQueue = createDefaultJobBuilder().inQueue(true).build();
         when(browserPanel.getSelectedJob()).thenReturn(jobInQueue);
         showLogAction.update(actionEvent);
@@ -58,7 +58,7 @@ public class ShowLogActionTest {
 
     @Test
     public void updateForNoSelectedJob() {
-        final ShowLogAction showLogAction = new ShowLogAction(BuildType.LAST);
+        final ShowLogAction showLogAction = new ShowLogAction(BuildTypeEnum.LAST);
         when(browserPanel.getSelectedJob()).thenReturn(null);
         showLogAction.update(actionEvent);
         verify(presentation).setVisible(false);
@@ -66,7 +66,7 @@ public class ShowLogActionTest {
 
     @Test
     public void updateForNonBuildableJob() {
-        final ShowLogAction showLogAction = new ShowLogAction(BuildType.LAST);
+        final ShowLogAction showLogAction = new ShowLogAction(BuildTypeEnum.LAST);
         final Job jobNotBuildable = createDefaultJobBuilder().inQueue(true).build();
         when(browserPanel.getSelectedJob()).thenReturn(jobNotBuildable);
         showLogAction.update(actionEvent);
@@ -75,7 +75,7 @@ public class ShowLogActionTest {
 
     @Test
     public void updateForLastLogAvailable() {
-        final ShowLogAction showLogAction = new ShowLogAction(BuildType.LAST);
+        final ShowLogAction showLogAction = new ShowLogAction(BuildTypeEnum.LAST);
         showLogAction.update(actionEvent);
         verify(presentation).setVisible(true);
     }
@@ -83,26 +83,26 @@ public class ShowLogActionTest {
     @Test
     public void updateForLastLogNotAvailable() {
         final Job jobWithoutBuildType = createDefaultJobBuilder().inQueue(true)
-                .availableBuildTypes(EnumSet.of(BuildType.LAST_SUCCESSFUL))
+                .availableBuildTypeEnums(EnumSet.of(BuildTypeEnum.LAST_SUCCESSFUL))
                 .build();
         when(browserPanel.getSelectedJob()).thenReturn(jobWithoutBuildType);;
-        final ShowLogAction showLogAction = new ShowLogAction(BuildType.LAST);
+        final ShowLogAction showLogAction = new ShowLogAction(BuildTypeEnum.LAST);
         showLogAction.update(actionEvent);
         verify(presentation).setVisible(false);
     }
 
     @Test
     public void updateForLastSuccessfulLog() {
-        final ShowLogAction showLogAction = new ShowLogAction(BuildType.LAST_SUCCESSFUL);
+        final ShowLogAction showLogAction = new ShowLogAction(BuildTypeEnum.LAST_SUCCESSFUL);
         showLogAction.update(actionEvent);
         verify(presentation).setVisible(true);
     }
 
     @Test
     public void updateForLastSuccessfulLogNotAvailable() {
-        final ShowLogAction showLogAction = new ShowLogAction(BuildType.LAST_SUCCESSFUL);
+        final ShowLogAction showLogAction = new ShowLogAction(BuildTypeEnum.LAST_SUCCESSFUL);
         final Job jobWithoutBuildType = createDefaultJobBuilder().inQueue(true)
-                .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                .availableBuildTypeEnums(EnumSet.of(BuildTypeEnum.LAST))
                 .build();
         when(browserPanel.getSelectedJob()).thenReturn(jobWithoutBuildType);
         showLogAction.update(actionEvent);
@@ -111,7 +111,7 @@ public class ShowLogActionTest {
 
     @Test
     public void updateForLastFailedLog() {
-        final ShowLogAction showLogAction = new ShowLogAction(BuildType.LAST_FAILED);
+        final ShowLogAction showLogAction = new ShowLogAction(BuildTypeEnum.LAST_FAILED);
         showLogAction.update(actionEvent);
         verify(presentation).setVisible(true);
     }
@@ -119,10 +119,10 @@ public class ShowLogActionTest {
     @Test
     public void updateForLastFailedLogNotAvailable() {
         final Job jobWithoutBuildType = createDefaultJobBuilder().inQueue(true)
-                .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                .availableBuildTypeEnums(EnumSet.of(BuildTypeEnum.LAST))
                 .build();
         when(browserPanel.getSelectedJob()).thenReturn(jobWithoutBuildType);
-        final ShowLogAction showLogAction = new ShowLogAction(BuildType.LAST_FAILED);
+        final ShowLogAction showLogAction = new ShowLogAction(BuildTypeEnum.LAST_FAILED);
         showLogAction.update(actionEvent);
         verify(presentation).setVisible(false);
     }
@@ -139,8 +139,8 @@ public class ShowLogActionTest {
 
     @NotNull
     private static Job.JobBuilder createDefaultJobBuilder() {
-        return Job.builder().name("Test").jobType(JobType.JOB).displayName("DisplayName")
+        return Job.builder().name("Test").jobTypeEnum(JobTypeEnum.JOB).displayName("DisplayName")
                 .fullName("FullName").url("http://url-to-test.com").inQueue(false).buildable(true)
-                .availableBuildTypes(EnumSet.allOf(BuildType.class));
+                .availableBuildTypeEnums(EnumSet.allOf(BuildTypeEnum.class));
     }
 }

@@ -14,30 +14,33 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.jenkins.security;
+package org.codinjutsu.tools.jenkins.model.jenkins;
 
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.protocol.HttpContext;
-import org.codinjutsu.tools.jenkins.model.RequestData;
+import lombok.Singular;
+import lombok.Value;
+import lombok.experimental.NonFinal;
+import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
-public interface SecurityClient {
+@Value
+@NonFinal
+@SuperBuilder(toBuilder = true)
+public class View {
 
+    @NotNull
+    private final String name;
+    //TODO URL shoud be changed to object representing URL
     @Nullable
-    String connect(URL jenkinsUrl);
+    private final String url;
+    private final boolean isNested;
+    @NotNull
+    @Singular
+    private final List<View> subViews;
 
-    default String execute(URL url) {
-        return execute(url, Collections.emptySet()).getData();
+    public boolean hasNestedView() {
+        return !subViews.isEmpty();
     }
-
-    @NotNull Response execute(URL url, @NotNull Collection<RequestData> data);
-
-    @NotNull HttpContext getHttpClientContext();
-
-    @NotNull CloseableHttpClient getHttpClient();
 }

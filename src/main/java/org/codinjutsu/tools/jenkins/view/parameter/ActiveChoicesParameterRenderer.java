@@ -1,8 +1,8 @@
 package org.codinjutsu.tools.jenkins.view.parameter;
 
-import org.codinjutsu.tools.jenkins.model.JobParameter;
-import org.codinjutsu.tools.jenkins.model.JobParameterType;
-import org.codinjutsu.tools.jenkins.model.ProjectJob;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
+import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderers;
 import org.jetbrains.annotations.NonNls;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import static org.codinjutsu.tools.jenkins.model.JobParameterType.createTypeForClassPrefix;
+import static org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType.createTypeForClassPrefix;
 
 public class ActiveChoicesParameterRenderer implements JobParameterRenderer {
 

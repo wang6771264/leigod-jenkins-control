@@ -17,7 +17,9 @@
 package org.codinjutsu.tools.jenkins.logic;
 
 import org.assertj.core.util.Lists;
-import org.codinjutsu.tools.jenkins.model.*;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.*;
 import org.codinjutsu.tools.jenkins.util.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -28,8 +30,8 @@ import java.util.*;
 import java.util.function.UnaryOperator;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.codinjutsu.tools.jenkins.model.BuildStatusEnum.FAILURE;
-import static org.codinjutsu.tools.jenkins.model.BuildStatusEnum.SUCCESS;
+import static org.codinjutsu.tools.jenkins.enums.BuildStatusEnum.FAILURE;
+import static org.codinjutsu.tools.jenkins.enums.BuildStatusEnum.SUCCESS;
 
 public class JenkinsJsonParserTest {
 
@@ -97,20 +99,20 @@ public class JenkinsJsonParserTest {
         expectedJobs.add(new JobBuilder().job("sql-tools", "blue", "http://myjenkins/job/sql-tools/", true, true)
                 .lastBuild("http://myjenkins/job/sql-tools/15/", 15, SUCCESS.getStatus(), false, "2012-04-02_15-26-29", 1477640156281l, 4386421l)
                 .health("health-80plus", "0 tests en echec sur un total de 24 tests")
-                .availableBuildTypes(EnumSet.of(BuildType.LAST)).get());
+                .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST)).get());
         expectedJobs.add(new JobBuilder().job("db-utils", "grey", "http://myjenkins/job/db-utils/", false, true).get());
         expectedJobs.add(new JobBuilder().job("myapp", "red", "http://myjenkins/job/myapp/", false, true)
                 .lastBuild("http://myjenkins/job/myapp/12/", 12, FAILURE.getStatus(), true, "2012-04-02_16-26-29", 1477640156281l, 4386421l)
                 .health("health-00to19", "24 tests en echec sur un total de 24 tests")
                 .parameter("param1", "ChoiceParameterDefinition", "value1", "value1", "value2", "value3")
                 .parameter("runIntegrationTest", "BooleanParameterDefinition", null)
-                .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                 .get());
         expectedJobs.add(new JobBuilder().job("swing-utils", "disabled", "http://myjenkins/job/swing-utils/", true, false)
                 .lastBuild("http://myjenkins/job/swing-utils/5/", 5, FAILURE.getStatus(), false, "2012-04-02_10-26-29", 1477640156281l, 4386421l)
                 .health("health20to39", "0 tests en echec sur un total de 24 tests")
                 .parameter("dummyParam", "DummyParameterDefinition", null)
-                .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                 .get());
 
         assertThat(actualJobs).containsAll(expectedJobs);
@@ -125,7 +127,7 @@ public class JenkinsJsonParserTest {
                 .lastBuild("http://myjenkins/job/swing-utils/5/", 5, FAILURE.getStatus(), false, "2012-04-02_10-26-29", 1477640156281l, 4386421l)
                 .health("health20to39", "0 tests en echec sur un total de 24 tests")
                 .parameter("dummyParam", "DummyParameterDefinition", null)
-                .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                 .get());
 
         assertThat(actualJobs).containsAll(expectedJobs);
@@ -167,20 +169,20 @@ public class JenkinsJsonParserTest {
                 new JobBuilder().job("sql-tools", "blue", "http://myjenkins/job/sql-tools/", true, true)
                         .lastBuild("http://myjenkins/job/sql-tools/15/", 15, SUCCESS.getStatus(), false, "2012-04-02_15-26-29", 1477640156281l, 4386421l)
                         .health("health-80plus", "0 tests en echec sur un total de 24 tests")
-                        .availableBuildTypes(EnumSet.of(BuildType.LAST)).get(),
+                        .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST)).get(),
                 new JobBuilder().job("db-utils", "grey", "http://myjenkins/job/db-utils/", false, true).get(),
                 new JobBuilder().job("myapp", "red", "http://myjenkins/job/myapp/", false, true)
                         .lastBuild("http://myjenkins/job/myapp/12/", 12, FAILURE.getStatus(), true, "2012-04-02_16-26-29", 1477640156281l, 4386421l)
                         .health("health-00to19", "24 tests en echec sur un total de 24 tests")
                         .parameter("param1", "ChoiceParameterDefinition", "value1", "value1", "value2", "value3")
                         .parameter("runIntegrationTest", "BooleanParameterDefinition", null)
-                        .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                        .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                         .get(),
                 new JobBuilder().job("swing-utils", "disabled", "http://myjenkins/job/swing-utils/", true, false)
                         .lastBuild("http://myjenkins/job/swing-utils/5/", 5, FAILURE.getStatus(), false, "2012-04-02_10-26-29", 1477640156281l, 4386421l)
                         .health("health20to39", "0 tests en echec sur un total de 24 tests")
                         .parameter("dummyParam", "DummyParameterDefinition", null)
-                        .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                        .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                         .get());
 
         assertThat(actualJobs).containsAll(expectedJobs);
@@ -252,7 +254,7 @@ public class JenkinsJsonParserTest {
                 .fullDisplayName("config-provider-model")
                 .lastBuild("http://ci.jenkins-ci.org/job/config-provider-model/8/", 8, "SUCCESS", false, "2012-04-02_16-26-29", 1477640156281l, 4386421l)
                 .health("health-80plus", "0 tests en echec sur un total de 24 tests")
-                .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                 .get();
         assertThat(actualJob).isEqualTo(expectedJob);
     }
@@ -265,7 +267,7 @@ public class JenkinsJsonParserTest {
                 .fullDisplayName("config-provider-model-full")
                 .lastBuild("http://ci.jenkins-ci.org/job/config-provider-model/8/", 8, "SUCCESS", false, "2012-04-02_16-26-29", 1477640156281l, 4386421l)
                 .health("health-80plus", "0 tests en echec sur un total de 24 tests")
-                .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                 .get();
         assertThat(actualJob).isEqualTo(expectedJob);
     }
@@ -278,7 +280,7 @@ public class JenkinsJsonParserTest {
                 .fullDisplayName("config-provider-model-full")
                 .lastBuild("http://ci.jenkins-ci.org/job/config-provider-model/8/", 8, "SUCCESS", false, "2012-04-02_16-26-29", 1477640156281l, 4386421l)
                 .health("health-80plus", "0 tests en echec sur un total de 24 tests")
-                .availableBuildTypes(EnumSet.allOf(BuildType.class))
+                .availableBuildTypes(EnumSet.allOf(BuildTypeEnum.class))
                 .get();
         assertThat(actualJob).isEqualTo(expectedJob);
     }
@@ -291,7 +293,7 @@ public class JenkinsJsonParserTest {
                 .fullDisplayName("config-provider-model-full")
                 .lastBuild("http://ci.jenkins-ci.org/job/config-provider-model/8/", 8, "SUCCESS", false, "2012-04-02_16-26-29", 1477640156281l, 4386421l)
                 .health("health-80plus", "0 tests en echec sur un total de 24 tests")
-                .availableBuildTypes(EnumSet.of(BuildType.LAST, BuildType.LAST_SUCCESSFUL))
+                .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST, BuildTypeEnum.LAST_SUCCESSFUL))
                 .get();
         assertThat(actualJob).isEqualTo(expectedJob);
     }
@@ -317,7 +319,7 @@ public class JenkinsJsonParserTest {
                 .displayName("Simple Jenkins Test")
                 .fullName("Parent/Simple Jenkins Test")
                 .fullDisplayName("Parent -> Simple Jenkins Test")
-                .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                 .get();
         assertThat(actualJob).isEqualTo(expected);
     }
@@ -332,7 +334,7 @@ public class JenkinsJsonParserTest {
                         .job("abris", "blue", "http://jenkins.home.lobach.info:8080/job/abris/", false, true)
                         .lastBuild("http://jenkins.home.lobach.info:8080/job/abris/80/", 80, "SUCCESS", false, "2012-11-04_14-56-10", 1477640156281l, 4386421l)
                         .health("health-20to39", "Clover Coverage: Elements 23% (4292/18940)")
-                        .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                        .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                         .get(),
                 new JobBuilder()
                         .job("php-template", "disabled", "http://jenkins.home.lobach.info:8080/job/php-template/", false, false)
@@ -341,7 +343,7 @@ public class JenkinsJsonParserTest {
                         .job("zfImageFilter", "blue", "http://jenkins.home.lobach.info:8080/job/zfImageFilter/", false, true)
                         .lastBuild("http://jenkins.home.lobach.info:8080/job/zfImageFilter/14/", 14, "SUCCESS", false, "2011-10-13_11-16-52", 1477640156281l, 4386421l)
                         .health("health-00to19", "Clover Coverage: Statements 7% (10/136)")
-                        .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                        .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                         .get()
 
         );
@@ -367,7 +369,7 @@ public class JenkinsJsonParserTest {
                         .parameter("parameterWithNullAsDefaultValue", "TextParameterDefinition", null)
                         .parameter("runner", "RunParameterDefinition", null)
                         .parameter("tag", "ListSubversionTagsParameterDefinition", null)
-                        .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                        .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                         .get()
 
         );
@@ -382,7 +384,7 @@ public class JenkinsJsonParserTest {
         final Job expectedJob = new JobBuilder()
                 .job("test", "blue", "http://localhost/job/test/", false, true)
                 .lastBuild(buildUrl, 8, "SUCCESS", false, "2012-04-02_16-26-29", 1477640156281l, 4386421l)
-                .availableBuildTypes(EnumSet.of(BuildType.LAST))
+                .availableBuildTypes(EnumSet.of(BuildTypeEnum.LAST))
                 .get();
         assertThat(actualJob).isNotNull();
         final Build lastBuild = actualJob.getLastBuild();

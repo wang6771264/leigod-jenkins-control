@@ -26,7 +26,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.config.Storage.PropertiesComponentStorage;
-import org.codinjutsu.tools.jenkins.model.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.jetbrains.annotations.NotNull;
 
 public class BuildTestConsoleProperties extends TestConsoleProperties implements SMCustomMessagesParsing {

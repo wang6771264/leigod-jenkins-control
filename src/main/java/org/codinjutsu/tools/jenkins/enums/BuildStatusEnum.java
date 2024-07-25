@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.enums;
 
 import com.intellij.openapi.diagnostic.Logger;
 import lombok.RequiredArgsConstructor;
@@ -29,26 +29,26 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor
 public enum BuildStatusEnum {
 
-    FAILURE("Failure", Color.RED),
-    UNSTABLE("Unstable", Color.YELLOW),
-    ABORTED("Aborted", Color.ABORTED),
-    SUCCESS("Success", Color.BLUE),
-    STABLE("Stable", Color.BLUE),
+    FAILURE("Failure", ColorEnum.RED),
+    UNSTABLE("Unstable", ColorEnum.YELLOW),
+    ABORTED("Aborted", ColorEnum.ABORTED),
+    SUCCESS("Success", ColorEnum.BLUE),
+    STABLE("Stable", ColorEnum.BLUE),
     NULL("Null"),
     // TODO: handle the folder-case explicitly. @mcmics: use better Folder Detection
     // instead of simply making it a BuildStatusEnum so that the icon renders
     FOLDER("Folder"),
-    RUNNING("Running", Color.GRAY);
+    RUNNING("Running", ColorEnum.GRAY);
 
 
     private static final Logger log = Logger.getInstance(BuildStatusEnum.class);
 
     private final String status;
-    private final Color color;
+    private final ColorEnum colorEnum;
 
 
     BuildStatusEnum(String status) {
-        this(status, Color.DISABLED);
+        this(status, ColorEnum.DISABLED);
     }
 
     public static BuildStatusEnum parseStatus(String status) {
@@ -74,7 +74,7 @@ public enum BuildStatusEnum {
         }
         BuildStatusEnum[] jobStates = values();
         for (BuildStatusEnum jobStatus : jobStates) {
-            if (jobStatus.getColor().isForJobColor(jobColor)) {
+            if (jobStatus.getColorEnum().isForJobColor(jobColor)) {
                 return jobStatus;
             }
         }
@@ -88,7 +88,7 @@ public enum BuildStatusEnum {
     }
 
     @NotNull
-    public Color getColor() {
-        return color;
+    public ColorEnum getColorEnum() {
+        return colorEnum;
     }
 }

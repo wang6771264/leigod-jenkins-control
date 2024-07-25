@@ -1,5 +1,6 @@
 package org.codinjutsu.tools.jenkins.model;
 
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

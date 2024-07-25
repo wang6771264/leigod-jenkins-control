@@ -1,6 +1,6 @@
 package org.codinjutsu.tools.jenkins.view.action;
 
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface

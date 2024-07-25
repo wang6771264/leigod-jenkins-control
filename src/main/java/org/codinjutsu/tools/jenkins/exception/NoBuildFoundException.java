@@ -1,6 +1,6 @@
 package org.codinjutsu.tools.jenkins.exception;
 
-import org.codinjutsu.tools.jenkins.model.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

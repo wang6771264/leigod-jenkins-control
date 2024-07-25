@@ -1,6 +1,7 @@
 package org.codinjutsu.tools.jenkins.model;
 
 import org.assertj.core.api.Assertions;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.junit.Test;
 
 public class JobTest {

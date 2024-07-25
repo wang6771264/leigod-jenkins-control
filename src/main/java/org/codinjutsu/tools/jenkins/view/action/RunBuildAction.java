@@ -28,9 +28,9 @@ import org.codinjutsu.tools.jenkins.logic.ExecutorService;
 import org.codinjutsu.tools.jenkins.logic.JenkinsBackgroundTask;
 import org.codinjutsu.tools.jenkins.logic.JenkinsBackgroundTaskFactory;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
-import org.codinjutsu.tools.jenkins.model.Build;
-import org.codinjutsu.tools.jenkins.model.BuildType;
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
 import org.codinjutsu.tools.jenkins.view.BrowserPanel;
 import org.codinjutsu.tools.jenkins.view.BuildParamDialog;
@@ -132,7 +132,7 @@ public class RunBuildAction extends AnAction implements DumbAware {
                                 (previousLastBuild == null || previousLastBuild.getNumber() < lastBuild.getNumber());
                         if (isNewerBuild && lastBuild.isBuilding()) {
                             final LogToolWindow logToolWindow = new LogToolWindow(project);
-                            logToolWindow.showLog(BuildType.LAST, job);
+                            logToolWindow.showLog(BuildTypeEnum.LAST, job);
                         }
                     }
                 }).queue();

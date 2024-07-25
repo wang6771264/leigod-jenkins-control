@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.model.jenkins;
 
 import com.intellij.ide.nls.NlsMessages;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.text.DateFormatUtil;
 import lombok.Builder;
 import lombok.Value;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.util.DateUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

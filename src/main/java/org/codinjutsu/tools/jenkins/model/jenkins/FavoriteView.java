@@ -14,29 +14,18 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.model.jenkins;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedList;
-import java.util.List;
+@SuperBuilder
+public class FavoriteView extends View {
 
-/**
- * Computer aka Nodes
- */
-@Builder
-@Data
-public class Computer {
+    private static final String FAVORITE_NAME = "My Favorites";
 
     @NotNull
-    private final String displayName;
-    @NotNull
-    private final String description;
-    @Builder.Default
-    @NotNull
-    private final List<String> labels = new LinkedList<>();
-
-    private final boolean offline;
+    public static FavoriteView create() {
+        return FavoriteView.builder().name(FAVORITE_NAME).isNested(false).build();
+    }
 }

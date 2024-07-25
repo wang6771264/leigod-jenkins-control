@@ -31,17 +31,17 @@ public class SecurityClientFactory {
     }
 
     @NotNull
-    public static SecurityClient basic(String username, String password, String crumbData, int connectionTimout) {
+    public static JenkinsSecurityClient basic(String username, String password, String crumbData, int connectionTimout) {
         return setConnectionProperties(new BasicSecurityClient(username, password, crumbData, connectionTimout));
     }
 
     @NotNull
-    public static SecurityClient none(String crumbData, int connectionTimout) {
+    public static JenkinsSecurityClient none(String crumbData, int connectionTimout) {
         return setConnectionProperties(new DefaultSecurityClient(crumbData, connectionTimout));
     }
 
     @NotNull
-    private static SecurityClient setConnectionProperties(@NotNull DefaultSecurityClient securityClient) {
+    private static JenkinsSecurityClient setConnectionProperties(@NotNull DefaultSecurityClient securityClient) {
         securityClient.setJenkinsVersion(_version);
         return securityClient;
     }

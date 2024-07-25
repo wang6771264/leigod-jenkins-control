@@ -16,7 +16,7 @@
 
 package org.codinjutsu.tools.jenkins.logic;
 
-import org.codinjutsu.tools.jenkins.model.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 
 public class RssBuildStatusVisitor implements BuildStatusVisitor {
 

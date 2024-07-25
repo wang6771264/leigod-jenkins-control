@@ -16,13 +16,14 @@
 
 package org.codinjutsu.tools.jenkins.model;
 
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static org.codinjutsu.tools.jenkins.model.BuildStatusEnum.SUCCESS;
+import static org.codinjutsu.tools.jenkins.enums.BuildStatusEnum.SUCCESS;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.*;
 

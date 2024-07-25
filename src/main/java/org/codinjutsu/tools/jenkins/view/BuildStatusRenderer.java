@@ -1,6 +1,6 @@
 package org.codinjutsu.tools.jenkins.view;
 
-import org.codinjutsu.tools.jenkins.model.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

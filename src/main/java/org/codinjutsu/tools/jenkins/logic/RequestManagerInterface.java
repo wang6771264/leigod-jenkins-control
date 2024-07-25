@@ -3,8 +3,10 @@ package org.codinjutsu.tools.jenkins.logic;
 import com.offbytwo.jenkins.model.TestResult;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.JenkinsSettings;
-import org.codinjutsu.tools.jenkins.model.*;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.*;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
+import org.codinjutsu.tools.jenkins.model.FavoriteJob;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -21,7 +23,7 @@ public interface RequestManagerInterface {
 
     String testAuthenticate(String serverUrl, String username, String password, String crumbData, JenkinsVersion version, int connectionTimoutInSeconds);
 
-    List<Job> loadFavoriteJobs(List<JenkinsSettings.FavoriteJob> favoriteJobs);
+    List<Job> loadFavoriteJobs(List<FavoriteJob> favoriteJobs);
 
     void stopBuild(Build build);
 
@@ -36,7 +38,7 @@ public interface RequestManagerInterface {
 
     List<Build> loadBuilds(Job job);
 
-    void loadConsoleTextFor(Job job, BuildType buildType,
+    void loadConsoleTextFor(Job job, BuildTypeEnum buildTypeEnum,
                             RequestManager.BuildLogConsoleStreamListener buildConsoleStreamListener);
 
     void loadConsoleTextFor(Build build,

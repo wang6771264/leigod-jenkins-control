@@ -24,8 +24,8 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsActions;
 import lombok.Value;
-import org.codinjutsu.tools.jenkins.model.BuildType;
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.view.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,27 +36,27 @@ public class ShowLogAction extends AnAction implements DumbAware {
 
     private static final Icon ICON = AllIcons.Actions.Show;//AllIcons.Nodes.Console
 
-    private final BuildType buildType;
+    private final BuildTypeEnum buildTypeEnum;
 
-    public ShowLogAction(BuildType buildType) {
+    public ShowLogAction(BuildTypeEnum buildTypeEnum) {
         super(ICON);
-        final ShowLogActionText actionText = getActionText(buildType);
+        final ShowLogActionText actionText = getActionText(buildTypeEnum);
         getTemplatePresentation().setText(actionText.getText());
         getTemplatePresentation().setDescription(actionText.getDescription());
-        this.buildType = buildType;
+        this.buildTypeEnum = buildTypeEnum;
     }
 
-    public static boolean isAvailable(@Nullable Job job, @NotNull BuildType buildType) {
+    public static boolean isAvailable(@Nullable Job job, @NotNull BuildTypeEnum buildTypeEnum) {
         return job != null
                 && job.isBuildable()
-                && isLogAvailable(job, buildType)
+                && isLogAvailable(job, buildTypeEnum)
                 && !job.isInQueue();
     }
 
     @NotNull
-    static ShowLogActionText getActionText(BuildType buildType) {
+    static ShowLogActionText getActionText(BuildTypeEnum buildTypeEnum) {
         final ShowLogActionText logActionText;
-        switch (buildType) {
+        switch (buildTypeEnum) {
             case LAST_SUCCESSFUL:
                 logActionText = new ShowLogActionText("Show last successful log", "Show last successful build's log");
                 break;
@@ -70,8 +70,8 @@ public class ShowLogAction extends AnAction implements DumbAware {
         return logActionText;
     }
 
-    private static boolean isLogAvailable(@NotNull Job buildableJob, @NotNull BuildType buildType) {
-        return buildableJob.getAvailableBuildTypes().contains(buildType);
+    private static boolean isLogAvailable(@NotNull Job buildableJob, @NotNull BuildTypeEnum buildTypeEnum) {
+        return buildableJob.getAvailableBuildTypeEnums().contains(buildTypeEnum);
     }
 
     @Override
@@ -84,12 +84,12 @@ public class ShowLogAction extends AnAction implements DumbAware {
         final Job job = browserPanelForAction.getSelectedJob();
         if (job != null) {
             final LogToolWindow logToolWindow = new LogToolWindow(project);
-            logToolWindow.showLog(buildType, job);
+            logToolWindow.showLog(buildTypeEnum, job);
         }
     }
 
     public boolean isAvailable(@Nullable Job job) {
-        return isAvailable(job, buildType);
+        return isAvailable(job, buildTypeEnum);
     }
 
     @Override

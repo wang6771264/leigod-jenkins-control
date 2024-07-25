@@ -45,7 +45,7 @@ import org.apache.http.util.EntityUtils;
 import org.codinjutsu.tools.jenkins.exception.AuthenticationException;
 import org.codinjutsu.tools.jenkins.exception.ConfigurationException;
 import org.codinjutsu.tools.jenkins.logic.JenkinsNotifier;
-import org.codinjutsu.tools.jenkins.model.RequestData;
+import org.codinjutsu.tools.jenkins.model.jenkins.RequestData;
 import org.codinjutsu.tools.jenkins.util.CollectionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +61,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 
-class DefaultSecurityClient implements SecurityClient {
+class DefaultSecurityClient implements JenkinsSecurityClient {
 
     static final Charset CHARSET = StandardCharsets.UTF_8;
     private static final Logger LOG = Logger.getInstance(DefaultSecurityClient.class);

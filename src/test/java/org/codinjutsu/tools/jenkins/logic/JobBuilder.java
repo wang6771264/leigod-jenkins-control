@@ -16,13 +16,16 @@
 
 package org.codinjutsu.tools.jenkins.logic;
 
-import org.codinjutsu.tools.jenkins.model.*;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
 
 public class JobBuilder {
 
@@ -82,8 +85,8 @@ public class JobBuilder {
         return jobBuilder.build();
     }
 
-    public JobBuilder availableBuildTypes(EnumSet<BuildType> buildTypes) {
-         jobBuilder.availableBuildTypes(buildTypes);
+    public JobBuilder availableBuildTypes(EnumSet<BuildTypeEnum> buildTypeEnums) {
+         jobBuilder.availableBuildTypeEnums(buildTypeEnums);
          return this;
     }
 }

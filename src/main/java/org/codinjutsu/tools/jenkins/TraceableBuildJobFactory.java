@@ -1,7 +1,7 @@
 package org.codinjutsu.tools.jenkins;
 
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 
 import java.text.MessageFormat;
 import java.util.Map;

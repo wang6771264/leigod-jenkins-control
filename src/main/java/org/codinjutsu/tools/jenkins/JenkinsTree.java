@@ -13,10 +13,10 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.containers.Convertor;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.val;
-import org.codinjutsu.tools.jenkins.model.Build;
-import org.codinjutsu.tools.jenkins.model.BuildParameter;
-import org.codinjutsu.tools.jenkins.model.Jenkins;
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.BuildParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
 import org.codinjutsu.tools.jenkins.view.*;
 import org.codinjutsu.tools.jenkins.view.action.JobAction;
@@ -117,7 +117,7 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
     @NotNull
     public static DefaultMutableTreeNode fillJobTree(@NotNull Job job, @NotNull DefaultMutableTreeNode jobNode) {
         jobNode.removeAllChildren();
-        if (job.getJobType().containNestedJobs()) {
+        if (job.getJobTypeEnum().containNestedJobs()) {
             job.getNestedJobs().stream().map(JenkinsTree::createJobTree).forEach(jobNode::add);
         } else {
             job.getLastBuilds().stream().map(JenkinsTree::initBuildNode).forEach(jobNode::add);

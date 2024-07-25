@@ -2,8 +2,8 @@ package org.codinjutsu.tools.jenkins.view.extension;
 
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.util.text.StringUtil;
-import org.codinjutsu.tools.jenkins.model.JobParameter;
-import org.codinjutsu.tools.jenkins.model.ProjectJob;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

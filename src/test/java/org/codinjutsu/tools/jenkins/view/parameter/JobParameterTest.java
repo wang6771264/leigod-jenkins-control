@@ -1,10 +1,10 @@
 package org.codinjutsu.tools.jenkins.view.parameter;
 
 import com.intellij.openapi.project.Project;
-import org.codinjutsu.tools.jenkins.model.Job;
-import org.codinjutsu.tools.jenkins.model.JobParameter;
-import org.codinjutsu.tools.jenkins.model.JobParameterType;
-import org.codinjutsu.tools.jenkins.model.ProjectJob;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
+import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

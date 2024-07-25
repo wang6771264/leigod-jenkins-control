@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.model.jenkins;
 
 import org.jetbrains.annotations.NotNull;
 

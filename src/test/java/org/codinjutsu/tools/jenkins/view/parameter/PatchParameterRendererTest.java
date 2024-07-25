@@ -1,9 +1,9 @@
 package org.codinjutsu.tools.jenkins.view.parameter;
 
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import org.codinjutsu.tools.jenkins.model.BuildInJobParameter;
-import org.codinjutsu.tools.jenkins.model.JobParameter;
-import org.codinjutsu.tools.jenkins.model.JobParameterType;
+import org.codinjutsu.tools.jenkins.model.jenkins.BuildInJobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.*;

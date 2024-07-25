@@ -1,8 +1,8 @@
 package org.codinjutsu.tools.jenkins.logic;
 
 import com.intellij.util.ResourceUtil;
-import org.codinjutsu.tools.jenkins.model.Build;
-import org.codinjutsu.tools.jenkins.model.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -9,9 +9,9 @@ import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Lists;
-import org.codinjutsu.tools.jenkins.model.FileParameter;
-import org.codinjutsu.tools.jenkins.model.RequestData;
-import org.codinjutsu.tools.jenkins.model.StringParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.FileParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.RequestData;
+import org.codinjutsu.tools.jenkins.model.jenkins.StringParameter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
@@ -27,11 +27,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.List;
 
-public class DefaultSecurityClientTest {
+public class DefaultJenkinsSecurityClientTest {
 
     private final DefaultSecurityClient securityClient;
 
-    public DefaultSecurityClientTest() throws NoSuchAlgorithmException {
+    public DefaultJenkinsSecurityClientTest() throws NoSuchAlgorithmException {
         securityClient = new DefaultSecurityClient("Crumb", 10, SSLContext.getDefault(), false);
     }
 

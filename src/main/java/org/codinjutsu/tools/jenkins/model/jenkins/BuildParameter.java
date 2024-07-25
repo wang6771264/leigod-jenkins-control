@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.model.jenkins;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

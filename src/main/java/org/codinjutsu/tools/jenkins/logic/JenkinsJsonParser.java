@@ -23,8 +23,11 @@ import com.github.cliftonlabs.json_simple.Jsoner;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import org.apache.commons.lang3.ObjectUtils;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
 import org.codinjutsu.tools.jenkins.exception.JenkinsPluginRuntimeException;
-import org.codinjutsu.tools.jenkins.model.*;
+import org.codinjutsu.tools.jenkins.model.jenkins.*;
 import org.codinjutsu.tools.jenkins.util.DateUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -251,39 +254,39 @@ public class JenkinsJsonParser implements JenkinsParser {
     }
 
     @NotNull
-    private JobType getJobTypeByJenkinsClass(@NotNull String className, @NotNull JobType defaultValue) {
-        final JobType jobType;
+    private JobTypeEnum getJobTypeByJenkinsClass(@NotNull String className, @NotNull JobTypeEnum defaultValue) {
+        final JobTypeEnum jobTypeEnum;
         if (className.endsWith("WorkflowMultiBranchProject")) {
-            jobType = JobType.MULTI_BRANCH;
+            jobTypeEnum = JobTypeEnum.MULTI_BRANCH;
         } else if (className.endsWith("Folder")) {
-            jobType = JobType.FOLDER;
+            jobTypeEnum = JobTypeEnum.FOLDER;
         } else if (className.endsWith(Job.WORKFLOW_JOB)) {
-            jobType = JobType.JOB;
+            jobTypeEnum = JobTypeEnum.JOB;
         } else {
-            jobType = defaultValue;
+            jobTypeEnum = defaultValue;
         }
-        return jobType;
+        return jobTypeEnum;
     }
 
     @NotNull
-    private JobType getJobType(@NotNull JsonObject jobObject) {
-        final JobType jobType;
+    private JobTypeEnum getJobType(@NotNull JsonObject jobObject) {
+        final JobTypeEnum jobTypeEnum;
         final String jenkinsType = jobObject.getStringOrDefault(createJsonKey(CLASS, Job.WORKFLOW_JOB));
-        final JobType defaultValue;
+        final JobTypeEnum defaultValue;
         if (jobObject.containsKey(JOBS)) {
-            defaultValue = JobType.FOLDER;
+            defaultValue = JobTypeEnum.FOLDER;
         } else {
-            defaultValue = JobType.JOB;
+            defaultValue = JobTypeEnum.JOB;
         }
-        jobType = getJobTypeByJenkinsClass(jenkinsType, defaultValue);
-        return jobType;
+        jobTypeEnum = getJobTypeByJenkinsClass(jenkinsType, defaultValue);
+        return jobTypeEnum;
     }
 
     @NotNull
     private Job getJob(JsonObject jsonObject) {
         final String name = getStringNonNull(jsonObject, JOB_NAME);
         final String fullName = getNonNullStringOrDefaultForNull(jsonObject, JOB_FULL_NAME, name);
-        final JobType jobType = getJobType(jsonObject);
+        final JobTypeEnum jobTypeEnum = getJobType(jsonObject);
         final String displayName = getDisplayName(jsonObject);
         final String fullDisplayName = getFullDisplayName(jsonObject);
         final String url = jsonObject.getString(createJsonKey(JOB_URL));
@@ -292,37 +295,33 @@ public class JenkinsJsonParser implements JenkinsParser {
         final boolean inQueue = getBoolean(jsonObject.getBoolean(createJsonKey(JOB_IS_IN_QUEUE)));
 
         JsonArray healths = getArray(jsonObject, JOB_HEALTH);
-        final Job.JobBuilder jobBuilder = Job.builder().name(name).jobType(jobType)
+        final Job.JobBuilder jobBuilder = Job.builder().name(name).jobTypeEnum(jobTypeEnum)
                 .fullName(fullName)
                 .displayName(displayName).fullDisplayName(fullDisplayName)
                 .color(color).url(url).inQueue(inQueue).buildable(buildable)
                 .health(getHealth(healths));
 
-        final EnumSet<BuildType> availableBuildTypes = EnumSet.noneOf(BuildType.class);
+        final EnumSet<BuildTypeEnum> availableBuildTypeEnums = EnumSet.noneOf(BuildTypeEnum.class);
         JsonObject lastBuildObject = (JsonObject) jsonObject.get(JOB_LAST_BUILD);
         Optional.ofNullable(lastBuildObject).map(this::getLastBuild).ifPresent(jobBuilder::lastBuild);
         JsonObject lastCompletedBuildObject = (JsonObject) jsonObject.get(JOB_LAST_COMPLETED_BUILD);
         JsonObject lastSuccessfulBuildObject = (JsonObject) jsonObject.get(JOB_LAST_SUCCESSFUL_BUILD);
         JsonObject lastFailedBuildObject = (JsonObject) jsonObject.get(JOB_LAST_FAILED_BUILD);
-        addBuildType(availableBuildTypes, BuildType.LAST, lastBuildObject);
-        if (!availableBuildTypes.contains(BuildType.LAST)) {
-            addBuildType(availableBuildTypes, BuildType.LAST, lastCompletedBuildObject);
+        addBuildType(availableBuildTypeEnums, BuildTypeEnum.LAST, lastBuildObject);
+        if (!availableBuildTypeEnums.contains(BuildTypeEnum.LAST)) {
+            addBuildType(availableBuildTypeEnums, BuildTypeEnum.LAST, lastCompletedBuildObject);
         }
-        addBuildType(availableBuildTypes, BuildType.LAST_SUCCESSFUL, lastSuccessfulBuildObject);
-        addBuildType(availableBuildTypes, BuildType.LAST_FAILED, lastFailedBuildObject);
-        jobBuilder.availableBuildTypes(availableBuildTypes);
-        com.cdancy.jenkins.rest.JenkinsClient client = com.cdancy.jenkins.rest.JenkinsClient.builder()
-                .endPoint("http://172.31.4.7:8090/jenkins") // Optional. Defaults to http://127.0.0.1:8080
-                .apiToken("118df27d57cb2bd00a8d54675158718729")
-                .build();
+        addBuildType(availableBuildTypeEnums, BuildTypeEnum.LAST_SUCCESSFUL, lastSuccessfulBuildObject);
+        addBuildType(availableBuildTypeEnums, BuildTypeEnum.LAST_FAILED, lastFailedBuildObject);
+        jobBuilder.availableBuildTypeEnums(availableBuildTypeEnums);
         JsonArray parameterProperty = getArray(jsonObject, PARAMETER_PROPERTY);
         jobBuilder.parameters(getParameters(parameterProperty));
         return jobBuilder.build();
     }
 
-    private void addBuildType(@NotNull Collection<BuildType> buildTypes, @NotNull BuildType buildType,
+    private void addBuildType(@NotNull Collection<BuildTypeEnum> buildTypeEnums, @NotNull BuildTypeEnum buildTypeEnum,
                               @Nullable JsonObject buildJsonObject) {
-        Optional.ofNullable(buildJsonObject).ifPresent(o -> buildTypes.add(buildType));
+        Optional.ofNullable(buildJsonObject).ifPresent(o -> buildTypeEnums.add(buildTypeEnum));
     }
 
     @Nullable

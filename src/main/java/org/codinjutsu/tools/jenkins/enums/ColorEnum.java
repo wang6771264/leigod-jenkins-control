@@ -1,10 +1,10 @@
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.enums;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public enum Color {
+public enum ColorEnum {
 
     RED,
     YELLOW,

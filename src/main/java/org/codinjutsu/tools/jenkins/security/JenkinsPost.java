@@ -7,9 +7,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.codinjutsu.tools.jenkins.exception.JenkinsPluginRuntimeException;
-import org.codinjutsu.tools.jenkins.model.FileParameter;
-import org.codinjutsu.tools.jenkins.model.RequestData;
-import org.codinjutsu.tools.jenkins.model.VirtualFilePart;
+import org.codinjutsu.tools.jenkins.model.jenkins.FileParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.RequestData;
+import org.codinjutsu.tools.jenkins.model.jenkins.VirtualFilePart;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

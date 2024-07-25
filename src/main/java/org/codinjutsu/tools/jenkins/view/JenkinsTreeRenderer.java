@@ -26,7 +26,11 @@ import com.intellij.util.text.DateFormatUtil;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Delegate;
-import org.codinjutsu.tools.jenkins.model.*;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -96,11 +100,11 @@ public class JenkinsTreeRenderer extends ColoredTreeCellRenderer {
 
     @NotNull
     private Icon getBuildStatusColor(Job job) {
-        final JobType jobType = job.getJobType();
-        if (jobType == JobType.JOB) {
+        final JobTypeEnum jobTypeEnum = job.getJobTypeEnum();
+        if (jobTypeEnum == JobTypeEnum.JOB) {
             return buildStatusRenderer.renderBuildStatus(BuildStatusEnum.getStatusByColor(job.getColor()));
         }
-        return jobType.getIcon();
+        return jobTypeEnum.getIcon();
     }
 
     @NotNull

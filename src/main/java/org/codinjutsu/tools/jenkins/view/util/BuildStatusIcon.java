@@ -19,7 +19,7 @@ package org.codinjutsu.tools.jenkins.view.util;
 import com.intellij.util.ui.UIUtil;
 import icons.JenkinsControlIcons;
 import org.codinjutsu.tools.jenkins.logic.BuildStatusAggregator;
-import org.codinjutsu.tools.jenkins.model.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.view.BuildStatusRenderer;
 
 import javax.swing.BoxLayout;

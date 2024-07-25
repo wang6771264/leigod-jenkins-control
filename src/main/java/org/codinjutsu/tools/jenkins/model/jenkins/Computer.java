@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.model.jenkins;
 
-import com.intellij.openapi.vfs.VirtualFile;
+import lombok.Builder;
+import lombok.Data;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * Description
- *
- * @author Yuri Novitsky
+ * Computer aka Nodes
  */
-public class VirtualFilePart {
+@Builder
+@Data
+public class Computer {
 
-    private VirtualFile file;
+    @NotNull
+    private final String displayName;
+    @NotNull
+    private final String description;
+    @Builder.Default
+    @NotNull
+    private final List<String> labels = new LinkedList<>();
 
-    public VirtualFilePart(VirtualFile file) {
-        this.file = file;
-    }
-
-    public String getFileName() {
-        return file.getName();
-    }
-
-    public InputStream createInputStream() throws IOException {
-        return file.getInputStream();
-    }
+    private final boolean offline;
 }

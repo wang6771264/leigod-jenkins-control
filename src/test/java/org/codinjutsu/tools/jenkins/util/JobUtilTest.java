@@ -1,18 +1,18 @@
 package org.codinjutsu.tools.jenkins.util;
 
-import org.codinjutsu.tools.jenkins.JenkinsSettings;
-import org.codinjutsu.tools.jenkins.model.Job;
-import org.codinjutsu.tools.jenkins.model.JobType;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
+import org.codinjutsu.tools.jenkins.model.FavoriteJob;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class JobUtilTest {
 
     private static final String FAVORITE_NAME = "Favorite Test";
     private static final String FAVORITE_URL = "http://url-to-favorite.com";
-    private static final JenkinsSettings.FavoriteJob FAVORITE_JOB = new JenkinsSettings.FavoriteJob(FAVORITE_NAME, FAVORITE_URL);
+    private static final FavoriteJob FAVORITE_JOB = new FavoriteJob(FAVORITE_NAME, FAVORITE_URL);
 
     @Test
     public void isFavoriteJobWithDifferentName() {
@@ -35,7 +35,7 @@ public class JobUtilTest {
     @Test
     public void createFavoriteJob() {
         assertThat(JobUtil.createFavoriteJob(createDefaultJob().build()))
-                .isEqualTo(new JenkinsSettings.FavoriteJob("FullName", "http://url-to-test.com"));
+                .isEqualTo(new FavoriteJob("FullName", "http://url-to-test.com"));
     }
 
 
@@ -53,7 +53,7 @@ public class JobUtilTest {
 
     @NotNull
     private Job.JobBuilder createDefaultJob() {
-        return Job.builder().name("Test").jobType(JobType.JOB).displayName("DisplayName")
+        return Job.builder().name("Test").jobTypeEnum(JobTypeEnum.JOB).displayName("DisplayName")
                 .fullName("FullName").url("http://url-to-test.com").inQueue(false).buildable(true);
     }
 }

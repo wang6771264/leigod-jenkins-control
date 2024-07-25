@@ -20,9 +20,9 @@ import lombok.Value;
 import org.codinjutsu.tools.jenkins.logic.JenkinsBackgroundTaskFactory;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
-import org.codinjutsu.tools.jenkins.model.Build;
-import org.codinjutsu.tools.jenkins.model.BuildType;
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,10 +76,10 @@ public class LogToolWindow {
     }
 
     @NotNull
-    static String getTabTitle(BuildType buildType, Job job) {
+    static String getTabTitle(BuildTypeEnum buildTypeEnum, Job job) {
         final String jobName = job.getNameToRenderSingleJob();
         final String buildInfo;
-        switch (buildType) {
+        switch (buildTypeEnum) {
             case LAST_SUCCESSFUL:
                 buildInfo = "(Last Successful)";
                 break;
@@ -98,9 +98,9 @@ public class LogToolWindow {
                 (requestManager, processHandler) -> requestManager.loadConsoleTextFor(build, processHandler));
     }
 
-    public void showLog(BuildType buildType, Job job) {
-        showLog(job::getNameToRenderSingleJob, () -> getTabTitle(buildType, job),
-                (requestManager, processHandler) -> requestManager.loadConsoleTextFor(job, buildType, processHandler));
+    public void showLog(BuildTypeEnum buildTypeEnum, Job job) {
+        showLog(job::getNameToRenderSingleJob, () -> getTabTitle(buildTypeEnum, job),
+                (requestManager, processHandler) -> requestManager.loadConsoleTextFor(job, buildTypeEnum, processHandler));
     }
 
     private void showLog(Supplier<String> tabTitle,

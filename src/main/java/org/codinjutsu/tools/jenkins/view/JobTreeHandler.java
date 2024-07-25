@@ -5,8 +5,8 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
 import lombok.Value;
 import org.codinjutsu.tools.jenkins.JenkinsTree;
-import org.codinjutsu.tools.jenkins.model.Job;
-import org.codinjutsu.tools.jenkins.model.JobType;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
 import org.codinjutsu.tools.jenkins.view.action.LoadBuildsAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,12 +23,12 @@ public class JobTreeHandler implements TreeWillExpandListener {
     @Override
     public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
         getJobForNode(event).filter(job -> job.getLastBuilds().isEmpty())
-                .filter(job -> job.getJobType() == JobType.JOB)
+                .filter(job -> job.getJobTypeEnum() == JobTypeEnum.JOB)
                 .ifPresent(this::expandNode);
     }
 
     private void expandNode(@NotNull Job jobNode) {
-        if (jobNode.getJobType() == JobType.JOB) {
+        if (jobNode.getJobTypeEnum() == JobTypeEnum.JOB) {
             final AnAction action = ActionManager.getInstance().getAction(LoadBuildsAction.ACTION_ID);
             if (action instanceof LoadBuildsAction) {
                 final LoadBuildsAction loadBuildsAction = (LoadBuildsAction) action;

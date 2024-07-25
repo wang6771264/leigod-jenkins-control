@@ -4,8 +4,8 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.ui.playback.commands.ActionCommand;
 import lombok.experimental.UtilityClass;
-import org.codinjutsu.tools.jenkins.model.BuildType;
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.view.BrowserPanel;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +40,7 @@ public class JobActions {
 
     @NotNull
     public static JobAction showLastLog() {
-        return new ShowLog(BuildType.LAST);
+        return new ShowLog(BuildTypeEnum.LAST);
     }
 
     private static class TriggerBuildJob implements JobAction {
@@ -67,8 +67,8 @@ public class JobActions {
 
         private final ShowLogAction action;
 
-        public ShowLog(@NotNull BuildType buildType) {
-            this.action = new ShowLogAction(buildType);
+        public ShowLog(@NotNull BuildTypeEnum buildTypeEnum) {
+            this.action = new ShowLogAction(buildTypeEnum);
         }
 
         @Override

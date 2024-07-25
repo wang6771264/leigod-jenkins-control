@@ -16,7 +16,7 @@
 
 package org.codinjutsu.tools.jenkins.exception;
 
-import org.codinjutsu.tools.jenkins.model.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.model.jenkins;
 
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ObjectUtils;
@@ -24,6 +24,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 import lombok.Value;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +56,7 @@ public class Job {
     private final String name;
     @Builder.Default
     @NotNull
-    private final JobType jobType = JobType.JOB;
+    private final JobTypeEnum jobTypeEnum = JobTypeEnum.JOB;
     private final boolean buildable;
     @Builder.Default
     @Nullable
@@ -87,7 +89,7 @@ public class Job {
     private List<Job> nestedJobs = new LinkedList<>();
     @Builder.Default
     @NotNull
-    private EnumSet<BuildType> availableBuildTypes = EnumSet.noneOf(BuildType.class);
+    private EnumSet<BuildTypeEnum> availableBuildTypeEnums = EnumSet.noneOf(BuildTypeEnum.class);
 
     @NotNull
     public Icon getHealthIcon() {

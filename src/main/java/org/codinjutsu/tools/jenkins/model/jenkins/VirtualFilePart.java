@@ -14,18 +14,31 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.model.jenkins;
 
-import lombok.experimental.SuperBuilder;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.vfs.VirtualFile;
 
-@SuperBuilder
-public class FavoriteView extends View {
+import java.io.IOException;
+import java.io.InputStream;
 
-    private static final String FAVORITE_NAME = "My Favorites";
+/**
+ * Description
+ *
+ * @author Yuri Novitsky
+ */
+public class VirtualFilePart {
 
-    @NotNull
-    public static FavoriteView create() {
-        return FavoriteView.builder().name(FAVORITE_NAME).isNested(false).build();
+    private VirtualFile file;
+
+    public VirtualFilePart(VirtualFile file) {
+        this.file = file;
+    }
+
+    public String getFileName() {
+        return file.getName();
+    }
+
+    public InputStream createInputStream() throws IOException {
+        return file.getInputStream();
     }
 }

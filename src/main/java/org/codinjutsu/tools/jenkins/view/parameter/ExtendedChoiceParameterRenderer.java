@@ -1,8 +1,8 @@
 package org.codinjutsu.tools.jenkins.view.parameter;
 
-import org.codinjutsu.tools.jenkins.model.JobParameter;
-import org.codinjutsu.tools.jenkins.model.JobParameterType;
-import org.codinjutsu.tools.jenkins.model.ProjectJob;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
+import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderers;
 import org.jetbrains.annotations.NonNls;
@@ -35,7 +35,7 @@ public class ExtendedChoiceParameterRenderer implements JobParameterRenderer {
         converter.put(PT_SINGLE_SELECT, JobParameterRenderers::createComboBoxIfChoicesExists);
         converter.put(PT_MULTI_SELECT, JobParameterRenderers::createComboBoxIfChoicesExists);
         converter.put(PT_CHECKBOX, JobParameterRenderers::createComboBoxIfChoicesExists);
-        converter.put(PT_RADIO, JobParameterRenderers::createErrorLabel);
+        converter.put(PT_RADIO, JobParameterRenderers::createTextField);
         converter.put(PT_TEXTBOX, JobParameterRenderers::createTextField);
         converter.put(PT_HIDDEN, (jobParameter, name) -> new JobParameterComponent<>(jobParameter, new JLabel(), false));
     }

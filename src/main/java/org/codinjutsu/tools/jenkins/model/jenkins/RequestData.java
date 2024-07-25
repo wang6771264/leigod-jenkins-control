@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.model;
+package org.codinjutsu.tools.jenkins.model.jenkins;
 
 import com.github.cliftonlabs.json_simple.Jsonable;
 import com.intellij.openapi.diagnostic.Logger;

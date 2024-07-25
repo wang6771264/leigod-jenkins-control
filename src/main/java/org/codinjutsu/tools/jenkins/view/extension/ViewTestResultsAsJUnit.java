@@ -1,7 +1,7 @@
 package org.codinjutsu.tools.jenkins.view.extension;
 
 import com.intellij.openapi.project.Project;
-import org.codinjutsu.tools.jenkins.model.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.view.action.results.BuildTestResultsToolWindow;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
