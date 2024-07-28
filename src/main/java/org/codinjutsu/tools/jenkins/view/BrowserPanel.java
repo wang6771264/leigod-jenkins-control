@@ -252,7 +252,8 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     }
 
     public void loadJob(final Job job) {
-        loadJob(job, j -> {});
+        loadJob(job, j -> {
+        });
     }
 
     public void loadJob(final Job job, Consumer<Job> loadedJob) {
@@ -362,8 +363,8 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     }
 
     private void installActionsInPopupMenu() {
+        //fixme 列表添加菜单
         DefaultActionGroup popupGroup = new DefaultActionGroup("JenkinsPopupAction", true);
-
         final CopyAction copyAction = new CopyAction();
         copyAction.getTemplatePresentation().setText(LangBundle.message("popup.title.copy"));
         copyAction.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
