@@ -83,8 +83,10 @@ public class RunBuildAction extends AnAction implements DumbAware {
         final boolean isBuildable = ActionUtil.getBrowserPanel(event).map(BrowserPanel::getSelectedJob)
                 .map(RunBuildAction::isBuildable).orElse(Boolean.FALSE);
         if (event.getPlace().equals(POPUP_PLACE)) {
+            //菜单选项是否显示
             event.getPresentation().setVisible(isBuildable);
         } else {
+            //菜单选项是否显示
             event.getPresentation().setEnabled(isBuildable);
         }
     }

@@ -24,11 +24,10 @@
                     nonDefaultProject="false"
                     instance="org.codinjutsu.tools.jenkins.settings.ServerConfigurable"/>
         </projectConfigurable>
-
+        <applicationService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsAppSettings"/>
+        <applicationService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsSettings"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.ExecutorService" />
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.LoginService" />
-        <projectService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsAppSettings"/>
-        <projectService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsSettings"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsWindowManager"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.view.JenkinsStatusBarWidget"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.RequestManager"/>

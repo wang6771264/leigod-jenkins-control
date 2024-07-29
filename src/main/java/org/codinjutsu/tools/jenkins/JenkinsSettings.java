@@ -18,6 +18,7 @@ package org.codinjutsu.tools.jenkins;
 
 import com.intellij.credentialStore.CredentialAttributes;
 import com.intellij.ide.passwordSafe.PasswordSafe;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
@@ -35,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @State(name = "Jenkins.Settings", storages = {
-        @Storage(value = "jenkins_setting.xml", roamingType = RoamingType.PER_OS)
+        @Storage(value = "jenkins_share_setting.xml", roamingType = RoamingType.PER_OS)
 })
 public class JenkinsSettings implements PersistentStateComponent<ProjectState> {
 
@@ -43,7 +44,8 @@ public class JenkinsSettings implements PersistentStateComponent<ProjectState> {
     private final ProjectState myState = new ProjectState();
 
     public static JenkinsSettings getSafeInstance(Project project) {
-        JenkinsSettings settings = project.getService(JenkinsSettings.class);
+        JenkinsSettings settings = ApplicationManager.getApplication()
+                .getService(JenkinsSettings.class);
         return settings != null ? settings : new JenkinsSettings();
     }
 

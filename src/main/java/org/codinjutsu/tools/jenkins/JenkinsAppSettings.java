@@ -16,6 +16,7 @@
 
 package org.codinjutsu.tools.jenkins;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
@@ -24,14 +25,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import lombok.Data;
-import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.jetbrains.annotations.NotNull;
 
 @State(
         name = "Jenkins.Application.Settings",
         storages = {
-                @Storage(value = "jenkins_setting.xml", roamingType = RoamingType.PER_OS)
+                @Storage(value = "jenkins_share_setting.xml", roamingType = RoamingType.PER_OS)
         }
 )
 public class JenkinsAppSettings implements PersistentStateComponent<JenkinsAppSettings.State> {
@@ -45,7 +46,8 @@ public class JenkinsAppSettings implements PersistentStateComponent<JenkinsAppSe
     private final State myState = new State();
 
     public static JenkinsAppSettings getSafeInstance(Project project) {
-        JenkinsAppSettings settings = project.getService(JenkinsAppSettings.class);
+        JenkinsAppSettings settings = ApplicationManager.getApplication()
+                .getService(JenkinsAppSettings.class);
         return settings != null ? settings : new JenkinsAppSettings();
     }
 
