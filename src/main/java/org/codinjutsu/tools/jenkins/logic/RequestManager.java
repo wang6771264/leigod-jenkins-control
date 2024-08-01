@@ -330,6 +330,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     public List<Job> loadFavoriteJobs(List<FavoriteJob> favoriteJobs) {
         if (handleNotYetLoggedInState()) return Collections.emptyList();
         final List<Job> jobs = new LinkedList<>();
+        //加载收藏的任务
         for (FavoriteJob favoriteJob : favoriteJobs) {
             jobs.add(loadJob(favoriteJob.getUrl()));
         }
