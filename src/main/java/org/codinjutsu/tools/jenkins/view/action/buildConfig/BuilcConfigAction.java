@@ -46,11 +46,11 @@ import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
  * 描述：构建参数保存操作
  * ==========================
  */
-public class BuilcConfigParamAction extends AnAction implements DumbAware {
+public class BuilcConfigAction extends AnAction implements DumbAware {
 
     public static final String ACTION_ID = "Jenkins.BuildConfig";
     public static final int BUILD_STATUS_UPDATE_DELAY = 1;
-    private static final Logger LOG = Logger.getInstance(BuilcConfigParamAction.class.getName());
+    private static final Logger LOG = Logger.getInstance(BuilcConfigAction.class.getName());
     private static final Consumer<Job> DO_NOTHING = job -> {
     };
 
@@ -83,7 +83,7 @@ public class BuilcConfigParamAction extends AnAction implements DumbAware {
     @Override
     public void update(@NotNull AnActionEvent event) {
         final boolean isBuildable = ActionUtil.getBrowserPanel(event).map(BrowserPanel::getSelectedJob)
-                .map(BuilcConfigParamAction::isBuildable).orElse(Boolean.FALSE);
+                .map(BuilcConfigAction::isBuildable).orElse(Boolean.FALSE);
         if (event.getPlace().equals(POPUP_PLACE)) {
             event.getPresentation().setVisible(isBuildable);
         } else {

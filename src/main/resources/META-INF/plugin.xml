@@ -77,7 +77,7 @@
                 icon="AllIcons.Actions.Suspend">
             <override-text place="GoToAction"/>
         </action>
-        <action id="Jenkins.BuilcConfigParam" class="org.codinjutsu.tools.jenkins.view.action.buildConfig.BuilcConfigParamAction"
+        <action id="Jenkins.BuildConfig" class="org.codinjutsu.tools.jenkins.view.action.buildConfig.BuilcConfigAction"
                 icon="AllIcons.Actions.Execute">
             <override-text place="GoToAction"/>
         </action>
