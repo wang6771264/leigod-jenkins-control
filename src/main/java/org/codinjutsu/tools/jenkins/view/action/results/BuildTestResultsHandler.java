@@ -16,7 +16,7 @@ import jetbrains.buildServer.messages.serviceMessages.TestFailed;
 import org.codinjutsu.tools.jenkins.exception.JenkinsPluginRuntimeException;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
-import org.codinjutsu.tools.jenkins.view.BrowserPanel;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 
 import java.util.Arrays;
 import java.util.Collections;

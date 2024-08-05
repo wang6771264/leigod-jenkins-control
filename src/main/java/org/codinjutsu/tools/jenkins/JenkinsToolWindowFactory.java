@@ -8,7 +8,7 @@ import com.intellij.openapi.wm.ToolWindowType;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
-import org.codinjutsu.tools.jenkins.view.BrowserPanel;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 
 public class JenkinsToolWindowFactory implements ToolWindowFactory, DumbAware {

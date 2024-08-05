@@ -12,7 +12,7 @@ import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
-import org.codinjutsu.tools.jenkins.view.BrowserPanel;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +20,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.util.Optional;
 
-import static org.codinjutsu.tools.jenkins.view.BrowserPanel.POPUP_PLACE;
+import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
 
 public class StopBuildAction extends AnAction implements DumbAware {
     public static final String ACTION_ID = "Jenkins.StopBuild";

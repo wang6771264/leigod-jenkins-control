@@ -1,13 +1,13 @@
-package org.codinjutsu.tools.jenkins.view.parameter;
+package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderers;
+import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.function.BiFunction;
 
 import static org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType.createTypeForClassPrefix;
 
-public class ActiveChoicesParameterRenderer implements JobParameterRenderer {
+public class ActiveChoicesParameterRenderer extends AbstractParameterRenderer implements JobParameterRenderer {
 
     @NonNls
     private static final String TYPE_CLASS_PREFIX = "org.biouno.unochoice.";
@@ -33,9 +33,9 @@ public class ActiveChoicesParameterRenderer implements JobParameterRenderer {
     }
 
     @Override
-    public @NotNull JobParameterComponent render(@NotNull JobParameter jobParameter, @Nullable ProjectJob projectJob) {
-        return converter.getOrDefault(jobParameter.getJobParameterType(), JobParameterRenderers::createErrorLabel)
-                .apply(jobParameter, jobParameter.getDefaultValue());
+    protected JobParameterComponent getJobParameterComponent(JobParameter jobParameter, ProjectJob projectJob, String defaultValue) {
+        return converter.getOrDefault(jobParameter.getJobParameterType(), JobParameterRenderers::createTextField)
+                .apply(jobParameter, defaultValue);
     }
 
     @Override

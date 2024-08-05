@@ -28,7 +28,7 @@ import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBList;
 import org.codinjutsu.tools.jenkins.model.jenkins.FavoriteView;
 import org.codinjutsu.tools.jenkins.model.jenkins.View;
-import org.codinjutsu.tools.jenkins.view.BrowserPanel;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.codinjutsu.tools.jenkins.view.JenkinsViewComboRenderer;
 import org.jetbrains.annotations.NotNull;
 

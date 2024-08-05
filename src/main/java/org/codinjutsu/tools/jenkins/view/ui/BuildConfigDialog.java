@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.jenkins.view.buildConfig;
+package org.codinjutsu.tools.jenkins.view.ui;
 
 import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.application.ApplicationManager;
@@ -126,12 +126,9 @@ public class BuildConfigDialog extends DialogWrapper {
         final AtomicInteger rows = new AtomicInteger(0);
         for (JobParameter jobParameter : parameters) {
             //跳过测试是必然的
-            if (jobParameter.getName().equals("SKIP_TEST")) {
-                continue;
-            }
             final JobParameterRenderer jobParameterRenderer = JobParameterRenderer.findRenderer(jobParameter)
                     .orElseGet(DefaultRenderer::new);
-            final ProjectJob projectJob = ProjectJob.builder().project(project).job(job).build();
+            final ProjectJob projectJob = ProjectJob.builder().project(project).lastBuild(job.getLastBuild()).build();
             final JobParameterComponent<?> jobParameterComponent = jobParameterRenderer.render(jobParameter, projectJob);
 
             if (jobParameterComponent.isVisible()) {

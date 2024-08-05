@@ -1,18 +1,18 @@
-package org.codinjutsu.tools.jenkins.view.parameter;
+package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderers;
+import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class GitParameterRenderer implements JobParameterRenderer {
+public class GitParameterRenderer extends AbstractParameterRenderer implements JobParameterRenderer {
 
     @NonNls
     private static final String TYPE_CLASS = "net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition";
@@ -44,14 +44,13 @@ public class GitParameterRenderer implements JobParameterRenderer {
         this.validTypes.addAll(validTypes);
     }
 
-    @NotNull
     @Override
-    public JobParameterComponent<String> render(@NotNull JobParameter jobParameter, @Nullable ProjectJob projectJob) {
+    protected JobParameterComponent getJobParameterComponent(JobParameter jobParameter, ProjectJob projectJob, String defaultValue) {
         if (!validTypes.contains(jobParameter.getJobParameterType())) {
             return JobParameterRenderers.createErrorLabel(jobParameter);
         }
         if (projectJob == null) {
-            return JobParameterRenderers.createComboBoxIfChoicesExists(jobParameter, jobParameter.getDefaultValue());
+            return JobParameterRenderers.createComboBoxIfChoicesExists(jobParameter, defaultValue);
         } else {
             return JobParameterRenderers.createGitParameterChoices(projectJob).apply(jobParameter);
         }

@@ -1,17 +1,17 @@
-package org.codinjutsu.tools.jenkins.view.parameter;
+package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
+import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class ListGitBranchesParameterRenderer implements JobParameterRenderer {
+public class ListGitBranchesParameterRenderer extends AbstractParameterRenderer implements JobParameterRenderer {
 
     @NonNls
     private static final String TYPE_CLASS = "com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition";
@@ -32,9 +32,8 @@ public class ListGitBranchesParameterRenderer implements JobParameterRenderer {
         this.parameterRenderer = new GitParameterRenderer(validTypes);
     }
 
-    @NotNull
     @Override
-    public JobParameterComponent<String> render(@NotNull JobParameter jobParameter, @Nullable ProjectJob projectJob) {
+    protected JobParameterComponent<String> getJobParameterComponent(JobParameter jobParameter, ProjectJob projectJob, String defaultValue) {
         return parameterRenderer.render(jobParameter, projectJob);
     }
 

@@ -17,6 +17,8 @@
 package org.codinjutsu.tools.jenkins.model.jenkins;
 
 import com.intellij.openapi.util.text.StringUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,11 +28,17 @@ import java.util.List;
 public class Jenkins {
 
     private @Nullable String name;
+    @Getter
     private String serverUrl;
 
+    @Getter
+    @Setter
     private List<Job> jobs;
-
+    @Setter
+    @Getter
     private List<View> views;
+    @Getter
+    @Setter
     private View primaryView;
 
     public Jenkins(@Nullable String description, String serverUrl) {
@@ -41,42 +49,8 @@ public class Jenkins {
     }
 
 
-    public void setJobs(List<Job> jobs) {
-        this.jobs = jobs;
-    }
-
-
-    public List<Job> getJobs() {
-        return jobs;
-    }
-
-
-    public List<View> getViews() {
-        return views;
-    }
-
-
     public @Nullable String getName() {
         return name;
-    }
-
-
-    public void setViews(List<View> views) {
-        this.views = views;
-    }
-
-
-    public void setPrimaryView(View primaryView) {
-        this.primaryView = primaryView;
-    }
-
-
-    public View getPrimaryView() {
-        return primaryView;
-    }
-
-    public String getServerUrl() {
-        return serverUrl;
     }
 
     public View getViewByName(String lastSelectedViewName) {

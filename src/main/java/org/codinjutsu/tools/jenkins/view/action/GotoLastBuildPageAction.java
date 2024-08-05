@@ -18,7 +18,7 @@ package org.codinjutsu.tools.jenkins.view.action;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
-import org.codinjutsu.tools.jenkins.view.BrowserPanel;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 
 public class GotoLastBuildPageAction extends AbstractGotoWebPageAction {

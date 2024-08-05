@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.jenkins.view;
+package org.codinjutsu.tools.jenkins.view.ui;
 
 import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.application.ApplicationManager;
@@ -60,8 +60,8 @@ public class BuildParamDialog extends DialogWrapper {
     private JPanel contentPane;
     private JPanel contentPanel;
 
-    BuildParamDialog(@NotNull Project project, Job job, JenkinsAppSettings configuration,
-                     RequestManagerInterface requestManager, RunBuildCallback runBuildCallback) {
+    public BuildParamDialog(@NotNull Project project, Job job, JenkinsAppSettings configuration,
+                            RequestManagerInterface requestManager, RunBuildCallback runBuildCallback) {
         super(project);
         this.project = project;
         init();
@@ -133,12 +133,12 @@ public class BuildParamDialog extends DialogWrapper {
         final AtomicInteger rows = new AtomicInteger(0);
         for (JobParameter jobParameter : parameters) {
             //跳过测试是必然的
-            if (jobParameter.getName().equals("SKIP_TEST")) {
-                continue;
-            }
+//            if (jobParameter.getName().equals("SKIP_TEST")) {
+//                continue;
+//            }
             final JobParameterRenderer jobParameterRenderer = JobParameterRenderer.findRenderer(jobParameter)
                     .orElseGet(DefaultRenderer::new);
-            final ProjectJob projectJob = ProjectJob.builder().project(project).job(job).build();
+            final ProjectJob projectJob = ProjectJob.builder().project(project).lastBuild(job.getLastBuild()).build();
             final JobParameterComponent<?> jobParameterComponent = jobParameterRenderer.render(jobParameter, projectJob);
 
             if (jobParameterComponent.isVisible()) {
@@ -195,7 +195,7 @@ public class BuildParamDialog extends DialogWrapper {
             jobParameterComponent.ifHasValue(value -> valueByNameMap.put(jobParameter.getName(), value));
         }
         //fixme 默认传入一个跳过测试
-        valueByNameMap.put("SKIP_TEST", "-Dmaven.test.skip=true");
+//        valueByNameMap.put("SKIP_TEST", "-Dmaven.test.skip=true");
         return valueByNameMap;
     }
 

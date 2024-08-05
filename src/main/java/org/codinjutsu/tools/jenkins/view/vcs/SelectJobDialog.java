@@ -33,7 +33,7 @@ import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.components.JBList;
 import org.codinjutsu.tools.jenkins.logic.RunBuildWithPatch;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
-import org.codinjutsu.tools.jenkins.view.BrowserPanel;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

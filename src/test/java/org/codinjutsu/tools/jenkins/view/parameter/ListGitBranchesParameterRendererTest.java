@@ -5,6 +5,8 @@ import org.assertj.core.util.Lists;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildInJobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
+import org.codinjutsu.tools.jenkins.view.parameter.renderer.GitParameterRenderer;
+import org.codinjutsu.tools.jenkins.view.parameter.renderer.ListGitBranchesParameterRenderer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

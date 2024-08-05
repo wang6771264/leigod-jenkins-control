@@ -2,6 +2,7 @@ package org.codinjutsu.tools.jenkins.view.parameter;
 
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildInJobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
+import org.codinjutsu.tools.jenkins.view.parameter.renderer.ActiveChoicesParameterRenderer;
 import org.junit.Test;
 
 import javax.swing.*;

@@ -77,6 +77,11 @@
                 icon="AllIcons.Actions.Suspend">
             <override-text place="GoToAction"/>
         </action>
+        <action id="Jenkins.BuilcConfigParam" class="org.codinjutsu.tools.jenkins.view.action.buildConfig.BuilcConfigParamAction"
+                icon="AllIcons.Actions.Execute">
+            <override-text place="GoToAction"/>
+        </action>
+
         <action id="Jenkins.ShowCommonSettings"
                 class="org.codinjutsu.tools.jenkins.view.action.OpenPluginSettingsAction">
         </action>

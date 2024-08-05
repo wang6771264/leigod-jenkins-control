@@ -27,23 +27,23 @@ import org.codinjutsu.tools.jenkins.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
-import org.codinjutsu.tools.jenkins.view.BrowserPanel;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.codinjutsu.tools.jenkins.view.action.ActionUtil;
-import org.codinjutsu.tools.jenkins.view.buildConfig.BuildConfigDialog;
+import org.codinjutsu.tools.jenkins.view.ui.BuildConfigDialog;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static org.codinjutsu.tools.jenkins.view.BrowserPanel.POPUP_PLACE;
+import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
 
 /**
  * ==========================
  * 开发：maple
  * 创建时间：2024/7/25 23:18
  * 版本：1.0
- * 描述：构建参数操作
+ * 描述：构建参数保存操作
  * ==========================
  */
 public class BuilcConfigParamAction extends AnAction implements DumbAware {

@@ -26,7 +26,7 @@ import com.intellij.openapi.vcs.changes.ChangeList;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ChangeListManagerEx;
 import lombok.Value;
-import org.codinjutsu.tools.jenkins.view.BrowserPanel;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.codinjutsu.tools.jenkins.view.action.ActionUtil;
 import org.codinjutsu.tools.jenkins.view.vcs.SelectJobDialog;
 import org.jetbrains.annotations.NotNull;

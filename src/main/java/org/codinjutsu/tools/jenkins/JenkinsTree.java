@@ -93,6 +93,7 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
 
     @NotNull
     private static DefaultMutableTreeNode createNode(Build build) {
+        //添加一个列表的展示节点
         return new DefaultMutableTreeNode(new JenkinsTreeNode.BuildNode(build), true);
     }
 
@@ -296,6 +297,7 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
     @SuppressWarnings("java:S110")
     private static class TreeWithoutDefaultSearch extends SimpleTree {
 
+        //树形结构展示
         @Override
         protected void configureUiHelper(TreeUIHelper helper) {
             final Convertor<TreePath, String> convertor = treePath -> JenkinsTree.getJob(treePath).map(Job::preferDisplayName).orElse("");

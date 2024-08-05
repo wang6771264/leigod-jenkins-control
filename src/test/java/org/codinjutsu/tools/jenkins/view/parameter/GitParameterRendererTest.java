@@ -6,6 +6,7 @@ import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildInJobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
+import org.codinjutsu.tools.jenkins.view.parameter.renderer.GitParameterRenderer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

@@ -12,6 +12,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+/**
+ * 树形节点构建
+ */
 public interface JenkinsTreeNode extends NodeDescriptorProvidingKey, NavigationItem, CopyTextProvider {
 
     @NotNull

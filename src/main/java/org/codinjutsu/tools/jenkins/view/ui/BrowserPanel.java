@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.codinjutsu.tools.jenkins.view;
+package org.codinjutsu.tools.jenkins.view.ui;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.actions.CopyAction;
@@ -37,7 +37,10 @@ import org.codinjutsu.tools.jenkins.logic.*;
 import org.codinjutsu.tools.jenkins.model.jenkins.*;
 import org.codinjutsu.tools.jenkins.util.CollectionUtil;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
+import org.codinjutsu.tools.jenkins.view.JenkinsStatusBarWidget;
+import org.codinjutsu.tools.jenkins.view.JenkinsTreeNode;
 import org.codinjutsu.tools.jenkins.view.action.*;
+import org.codinjutsu.tools.jenkins.view.action.buildConfig.BuilcConfigParamAction;
 import org.codinjutsu.tools.jenkins.view.action.settings.SortByStatusAction;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -143,7 +146,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         Build lastBuild = job.getLastBuild();
         if (job.isBuildable() && lastBuild != null) {
             BuildStatusEnum status = lastBuild.getStatus();
-            if (job.getLastBuild() != null && job.getLastBuild().isBuilding()) {
+            if (job.getLastBuild().isBuilding()) {
                 buildStatusVisitor.visitBuilding();
                 return;
             }
@@ -372,6 +375,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         popupGroup.addSeparator();
         popupGroup.add(ActionManager.getInstance().getAction(RunBuildAction.ACTION_ID));
         popupGroup.add(ActionManager.getInstance().getAction(StopBuildAction.ACTION_ID));
+        popupGroup.add(ActionManager.getInstance().getAction(BuilcConfigParamAction.ACTION_ID));
         popupGroup.addSeparator();
         popupGroup.add(new ShowLogAction(BuildTypeEnum.LAST));
         popupGroup.add(new ShowLogAction(BuildTypeEnum.LAST_SUCCESSFUL));

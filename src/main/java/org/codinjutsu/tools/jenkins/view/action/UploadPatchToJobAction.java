@@ -30,12 +30,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.codinjutsu.tools.jenkins.logic.RunBuildWithPatch;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
-import org.codinjutsu.tools.jenkins.view.BrowserPanel;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-import static org.codinjutsu.tools.jenkins.view.BrowserPanel.POPUP_PLACE;
+import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
 
 /**
  * Description

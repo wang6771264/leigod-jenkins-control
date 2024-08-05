@@ -14,4 +14,7 @@ public class ProjectJob {
 
     @NotNull
     private Job job;
+
+    @NotNull
+    private Build lastBuild;
 }

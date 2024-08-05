@@ -32,8 +32,8 @@ import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
-import org.codinjutsu.tools.jenkins.view.BrowserPanel;
-import org.codinjutsu.tools.jenkins.view.BuildParamDialog;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
+import org.codinjutsu.tools.jenkins.view.ui.BuildParamDialog;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +42,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import static org.codinjutsu.tools.jenkins.view.BrowserPanel.POPUP_PLACE;
+import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
 
 public class RunBuildAction extends AnAction implements DumbAware {
 

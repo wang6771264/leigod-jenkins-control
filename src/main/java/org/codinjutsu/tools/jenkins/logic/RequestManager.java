@@ -39,7 +39,7 @@ import org.codinjutsu.tools.jenkins.model.jenkins.*;
 import org.codinjutsu.tools.jenkins.security.JenkinsSecurityClient;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
 import org.codinjutsu.tools.jenkins.security.SecurityClientFactory;
-import org.codinjutsu.tools.jenkins.view.parameter.NodeParameterRenderer;
+import org.codinjutsu.tools.jenkins.view.parameter.renderer.NodeParameterRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.VisibleForTesting;
 

@@ -29,6 +29,7 @@ import org.codinjutsu.tools.jenkins.logic.JobBuilder;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildInJobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.view.ui.BuildParamDialog;
 import org.jetbrains.annotations.NonNls;
 import org.junit.After;
 import org.junit.Before;
@@ -91,12 +92,6 @@ public class BuildConfigDialogTest {
         mocks.close();
     }
 
-    @Before
-    public void setUp() throws Exception {
-        mocks = MockitoAnnotations.openMocks(this);
-        configuration = new JenkinsAppSettings();
-    }
-
     private void createDialog(final Job job) {
         BuildParamDialog buildParamDialog = GuiActionRunner.execute(new GuiQuery<BuildParamDialog>() {
             protected BuildParamDialog executeInEDT() {
@@ -106,6 +101,12 @@ public class BuildConfigDialogTest {
         });
         dialogFixture = new DialogFixture(BasicRobot.robotWithCurrentAwtHierarchy(), "BuildParamDialog");
         dialogFixture.show();
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        mocks = MockitoAnnotations.openMocks(this);
+        configuration = new JenkinsAppSettings();
     }
 
     @Test

@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.view.parameter;
+package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildInJobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
@@ -6,8 +6,8 @@ import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderers;
+import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-public class BuiltInJobParameterRenderer implements JobParameterRenderer {
+public class BuiltInJobParameterRenderer extends AbstractParameterRenderer implements JobParameterRenderer {
 
     private final Map<JobParameterType, BiFunction<JobParameter, String, JobParameterComponent<?>>> converter = new HashMap<>();
 
@@ -29,12 +29,10 @@ public class BuiltInJobParameterRenderer implements JobParameterRenderer {
         converter.put(BuildInJobParameter.FileParameterDefinition, JobParameterRenderers::createFileUpload);
     }
 
-    @NotNull
     @Override
-    public JobParameterComponent<?> render(@NotNull JobParameter jobParameter, @Nullable ProjectJob projectJob) {
-        final JobParameterType jobParameterType = jobParameter.getJobParameterType();
-        final String defaultValue = jobParameter.getDefaultValue();
-        return converter.getOrDefault(jobParameterType, JobParameterRenderers::createErrorLabel).apply(jobParameter, defaultValue);
+    protected JobParameterComponent getJobParameterComponent(JobParameter jobParameter, ProjectJob projectJob, String defaultValue) {
+        return converter.getOrDefault(jobParameter.getJobParameterType(), JobParameterRenderers::createTextField)
+                .apply(jobParameter, defaultValue);
     }
 
     @Override
@@ -46,7 +44,7 @@ public class BuiltInJobParameterRenderer implements JobParameterRenderer {
     @Override
     public Optional<JLabel> createLabel(@NotNull JobParameter jobParameter) {
         final JobParameterType jobParameterType = jobParameter.getJobParameterType();
-        final Optional<JLabel> label = JobParameterRenderer.super.createLabel(jobParameter);
+        final Optional<JLabel> label = super.createLabel(jobParameter);
         if (BuildInJobParameter.TextParameterDefinition.equals(jobParameterType)) {
             label.ifPresent(textAreaLabel -> textAreaLabel.setVerticalAlignment(SwingConstants.TOP));
         }
