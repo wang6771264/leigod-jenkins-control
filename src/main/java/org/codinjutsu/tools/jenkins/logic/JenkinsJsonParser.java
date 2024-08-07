@@ -54,7 +54,7 @@ public class JenkinsJsonParser implements JenkinsParser {
     }
 
     @NotNull
-    private static JsonKey createJsonKey(String key) {
+    public static JsonKey createJsonKey(String key) {
         return createJsonKey(key, null);
     }
 
@@ -136,7 +136,6 @@ public class JenkinsJsonParser implements JenkinsParser {
     public Job createJob(String jsonData) {
         checkJsonDataAndThrowExceptionIfNecessary(jsonData);
         return getJob(parseJson(jsonData));
-
     }
 
     @NotNull
@@ -364,6 +363,7 @@ public class JenkinsJsonParser implements JenkinsParser {
         jobParameterBuilder.name(name);
         JsonObject defaultParamObj = (JsonObject) parameterObj.get(PARAMETER_DEFAULT_PARAM);
         if (defaultParamObj != null && !defaultParamObj.isEmpty()) {
+            jobParameterBuilder.defaultParamObj(defaultParamObj);
             Optional<String> defaultValue = Optional.ofNullable(defaultParamObj.get(PARAMETER_DEFAULT_PARAM_VALUE))
                     .map(Object::toString);
             defaultValue.ifPresent(jobParameterBuilder::defaultValue);

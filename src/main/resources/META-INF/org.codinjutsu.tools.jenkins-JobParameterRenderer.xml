@@ -8,6 +8,7 @@
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.HiddenParameterRenderer" />
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.PatchParameterRenderer" />
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.GitParameterRenderer" />
+        <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.DepolyRunParameterRenderer" />
         <buildParameterRenderer
                 implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.PersistentParameterRenderer"/>
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.ListGitBranchesParameterRenderer" />

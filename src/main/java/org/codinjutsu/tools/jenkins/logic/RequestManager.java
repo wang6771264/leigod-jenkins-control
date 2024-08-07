@@ -16,6 +16,7 @@
 
 package org.codinjutsu.tools.jenkins.logic;
 
+import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -26,8 +27,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.offbytwo.jenkins.JenkinsServer;
 import com.offbytwo.jenkins.helper.BuildConsoleStreamListener;
 import com.offbytwo.jenkins.model.*;
+import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.JenkinsSettings;
+import org.codinjutsu.tools.jenkins.cache.JobCache;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.exception.*;
 import org.codinjutsu.tools.jenkins.model.FavoriteJob;
@@ -77,8 +81,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     }
 
     public static RequestManager getInstance(Project project) {
-        return Optional.ofNullable(project.getService(RequestManager.class))
-                .orElseGet(() -> new RequestManager(project));
+        return Optional.ofNullable(project.getService(RequestManager.class)).orElseGet(() -> new RequestManager(project));
     }
 
     private static boolean canContainNestedJobs(@NotNull Job job) {
@@ -89,11 +92,9 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     public Jenkins loadJenkinsWorkspace(JenkinsAppSettings configuration, JenkinsSettings jenkinsSettings) {
         if (handleNotYetLoggedInState()) return null;
         var url = urlBuilder.createJenkinsWorkspaceUrl(configuration);
-        var jenkinsWorkspaceData = jenkinsSecurityClient.execute(url);
+        var jenkinsWorkspaceData = jenkinsSecurityClient.executeForJson(url);
         final var serverUrl = configuration.getServerUrl();
-        final var configuredJenkinsUrl = Optional.of(jenkinsSettings.getJenkinsUrl())
-                .filter(StringUtil::isNotEmpty)
-                .orElse(serverUrl);
+        final var configuredJenkinsUrl = Optional.of(jenkinsSettings.getJenkinsUrl()).filter(StringUtil::isNotEmpty).orElse(serverUrl);
 
         if (configuredJenkinsUrl.contains(BUILDHIVE_CLOUDBEES)) {//TODO hack need to refactor
             jenkinsPlateform = JenkinsPlateform.CLOUDBEES;
@@ -102,8 +103,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         }
 
         final var jenkins = jenkinsParser.createWorkspace(jenkinsWorkspaceData);
-        final var validationResult = ConfigurationValidator.getInstance(project)
-                .validate(serverUrl, jenkins.getServerUrl());
+        final var validationResult = ConfigurationValidator.getInstance(project).validate(serverUrl, jenkins.getServerUrl());
         if (!validationResult.isValid()) {
             throw new ConfigurationException(validationResult.getFirstError());
         }
@@ -118,7 +118,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         if (handleNotYetLoggedInState()) return Collections.emptyMap();
         URL url = urlBuilder.createRssLatestUrl(configuration.getServerUrl());
 
-        String rssData = jenkinsSecurityClient.execute(url);
+        String rssData = jenkinsSecurityClient.executeForJson(url);
 
         return rssParser.loadJenkinsRssLatestBuilds(rssData);
     }
@@ -126,7 +126,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     private List<Job> loadJenkinsView(String viewUrl) {
         if (handleNotYetLoggedInState()) return Collections.emptyList();
         URL url = urlBuilder.createViewUrl(jenkinsPlateform, viewUrl);
-        String jenkinsViewData = jenkinsSecurityClient.execute(url);
+        String jenkinsViewData = jenkinsSecurityClient.executeForJson(url);
         final List<Job> jobsFromView;
         if (jenkinsPlateform.equals(JenkinsPlateform.CLASSIC)) {
             jobsFromView = jenkinsParser.createJobs(jenkinsViewData);
@@ -174,16 +174,14 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     @Deprecated
     @NotNull
     private Job withNodeParameterFix(@NotNull Job job, @NotNull Supplier<Collection<Computer>> computers) {
-        final boolean fixJob = job.getParameters().stream().map(JobParameter::getJobParameterType)
-                .anyMatch(NodeParameterRenderer.NODE_PARAMETER::equals);
+        final boolean fixJob = job.getParameters().stream().map(JobParameter::getJobParameterType).anyMatch(NodeParameterRenderer.NODE_PARAMETER::equals);
         if (fixJob) {
             final Job.JobBuilder fixedJob = job.toBuilder();
             fixedJob.clearParameters();
             for (JobParameter jobParameter : job.getParameters()) {
                 if (NodeParameterRenderer.NODE_PARAMETER.equals(jobParameter.getJobParameterType())) {
                     final JobParameter.JobParameterBuilder fixedJobParameter = jobParameter.toBuilder();
-                    final List<String> computerNames = computers.get().stream().map(Computer::getDisplayName)
-                            .collect(Collectors.toList());
+                    final List<String> computerNames = computers.get().stream().map(Computer::getDisplayName).collect(Collectors.toList());
                     fixedJobParameter.choices(computerNames);
                     fixedJob.parameter(fixedJobParameter.build());
                 } else {
@@ -205,7 +203,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     private List<Job> loadNestedJobs(String currentJobUrl) {
         if (handleNotYetLoggedInState()) return Collections.emptyList();
         URL url = urlBuilder.createNestedJobUrl(currentJobUrl);
-        return jenkinsParser.createJobs(jenkinsSecurityClient.execute(url));
+        return jenkinsParser.createJobs(jenkinsSecurityClient.executeForJson(url));
     }
 
     private boolean handleNotYetLoggedInState() {
@@ -220,29 +218,31 @@ public class RequestManager implements RequestManagerInterface, Disposable {
             threadStack = true;
             result = true;
         }
-        if (threadStack)
-            Thread.dumpStack();
+        if (threadStack) Thread.dumpStack();
         return result;
     }
 
     @NotNull
     private Job loadJob(String jenkinsJobUrl) {
+        //加载job详情
         if (handleNotYetLoggedInState()) return createEmptyJob(jenkinsJobUrl);
         URL url = urlBuilder.createJobUrl(jenkinsJobUrl);
-        String jenkinsJobData = jenkinsSecurityClient.execute(url);
-        return jenkinsParser.createJob(jenkinsJobData);
+        String jenkinsJobData = jenkinsSecurityClient.executeForJson(url);
+        Job job = jenkinsParser.createJob(jenkinsJobData);
+        //添加到缓存
+        JobCache.putIfAbsent(job.getFullName(), job);
+        return job;
     }
 
     @NotNull
     private Job createEmptyJob(String jenkinsJobUrl) {
-        return Job.builder().name("").buildable(false).fullName("").url(jenkinsJobUrl)
-                .parameters(Collections.emptyList()).inQueue(false).build();
+        return Job.builder().name("").buildable(false).fullName("").url(jenkinsJobUrl).parameters(Collections.emptyList()).inQueue(false).build();
     }
 
     private void stopBuild(String jenkinsBuildUrl) {
         if (handleNotYetLoggedInState()) return;
         URL url = urlBuilder.createStopBuildUrl(jenkinsBuildUrl);
-        jenkinsSecurityClient.execute(url);
+        jenkinsSecurityClient.executeForJson(url);
     }
 
     @VisibleForTesting
@@ -250,14 +250,14 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     Build loadBuild(String jenkinsBuildUrl) {
         if (handleNotYetLoggedInState()) return Build.NULL;
         URL url = urlBuilder.createBuildUrl(jenkinsBuildUrl);
-        String jenkinsJobData = jenkinsSecurityClient.execute(url);
+        String jenkinsJobData = jenkinsSecurityClient.executeForJson(url);
         return jenkinsParser.createBuild(jenkinsJobData);
     }
 
     private List<Build> loadBuilds(String jenkinsBuildUrl, RangeToLoad rangeToLoad) {
         if (handleNotYetLoggedInState()) return Collections.emptyList();
         URL url = urlBuilder.createBuildsUrl(jenkinsBuildUrl, rangeToLoad);
-        String jenkinsJobData = jenkinsSecurityClient.execute(url);
+        String jenkinsJobData = jenkinsSecurityClient.executeForJson(url);
         return jenkinsParser.createBuilds(jenkinsJobData);
     }
 
@@ -270,21 +270,26 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         final AtomicInteger fileCount = new AtomicInteger();
 
         final Collection<RequestData> requestData = new LinkedHashSet<>(parameters.size());
-        parameters.entrySet().stream()
-                .filter(entry -> entry.getValue() instanceof VirtualFile)
-                .map(entry -> new FileParameter(entry.getKey(), (VirtualFile) entry.getValue(),
-                        () -> String.format("file%d", fileCount.getAndIncrement())))
-                .forEach(requestData::add);
-        parameters.entrySet().stream().filter(entry -> entry.getValue() instanceof String)
-                .map(entry -> new StringParameter(entry.getKey(), (String) entry.getValue()))
-                .forEach(requestData::add);
-        runBuild(job, configuration, requestData);
+        parameters.entrySet().stream().filter(entry -> entry.getValue() instanceof VirtualFile).map(entry -> new FileParameter(entry.getKey(), (VirtualFile) entry.getValue(), () -> String.format("file%d", fileCount.getAndIncrement()))).forEach(requestData::add);
+        parameters.entrySet().stream().filter(entry -> entry.getValue() instanceof String).map(entry -> new StringParameter(entry.getKey(), (String) entry.getValue())).forEach(requestData::add);
+        //有参构建
+        runBuildWithParams(job, configuration, requestData);
     }
 
     private void runBuild(Job job, JenkinsAppSettings configuration, Collection<RequestData> requestData) {
         if (handleNotYetLoggedInState()) return;
         URL url = urlBuilder.createRunJobUrl(job.getUrl(), configuration);
-        final var response = jenkinsSecurityClient.execute(url, requestData);
+        final var response = jenkinsSecurityClient.executeForJson(url, requestData);
+        if (response.getStatusCode() != HttpURLConnection.HTTP_CREATED) {
+            throw new RunBuildError(Optional.ofNullable(response.getError()).orElse("Unknown"));
+        }
+    }
+
+    private void runBuildWithParams(Job job, JenkinsAppSettings configuration,
+                                    Collection<RequestData> requestData) {
+        if (handleNotYetLoggedInState()) return;
+        URL url = urlBuilder.createRunJobWithParamsUrl(job.getUrl(), configuration);
+        final var response = jenkinsSecurityClient.executeFormData(url, requestData);
         if (response.getStatusCode() != HttpURLConnection.HTTP_CREATED) {
             throw new RunBuildError(Optional.ofNullable(response.getError()).orElse("Unknown"));
         }
@@ -295,8 +300,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         SecurityClientFactory.setVersion(jenkinsSettings.getVersion());
         final int connectionTimout = getConnectionTimout(jenkinsSettings.getConnectionTimeout());
         if (jenkinsSettings.isSecurityMode()) {
-            jenkinsSecurityClient = SecurityClientFactory.basic(jenkinsSettings.getUsername(), jenkinsSettings.getPassword(),
-                    jenkinsSettings.getCrumbData(), connectionTimout);
+            jenkinsSecurityClient = SecurityClientFactory.basic(jenkinsSettings.getUsername(), jenkinsSettings.getPassword(), jenkinsSettings.getCrumbData(), connectionTimout);
         } else {
             jenkinsSecurityClient = SecurityClientFactory.none(jenkinsSettings.getCrumbData(), connectionTimout);
         }
@@ -304,15 +308,13 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         jenkinsSecurityClient.connect(urlBuilder.createAuthenticationUrl(serverUrl));
         setJenkinsServer(new JenkinsServer(new JenkinsControlClient(urlBuilder.createServerUrl(serverUrl), jenkinsSecurityClient)));
 
-        final var urlMapper = ApplicationManager.getApplication().getService(UrlMapperService.class)
-                .getMapper(jenkinsSettings, serverUrl);
+        final var urlMapper = ApplicationManager.getApplication().getService(UrlMapperService.class).getMapper(jenkinsSettings, serverUrl);
         ;
         setJenkinsParser(new JenkinsJsonParser(urlMapper));
     }
 
     @Override
-    public String testAuthenticate(String serverUrl, String username, String password, String crumbData, JenkinsVersion version,
-                                   int connectionTimoutInSeconds) {
+    public String testAuthenticate(String serverUrl, String username, String password, String crumbData, JenkinsVersion version, int connectionTimoutInSeconds) {
         final var jsonParserWithServerUrls = new JenkinsJsonParser(UnaryOperator.identity());
         SecurityClientFactory.setVersion(version);
         final int connectionTimout = getConnectionTimout(connectionTimoutInSeconds);
@@ -371,15 +373,11 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     }
 
     @Override
-    public void loadConsoleTextFor(Job job, BuildTypeEnum buildTypeEnum,
-                                   BuildLogConsoleStreamListener buildConsoleStreamListener) {
-        loadConsoleTextFor(getBuildForType(buildTypeEnum).apply(getJob(job)),
-                buildConsoleStreamListener, job::getNameToRenderSingleJob);
+    public void loadConsoleTextFor(Job job, BuildTypeEnum buildTypeEnum, BuildLogConsoleStreamListener buildConsoleStreamListener) {
+        loadConsoleTextFor(getBuildForType(buildTypeEnum).apply(getJob(job)), buildConsoleStreamListener, job::getNameToRenderSingleJob);
     }
 
-    private void loadConsoleTextFor(com.offbytwo.jenkins.model.Build build,
-                                    BuildLogConsoleStreamListener buildConsoleStreamListener,
-                                    @NotNull Supplier<String> logName) {
+    private void loadConsoleTextFor(com.offbytwo.jenkins.model.Build build, BuildLogConsoleStreamListener buildConsoleStreamListener, @NotNull Supplier<String> logName) {
         try {
             final int pollingInSeconds = 1;
             final int poolingTimeout = Math.toIntExact(TimeUnit.HOURS.toSeconds(1));
@@ -398,10 +396,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         }
     }
 
-    private void streamConsoleOutput(BuildWithDetails buildWithDetails,
-                                     BuildLogConsoleStreamListener listener,
-                                     int poolingInterval,
-                                     int poolingTimeout) throws InterruptedException, IOException {
+    private void streamConsoleOutput(BuildWithDetails buildWithDetails, BuildLogConsoleStreamListener listener, int poolingInterval, int poolingTimeout) throws InterruptedException, IOException {
         // Calculate start and timeout
         final long startTime = System.currentTimeMillis();
         final long timeoutTime = startTime + (poolingTimeout * 1000L);
@@ -424,9 +419,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
                 break;
             }
             if (System.currentTimeMillis() > timeoutTime) {
-                throw new JenkinsPluginRuntimeException(String.format("Pooling for build %s - %d timeout! " +
-                                "Check if job stuck in jenkins",
-                        buildWithDetails.getDisplayName(), buildWithDetails.getNumber()));
+                throw new JenkinsPluginRuntimeException(String.format("Pooling for build %s - %d timeout! " + "Check if job stuck in jenkins", buildWithDetails.getDisplayName(), buildWithDetails.getNumber()));
             }
         }
     }
@@ -449,8 +442,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     }
 
     @NotNull
-    private Function<JobWithDetails, com.offbytwo.jenkins.model.Build> preferLastBuildRunning(
-            Function<JobWithDetails, com.offbytwo.jenkins.model.Build> fallback) {
+    private Function<JobWithDetails, com.offbytwo.jenkins.model.Build> preferLastBuildRunning(Function<JobWithDetails, com.offbytwo.jenkins.model.Build> fallback) {
         return job -> {
             try {
                 com.offbytwo.jenkins.model.Build lastBuild = job.getLastBuild();
@@ -481,9 +473,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
                 result.add(build.getTestResult());
             }
             if (build.getTestReport().getChildReports() != null) {
-                result.addAll(build.getTestReport().getChildReports().stream()
-                        .map(TestChildReport::getResult)
-                        .collect(Collectors.toList()));
+                result.addAll(build.getTestReport().getChildReports().stream().map(TestChildReport::getResult).collect(Collectors.toList()));
             }
             return result;
         } catch (IOException e) {
@@ -499,22 +489,19 @@ public class RequestManager implements RequestManagerInterface, Disposable {
             return Collections.emptyList();
         }
         final URL url = urlBuilder.createComputerUrl(settings.getServerUrl());
-        return jenkinsParser.createComputers(jenkinsSecurityClient.execute(url));
+        return jenkinsParser.createComputers(jenkinsSecurityClient.executeForJson(url));
     }
 
     @NotNull
     @Override
     public List<String> getGitParameterChoices(Job job, JobParameter jobParameter) {
-        return Optional.ofNullable(jobParameter.getJobParameterType())
-                .map(JobParameterType::getClassName)
-                .map(jobClassName -> getFillValueItems(job, jobClassName, jobParameter.getName()))
-                .orElse(Collections.emptyList());
+        return Optional.ofNullable(jobParameter.getJobParameterType()).map(JobParameterType::getClassName).map(jobClassName -> getFillValueItems(job, jobClassName, jobParameter.getName())).orElse(Collections.emptyList());
     }
 
     @NotNull
     private List<String> getFillValueItems(Job job, String parameterClassName, String parameterName) {
         final URL url = urlBuilder.createFillValueItemsUrl(job.getUrl(), parameterClassName, parameterName);
-        return jenkinsParser.getFillValueItems(jenkinsSecurityClient.execute(url));
+        return jenkinsParser.getFillValueItems(jenkinsSecurityClient.executeForJson(url));
     }
 
     @NotNull
@@ -568,6 +555,41 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     @Override
     public void dispose() {
         Optional.ofNullable(jenkinsServer).ifPresent(JenkinsServer::close);
+    }
+
+    /**
+     * 上次构建成功的buildNumber
+     *
+     * @param job
+     * @return 返回buildNumber
+     */
+    public String lastSuccessfulBuild(Job job) {
+        URL url = urlBuilder.createLastSuccessfulBuildNumberUrl(job.getUrl());
+        return jenkinsSecurityClient.executeForJson(url);
+    }
+
+    /**
+     * 获取最近50个成功构建
+     *
+     * @param job
+     * @return 最近50个成功构建
+     */
+    public List<BuildHistory> findRecently50SuccessBuilds(Job job) {
+        URL url = urlBuilder.createOldBuildUrl(job.getUrl());
+        String jsonData = jenkinsSecurityClient.executeForJson(url);
+        if (StringUtils.isBlank(jsonData)) {
+            return Collections.emptyList();
+        }
+        BuildsHistories histories;
+        try {
+            histories = JSON.parseObject(jsonData, BuildsHistories.class);
+            return Optional.ofNullable(histories.getBuilds()).stream().flatMap(Collection::stream)
+                    .filter(buildHistory -> BuildStatusEnum.SUCCESS.equalsByStatus(buildHistory.getResult()))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.info("最近50个成功构建失败", e);
+        }
+        return Collections.emptyList();
     }
 
     public interface BuildLogConsoleStreamListener extends BuildConsoleStreamListener {

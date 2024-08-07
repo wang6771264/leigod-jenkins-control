@@ -126,14 +126,29 @@ class DefaultSecurityClient implements JenkinsSecurityClient {
     @Nullable
     @Override
     public String connect(URL jenkinsUrl) {
-        return execute(jenkinsUrl);
+        return executeForJson(jenkinsUrl);
     }
 
-    public @NotNull Response execute(URL url, @NotNull Collection<RequestData> data) {
+    public @NotNull Response executeForJson(URL url, @NotNull Collection<RequestData> data) {
         String urlStr = url.toString();
 
         final var responseCollector = new ResponseCollector();
         runMethod(urlStr, data, responseCollector);
+
+        if (isRedirection(responseCollector.statusCode)) {
+            LOG.trace(String.format("Handle redirect to: %s", responseCollector.data));
+            runMethod(responseCollector.data, data, responseCollector);
+        }
+
+        return new Response(responseCollector.statusCode, responseCollector.data, responseCollector.error);
+    }
+
+    @Override
+    public @NotNull Response executeFormData(URL url, @NotNull Collection<RequestData> data) {
+        String urlStr = url.toString();
+
+        final var responseCollector = new ResponseCollector();
+        runMethodFormdata(urlStr, data, responseCollector);
 
         if (isRedirection(responseCollector.statusCode)) {
             LOG.trace(String.format("Handle redirect to: %s", responseCollector.data));
@@ -180,6 +195,16 @@ class DefaultSecurityClient implements JenkinsSecurityClient {
         return post;
     }
 
+    @NotNull
+    JenkinsPost createPostFormData(String url, @NotNull Collection<RequestData> data) {
+        final var post = new JenkinsPost(url);
+        post.setDataFormdata(data);
+        if (isCrumbDataSet()) {
+            post.addHeader(jenkinsVersion.getCrumbName(), crumbData);
+        }
+        return post;
+    }
+
     protected final void addAuthenticationPreemptive(HttpHost host, UsernamePasswordCredentials credentials) {
         final var authScope = new AuthScope(host.getHostName(), host.getPort());
         authCache.put(host, new BasicScheme());
@@ -219,9 +244,19 @@ class DefaultSecurityClient implements JenkinsSecurityClient {
         }
     }
 
-    private void runMethod(String url, @NotNull Collection<RequestData> data, ResponseCollector responseCollector) {
-        final var post = createPost(url, data);
+    private void runMethod(String url, @NotNull Collection<RequestData> data,
+                           ResponseCollector responseCollector) {
+        final JenkinsPost post = createPost(url, data);
+        this.afterRunMethod(post, responseCollector);
+    }
 
+    private void runMethodFormdata(String url, @NotNull Collection<RequestData> data,
+                                   ResponseCollector responseCollector) {
+        final JenkinsPost post = createPostFormData(url, data);
+        this.afterRunMethod(post, responseCollector);
+    }
+
+    private void afterRunMethod(JenkinsPost post, ResponseCollector responseCollector) {
         try {
             LOG.trace(String.format("Executing POST to: %s", post.getURI()));
             final var response = executeHttp(post);
@@ -321,17 +356,20 @@ class DefaultSecurityClient implements JenkinsSecurityClient {
         private String data;
         private String error;
 
-        @NotNull ResponseCollector collect(int statusCode, String body) {
+        @NotNull
+        ResponseCollector collect(int statusCode, String body) {
             this.data = body;
             return statusCode(statusCode);
         }
 
-        @NotNull ResponseCollector statusCode(int statusCode) {
+        @NotNull
+        ResponseCollector statusCode(int statusCode) {
             this.statusCode = statusCode;
             return this;
         }
 
-        @NotNull ResponseCollector error(String error) {
+        @NotNull
+        ResponseCollector error(String error) {
             this.error = error;
             return this;
         }

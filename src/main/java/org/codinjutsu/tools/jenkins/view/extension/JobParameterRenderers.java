@@ -1,5 +1,6 @@
 package org.codinjutsu.tools.jenkins.view.extension;
 
+import com.google.common.collect.Lists;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
@@ -8,10 +9,12 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.CheckBoxList;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.collections.CollectionUtils;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
@@ -24,8 +27,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public final class JobParameterRenderers {
@@ -94,6 +99,50 @@ public final class JobParameterRenderers {
         return new JobParameterComponent<>(jobParameter, comboBox, asString(JComboBox::getSelectedItem));
     }
 
+    private static final List<JCheckBox> DEFAULT_K8S_ENV_CHOICE_LIST = Lists.newArrayList(
+            new JCheckBox("test", true),
+            new JCheckBox("test1", true),
+            new JCheckBox("prod", false),
+            new JCheckBox("test2", false)
+    );
+
+    private static final JCheckBox[] DEFAULT_K8S_ENV_CHOICES = DEFAULT_K8S_ENV_CHOICE_LIST.toArray(new JCheckBox[0]);
+
+    private static JCheckBox[] convertJCheckBoxList(List<String> choices){
+        return convertJCheckBoxList(choices, null);
+    }
+
+    private static JCheckBox[] convertJCheckBoxList(List<String> choices, List<String> selectedChoices){
+        JCheckBox[] checkBoxes = new JCheckBox[choices.size()];
+        int index = 0;
+        boolean hasSeleted = selectedChoices != null;
+        for (String choice : choices) {
+            JCheckBox checkBox = new JCheckBox(choice,
+                    hasSeleted && selectedChoices.contains(choice));
+            checkBoxes[index++] = checkBox;
+        }
+        return checkBoxes;
+    }
+
+    private static final String K8S_ENV_EQUAL_TRUE = "=true";
+
+    @NotNull
+    public static JobParameterComponent<String> createCheckBoxList(@NotNull JobParameter jobParameter,
+                                                                   String defaultValue) {
+        JCheckBox[] choices = DEFAULT_K8S_ENV_CHOICES;
+        if (CollectionUtils.isNotEmpty(jobParameter.getChoices())) {
+            choices = convertJCheckBoxList(jobParameter.getChoices());
+        }
+        CheckBoxList<String> list = new CheckBoxList<>();
+        list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        list.setListData(choices);
+        return new JobParameterComponent<>(jobParameter, list, asString(o ->{
+            List<JCheckBox> selected = o.getSelectedValuesList();
+            return selected.parallelStream().map(select -> select.getText() + K8S_ENV_EQUAL_TRUE)
+                    .collect(Collectors.joining("&"));
+        }));
+    }
+
     @SuppressWarnings("unused")
     @NotNull
     public static JobParameterComponent<String> createLabel(@NotNull JobParameter jobParameter, String defaultValue) {
@@ -143,6 +192,7 @@ public final class JobParameterRenderers {
         return renderer.apply(jobParameter, defaultValue);
     }
 
+
     @NotNull
     public static Function<JobParameter, JobParameterComponent<String>> createGitParameterChoices(
             @NotNull ProjectJob projectJob) {
@@ -151,8 +201,8 @@ public final class JobParameterRenderers {
 
     @NotNull
     public static JobParameterComponent<String> createGitParameterChoices(@NotNull ProjectJob projectJob,
-                                                                         @NotNull JobParameter jobParameter,
-                                                                         String defaultValue) {
+                                                                          @NotNull JobParameter jobParameter,
+                                                                          String defaultValue) {
         if (jobParameter.getChoices().isEmpty()) {
             final RequestManagerInterface requestManager = RequestManager.getInstance(projectJob.getProject());
             JobParameter gitParameter = JobParameter.builder()

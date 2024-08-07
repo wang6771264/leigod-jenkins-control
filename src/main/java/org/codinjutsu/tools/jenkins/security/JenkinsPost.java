@@ -3,17 +3,22 @@ package org.codinjutsu.tools.jenkins.security;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsoner;
 import org.apache.http.HttpHeaders;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.codinjutsu.tools.jenkins.exception.JenkinsPluginRuntimeException;
 import org.codinjutsu.tools.jenkins.model.jenkins.FileParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.RequestData;
+import org.codinjutsu.tools.jenkins.model.jenkins.StringParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.VirtualFilePart;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 
 @SuppressWarnings("java:S110")
@@ -45,6 +50,19 @@ public class JenkinsPost extends HttpPost {
             this.setEntity(multipart);
         }
     }
+
+    public void setDataFormdata(@NotNull Collection<RequestData> data) {
+        if (!data.isEmpty()) {
+            final var formParams = new ArrayList<BasicNameValuePair>();
+            for (RequestData datum : data) {
+                StringParameter param = (StringParameter) datum;
+                formParams.add(new BasicNameValuePair(param.getName(), param.getValue()));
+            }
+            final var formEntity = new UrlEncodedFormEntity(formParams, StandardCharsets.UTF_8);
+            this.setEntity(formEntity);
+        }
+    }
+
 
     private void addMultipartBinaryBody(FileParameter fileParameter,
                                         MultipartEntityBuilder multipartEntityBuilder) {

@@ -14,7 +14,7 @@ public class DateParameterRenderer extends AbstractParameterRenderer implements 
     @NonNls
     private static final String TYPE_CLASS = "me.leejay.jenkins.dateparameter.DateParameterDefinition";
 
-    static final JobParameterType DATE_PARAMETER = new JobParameterType("DateParameterDefinition", TYPE_CLASS);
+    public static final JobParameterType DATE_PARAMETER = new JobParameterType("DateParameterDefinition", TYPE_CLASS);
 
     @Override
     protected JobParameterComponent getJobParameterComponent(JobParameter jobParameter, ProjectJob projectJob, String defaultValue) {

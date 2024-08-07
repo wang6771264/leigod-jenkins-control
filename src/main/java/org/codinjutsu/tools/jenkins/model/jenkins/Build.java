@@ -39,32 +39,32 @@ public class Build {
     public static final Build NULL = createNullBuild();
 
     @NotNull
-    private final String url;
+    String url;
     @NotNull
     @Builder.Default
-    private final Date buildDate = new Date();
-    private final int number;
-    private final boolean building;
+    Date buildDate = new Date();
+    int number;
+    boolean building;
     @Nullable
     @Builder.Default
-    private final String message = null;
+    String message = null;
     @Builder.Default
     @Nullable
-    private final String displayName = null;
+    String displayName = null;
     @Builder.Default
     @Nullable
-    private final String fullDisplayName = null;
+    String fullDisplayName = null;
     @Builder.Default
-    private final Date timestamp = new Date();
+    Date timestamp = new Date();
     @Nullable
     @Builder.Default
-    private final Long duration = null;
+    Long duration = null;
     @NotNull
     @Builder.Default
-    private final BuildStatusEnum status = BuildStatusEnum.NULL;
+    BuildStatusEnum status = BuildStatusEnum.NULL;
     @Builder.Default
     @NotNull
-    private final List<BuildParameter> buildParameterList = new LinkedList<>();
+    List<BuildParameter> buildParameterList = new LinkedList<>();
 
     @SuppressWarnings("java:S107")
     @NotNull
@@ -144,7 +144,7 @@ public class Build {
         var runningStatus = isBuilding() ? " (running)" : "";
 
         final Optional<Long> buildDuration = Optional.ofNullable(getDuration());
-        if(buildDuration.isPresent()) {
+        if (buildDuration.isPresent()) {
             return String.format("%s duration: %s%s", getNameToRender(),
                     NlsMessages.formatDuration(buildDuration.get()), runningStatus);
         }

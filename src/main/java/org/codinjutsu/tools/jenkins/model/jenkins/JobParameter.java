@@ -16,15 +16,16 @@
 
 package org.codinjutsu.tools.jenkins.model.jenkins;
 
+import com.github.cliftonlabs.json_simple.JsonObject;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Singular;
-import lombok.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-@Value
+@Data
 @Builder(toBuilder = true)
 public class JobParameter {
 
@@ -34,10 +35,15 @@ public class JobParameter {
     private final String description;
     @Nullable
     private final JobParameterType jobParameterType;
+    /**
+     * 默认值的json格式
+     */
     @Nullable
-    private final String defaultValue;
+    private final JsonObject defaultParamObj;
+
+    @Nullable
+    private String defaultValue;
     @NotNull
     @Singular
-    private final List<String> choices;
-
+    private List<String> choices;
 }

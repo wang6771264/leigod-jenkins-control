@@ -18,7 +18,7 @@ public class ExtensibleChoiceParameterRenderer extends AbstractParameterRenderer
     @NonNls
     private static final String TYPE_CLASS = "jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition";
 
-    static final JobParameterType TYPE = new JobParameterType("ExtensibleChoiceParameterDefinition", TYPE_CLASS);
+    public static final JobParameterType TYPE = new JobParameterType("ExtensibleChoiceParameterDefinition", TYPE_CLASS);
 
     private final Map<JobParameterType, BiFunction<JobParameter, String, JobParameterComponent<String>>> converter =
             new HashMap<>();

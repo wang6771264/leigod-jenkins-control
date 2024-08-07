@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PatchParameterRenderer extends AbstractParameterRenderer implements JobParameterRenderer {
 
-    static final JobParameterType TYPE = new JobParameterType("PatchParameterDefinition",
+    public static final JobParameterType TYPE = new JobParameterType("PatchParameterDefinition",
             "org.jenkinsci.plugins.patch.PatchParameterDefinition");
 
     @NotNull

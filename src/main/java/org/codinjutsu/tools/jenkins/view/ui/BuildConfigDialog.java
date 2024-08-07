@@ -128,7 +128,9 @@ public class BuildConfigDialog extends DialogWrapper {
             //跳过测试是必然的
             final JobParameterRenderer jobParameterRenderer = JobParameterRenderer.findRenderer(jobParameter)
                     .orElseGet(DefaultRenderer::new);
-            final ProjectJob projectJob = ProjectJob.builder().project(project).lastBuild(job.getLastBuild()).build();
+            final ProjectJob projectJob = ProjectJob.builder()
+                    .job(job)
+                    .project(project).lastBuild(job.getLastBuild()).build();
             final JobParameterComponent<?> jobParameterComponent = jobParameterRenderer.render(jobParameter, projectJob);
 
             if (jobParameterComponent.isVisible()) {

@@ -2,7 +2,8 @@
     <!--suppress PluginXmlValidity -->
     <name>Jenkins Control</name>
     <id>Jenkins Control Plugin</id>
-    <description><![CDATA[A Jenkins Plugin for Jetbrains IDEs like IntelliJ or CLion. Will be replaced by gradle build]]></description>
+    <description>
+        <![CDATA[A Jenkins Plugin for Jetbrains IDEs like IntelliJ or CLion. Will be replaced by gradle build]]></description>
     <vendor url="https://github.com/MCMicS/jenkins-control-plugin/issues">
         mcmics
     </vendor>
@@ -10,10 +11,13 @@
     <idea-version since-build="232.8660"/>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends optional="true" config-file="org.codinjutsu.tools.jenkins-VcsSupport.xml">com.intellij.modules.vcs</depends>
-    <depends optional="true" config-file="org.codinjutsu.tools.jenkins-LangSupport.xml">com.intellij.modules.lang</depends>
+    <depends optional="true" config-file="org.codinjutsu.tools.jenkins-VcsSupport.xml">com.intellij.modules.vcs
+    </depends>
+    <depends optional="true" config-file="org.codinjutsu.tools.jenkins-LangSupport.xml">com.intellij.modules.lang
+    </depends>
     <depends optional="true" config-file="org.codinjutsu.tools.jenkins-JavaSupport.xml">com.intellij.java</depends>
-    <xi:include href="/META-INF/org.codinjutsu.tools.jenkins-JobParameterRenderer.xml" xpointer="xpointer(/idea-plugin/*)"/>
+    <xi:include href="/META-INF/org.codinjutsu.tools.jenkins-JobParameterRenderer.xml"
+                xpointer="xpointer(/idea-plugin/*)"/>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable parentId="tools" groupWeight="110" dynamic="true"
@@ -26,8 +30,8 @@
         </projectConfigurable>
         <applicationService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsAppSettings"/>
         <applicationService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsSettings"/>
-        <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.ExecutorService" />
-        <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.LoginService" />
+        <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.ExecutorService"/>
+        <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.LoginService"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsWindowManager"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.view.JenkinsStatusBarWidget"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.RequestManager"/>
@@ -36,14 +40,14 @@
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.BrowserPanelAuthenticationHandler"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.RssAuthenticationActionHandler"/>
 
-        <backgroundPostStartupActivity implementation="org.codinjutsu.tools.jenkins.StartupJenkinsService" />
+        <backgroundPostStartupActivity implementation="org.codinjutsu.tools.jenkins.StartupJenkinsService"/>
 
         <toolWindow id="Jenkins"
                     anchor="right"
                     canCloseContents="false"
                     factoryClass="org.codinjutsu.tools.jenkins.JenkinsToolWindowFactory"
                     doNotActivateOnStart="false"
-                    icon="JenkinsControlIcons.JENKINS_TOOLWINDOW_ICON" />
+                    icon="JenkinsControlIcons.JENKINS_TOOLWINDOW_ICON"/>
         <toolWindow id="Job test results"
                     anchor="bottom"
                     canCloseContents="true"
@@ -57,9 +61,9 @@
                     icon="JenkinsControlIcons.JENKINS_TOOLWINDOW_ICON"
                     factoryClass="org.codinjutsu.tools.jenkins.view.action.LogToolWindowFactory"/>
         <statusBarWidgetFactory implementation="org.codinjutsu.tools.jenkins.BuildStatusSummaryFactory"
-                                id="Jenkins.BuildStatusSummary" />
-        <aboutPopupDescriptionProvider implementation="org.codinjutsu.tools.jenkins.view.JenkinsAbout" />
-        <notificationGroup displayType="NONE" id="Jenkins Rss" />
+                                id="Jenkins.BuildStatusSummary"/>
+        <aboutPopupDescriptionProvider implementation="org.codinjutsu.tools.jenkins.view.JenkinsAbout"/>
+        <notificationGroup displayType="NONE" id="Jenkins Rss"/>
         <notificationGroup displayType="TOOL_WINDOW" id="Jenkins Notification" toolWindowId="Jenkins"/>
         <iconMapper mappingFile="JenkinsControlIconMappings.json"/>
     </extensions>

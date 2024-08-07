@@ -16,11 +16,11 @@ public class ListGitBranchesParameterRenderer extends AbstractParameterRenderer 
     @NonNls
     private static final String TYPE_CLASS = "com.syhuang.hudson.plugins.listgitbranchesparameter.ListGitBranchesParameterDefinition";
 
-    static final JobParameterType PT_TAG = new JobParameterType("PT_TAG", TYPE_CLASS);
+    public static final JobParameterType PT_TAG = new JobParameterType("PT_TAG", TYPE_CLASS);
 
-    static final JobParameterType PT_BRANCH = new JobParameterType("PT_BRANCH", TYPE_CLASS);
+    public static final JobParameterType PT_BRANCH = new JobParameterType("PT_BRANCH", TYPE_CLASS);
 
-    static final JobParameterType PT_BRANCH_TAG = new JobParameterType("PT_BRANCH_TAG", TYPE_CLASS);
+    public static final JobParameterType PT_BRANCH_TAG = new JobParameterType("PT_BRANCH_TAG", TYPE_CLASS);
 
     private final GitParameterRenderer parameterRenderer;
 

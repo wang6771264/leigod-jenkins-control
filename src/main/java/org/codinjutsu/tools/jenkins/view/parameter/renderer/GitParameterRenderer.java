@@ -17,17 +17,17 @@ public class GitParameterRenderer extends AbstractParameterRenderer implements J
     @NonNls
     private static final String TYPE_CLASS = "net.uaznia.lukanus.hudson.plugins.gitparameter.GitParameterDefinition";
 
-    static final JobParameterType PT_TAG = new JobParameterType("PT_TAG", TYPE_CLASS);
+    public static final JobParameterType PT_TAG = new JobParameterType("PT_TAG", TYPE_CLASS);
 
-    static final JobParameterType PT_BRANCH = new JobParameterType("PT_BRANCH", TYPE_CLASS);
+    public static final JobParameterType PT_BRANCH = new JobParameterType("PT_BRANCH", TYPE_CLASS);
 
-    static final JobParameterType PT_BRANCH_TAG = new JobParameterType("PT_BRANCH_TAG", TYPE_CLASS);
+    public static final JobParameterType PT_BRANCH_TAG = new JobParameterType("PT_BRANCH_TAG", TYPE_CLASS);
 
-    static final JobParameterType PT_REVISION = new JobParameterType("PT_REVISION", TYPE_CLASS);
+    public static final JobParameterType PT_REVISION = new JobParameterType("PT_REVISION", TYPE_CLASS);
 
-    static final JobParameterType PT_PULL_REQUEST = new JobParameterType("PT_PULL_REQUEST", TYPE_CLASS);
+    public static final JobParameterType PT_PULL_REQUEST = new JobParameterType("PT_PULL_REQUEST", TYPE_CLASS);
 
-    static final JobParameterType GIT_PARAMETER_DEFINITION = new JobParameterType("GitParameterDefinition", TYPE_CLASS);
+    public static final JobParameterType GIT_PARAMETER_DEFINITION = new JobParameterType("GitParameterDefinition", TYPE_CLASS);
 
     private final Set<JobParameterType> validTypes = new HashSet<>();
 

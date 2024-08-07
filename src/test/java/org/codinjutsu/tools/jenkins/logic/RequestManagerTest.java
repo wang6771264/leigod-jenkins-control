@@ -106,7 +106,7 @@ public class RequestManagerTest {
                 .thenReturn(urlFromConf);
         when(urlBuilderMock.createViewUrl(any(JenkinsPlateform.class), anyString()))
                 .thenReturn(urlFromJenkins);
-        when(jenkinsSecurityClientMock.execute(urlFromConf))
+        when(jenkinsSecurityClientMock.executeForJson(urlFromConf))
                 .thenReturn(IOUtils.toString(getClass().getResourceAsStream("JsonRequestManager_loadJenkinsWorkspaceWithIncorrectPortInTheResponse.json")));
         try {
             requestManager.loadJenkinsWorkspace(configuration, jenkinsSettings);
@@ -125,7 +125,7 @@ public class RequestManagerTest {
                 .thenReturn(urlFromConf);
         when(urlBuilderMock.createViewUrl(any(JenkinsPlateform.class), anyString()))
                 .thenReturn(urlFromJenkins);
-        when(jenkinsSecurityClientMock.execute(urlFromConf))
+        when(jenkinsSecurityClientMock.executeForJson(urlFromConf))
                 .thenReturn(IOUtils.toString(getClass().getResourceAsStream("JsonRequestManager_loadJenkinsWorkspaceWithIncorrectHostInTheResponse.json")));
         try {
             requestManager.loadJenkinsWorkspace(configuration, jenkinsSettings);
@@ -148,7 +148,7 @@ public class RequestManagerTest {
                 .thenReturn(urlFromConf);
         when(urlBuilderMock.createViewUrl(any(JenkinsPlateform.class), anyString()))
                 .thenReturn(urlFromJenkins);
-        when(jenkinsSecurityClientMock.execute(urlFromConf))
+        when(jenkinsSecurityClientMock.executeForJson(urlFromConf))
                 .thenReturn(IOUtils.toString(getClass().getResourceAsStream("JsonRequestManager_loadJenkinsWorkspaceWithIncorrectPortInTheResponse.json")));
         final Jenkins jenkins = requestManager.loadJenkinsWorkspace(configuration, jenkinsSettings);
         Assertions.assertThat(jenkins.getServerUrl()).isEqualTo(serverUrl);
@@ -160,7 +160,7 @@ public class RequestManagerTest {
         final URL computerUrl = new URL("http://myjenkins:8080/computer");
         setServerUrl(serverUrl);
         when(urlBuilderMock.createComputerUrl(serverUrl)).thenReturn(computerUrl);
-        when(jenkinsSecurityClientMock.execute(computerUrl))
+        when(jenkinsSecurityClientMock.executeForJson(computerUrl))
                 .thenReturn(IOUtils.toString(getClass().getResourceAsStream("JsonRequestManager_computer.json")));
         final List<Computer> computers = requestManager.loadComputer(configuration);
         assertThat(computers).hasSize(2);

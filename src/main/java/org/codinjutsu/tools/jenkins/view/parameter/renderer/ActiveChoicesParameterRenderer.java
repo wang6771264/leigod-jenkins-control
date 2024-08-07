@@ -20,9 +20,9 @@ public class ActiveChoicesParameterRenderer extends AbstractParameterRenderer im
     @NonNls
     private static final String TYPE_CLASS_PREFIX = "org.biouno.unochoice.";
 
-    static final JobParameterType CHOICE_PARAMETER = createTypeForClassPrefix("ChoiceParameter", TYPE_CLASS_PREFIX);
-    static final JobParameterType CASCADE_CHOICE_PARAMETER = createTypeForClassPrefix("CascadeChoiceParameter", TYPE_CLASS_PREFIX);
-    static final JobParameterType DYNAMIC_REFERENCE_PARAMETER = createTypeForClassPrefix("DynamicReferenceParameter", TYPE_CLASS_PREFIX);
+    public static final JobParameterType CHOICE_PARAMETER = createTypeForClassPrefix("ChoiceParameter", TYPE_CLASS_PREFIX);
+    public static final JobParameterType CASCADE_CHOICE_PARAMETER = createTypeForClassPrefix("CascadeChoiceParameter", TYPE_CLASS_PREFIX);
+    public static final JobParameterType DYNAMIC_REFERENCE_PARAMETER = createTypeForClassPrefix("DynamicReferenceParameter", TYPE_CLASS_PREFIX);
     private final Map<JobParameterType, BiFunction<JobParameter, String, JobParameterComponent<String>>> converter =
             new HashMap<>();
 

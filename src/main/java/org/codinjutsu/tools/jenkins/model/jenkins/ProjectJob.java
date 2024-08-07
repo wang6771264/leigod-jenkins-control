@@ -8,13 +8,11 @@ import org.jetbrains.annotations.NotNull;
 @Value
 @Builder(toBuilder = true)
 public class ProjectJob {
+    @NotNull
+    Project project;
 
     @NotNull
-    private Project project;
+    Job job;
 
-    @NotNull
-    private Job job;
-
-    @NotNull
-    private Build lastBuild;
+    Build lastBuild;
 }

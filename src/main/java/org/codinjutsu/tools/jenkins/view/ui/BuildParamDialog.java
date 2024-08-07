@@ -138,8 +138,11 @@ public class BuildParamDialog extends DialogWrapper {
 //            }
             final JobParameterRenderer jobParameterRenderer = JobParameterRenderer.findRenderer(jobParameter)
                     .orElseGet(DefaultRenderer::new);
-            final ProjectJob projectJob = ProjectJob.builder().project(project).lastBuild(job.getLastBuild()).build();
-            final JobParameterComponent<?> jobParameterComponent = jobParameterRenderer.render(jobParameter, projectJob);
+            final ProjectJob projectJob = ProjectJob.builder()
+                    .job(job).project(project).lastBuild(job.getLastBuild())
+                    .build();
+            final JobParameterComponent<?> jobParameterComponent = jobParameterRenderer.render(jobParameter,
+                    projectJob);
 
             if (jobParameterComponent.isVisible()) {
                 rows.incrementAndGet();
@@ -192,10 +195,13 @@ public class BuildParamDialog extends DialogWrapper {
         final HashMap<String, Object> valueByNameMap = new HashMap<>();
         for (JobParameterComponent<?> jobParameterComponent : inputFields) {
             final JobParameter jobParameter = jobParameterComponent.getJobParameter();
-            jobParameterComponent.ifHasValue(value -> valueByNameMap.put(jobParameter.getName(), value));
+            jobParameterComponent.ifHasValue(value ->{
+                //添加build参数
+                valueByNameMap.put(jobParameter.getName(), value);
+            });
         }
         //fixme 默认传入一个跳过测试
-//        valueByNameMap.put("SKIP_TEST", "-Dmaven.test.skip=true");
+        valueByNameMap.put("SKIP_TEST", "-Dmaven.test.skip=true");
         return valueByNameMap;
     }
 

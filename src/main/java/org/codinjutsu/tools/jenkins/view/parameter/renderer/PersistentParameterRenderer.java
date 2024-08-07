@@ -14,16 +14,16 @@ import java.util.function.BiFunction;
 
 public class PersistentParameterRenderer extends AbstractParameterRenderer implements JobParameterRenderer {
 
-    static final JobParameterType BOOLEAN = new JobParameterType("PersistentBooleanParameterDefinition",
+    public static final JobParameterType BOOLEAN = new JobParameterType("PersistentBooleanParameterDefinition",
             "com.gem.persistentparameter.PersistentBooleanParameterDefinition");
 
-    static final JobParameterType STRING = new JobParameterType("PersistentStringParameterDefinition",
+    public static final JobParameterType STRING = new JobParameterType("PersistentStringParameterDefinition",
             "com.gem.persistentparameter.PersistentStringParameterDefinition");
 
-    static final JobParameterType CHOICE = new JobParameterType("PersistentChoiceParameterDefinition",
+    public static final JobParameterType CHOICE = new JobParameterType("PersistentChoiceParameterDefinition",
             "com.gem.persistentparameter.PersistentChoiceParameterDefinition");
 
-    static final JobParameterType TEXT = new JobParameterType("PersistentTextParameterDefinition",
+    public static final JobParameterType TEXT = new JobParameterType("PersistentTextParameterDefinition",
             "com.gem.persistentparameter.PersistentTextParameterDefinition");
 
     private final Map<JobParameterType, BiFunction<JobParameter, String, JobParameterComponent<?>>> converter = new HashMap<>();

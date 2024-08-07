@@ -17,8 +17,12 @@
 package org.codinjutsu.tools.jenkins.enums;
 
 import com.intellij.openapi.diagnostic.Logger;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Currently missing color: nobuilt
@@ -26,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
  * @see <a href="https://github.com/jenkinsci/jenkins/blob/master/core/src/main/java/hudson/model/BallColor.java">Jenkins Color</a>
  * @see <a href="https://github.com/jenkinsci/jenkins/blob/master/core/src/main/java/hudson/model/StatusIcon.java>Jenkins Status</a>
  */
+@Getter
 @RequiredArgsConstructor
 public enum BuildStatusEnum {
 
@@ -46,23 +51,23 @@ public enum BuildStatusEnum {
     private final String status;
     private final ColorEnum colorEnum;
 
+    private static final Map<String, BuildStatusEnum> MAPPING = new HashMap<>();
+
+    static {
+        for (BuildStatusEnum value : values()) {
+            MAPPING.put(value.getStatus().toUpperCase(), value);
+        }
+    }
 
     BuildStatusEnum(String status) {
         this(status, ColorEnum.DISABLED);
     }
 
     public static BuildStatusEnum parseStatus(String status) {
-        BuildStatusEnum buildStatusEnum;
-        try {
-            if (status == null || "null".equals(status)) {
-                status = "NULL";
-            }
-            buildStatusEnum = valueOf(status.toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            log.info("Unsupported status : " + status, ex);
-            buildStatusEnum = NULL;
+        if (status == null) {
+            return NULL;
         }
-        return buildStatusEnum;
+        return MAPPING.get(status.toUpperCase());
     }
 
     /**
@@ -78,17 +83,10 @@ public enum BuildStatusEnum {
                 return jobStatus;
             }
         }
-
         return NULL;
     }
 
-
-    public String getStatus() {
-        return status;
-    }
-
-    @NotNull
-    public ColorEnum getColorEnum() {
-        return colorEnum;
+    public boolean equalsByStatus(String status){
+        return status != null && StringUtils.equalsIgnoreCase(status, this.status);
     }
 }

@@ -31,11 +31,13 @@ public interface JenkinsSecurityClient {
     @Nullable
     String connect(URL jenkinsUrl);
 
-    default String execute(URL url) {
-        return execute(url, Collections.emptySet()).getData();
+    default String executeForJson(URL url) {
+        return executeForJson(url, Collections.emptySet()).getData();
     }
 
-    @NotNull Response execute(URL url, @NotNull Collection<RequestData> data);
+    @NotNull Response executeForJson(URL url, @NotNull Collection<RequestData> data);
+
+    @NotNull Response executeFormData(URL url, @NotNull Collection<RequestData> data);
 
     @NotNull HttpContext getHttpClientContext();
 

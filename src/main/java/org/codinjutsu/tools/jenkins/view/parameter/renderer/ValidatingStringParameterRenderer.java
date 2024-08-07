@@ -14,7 +14,7 @@ public class ValidatingStringParameterRenderer extends AbstractParameterRenderer
     @NonNls
     private static final String TYPE_CLASS = "hudson.plugins.validating_string_parameter.ValidatingStringParameterDefinition";
 
-    static final JobParameterType TYPE = new JobParameterType("ValidatingStringParameterDefinition", TYPE_CLASS);
+    public static final JobParameterType TYPE = new JobParameterType("ValidatingStringParameterDefinition", TYPE_CLASS);
 
     @Override
     protected JobParameterComponent<String> getJobParameterComponent(JobParameter jobParameter, ProjectJob projectJob, String defaultValue) {

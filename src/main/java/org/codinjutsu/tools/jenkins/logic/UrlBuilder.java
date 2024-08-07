@@ -37,14 +37,16 @@ public class UrlBuilder {
     private static final Logger LOG = Logger.getInstance(UrlBuilder.class.getName());
 
     private static final String API_JSON = "/api/json";
+    private static final String LAST_SUCCESSFUL_BUILD_NUMBER_API = "/lastSuccessfulBuild/buildNumber";
     private static final String BUILD = "/build";
+    private static final String BUILD_WITHPARAMETERS = "/buildWithParameters";
     private static final String RSS_LATEST = "/rssLatest";
     private static final String TREE_PARAM = "?tree=";
     private static final String URL = "url";
     private static final String BASIC_JENKINS_INFO = URL + ",description,nodeName,nodeDescription,primaryView[name,url],views[name,url,views[name,url]]";
     private static final String BASIC_BUILD_INFO = URL + ",id,building,result,number,displayName,fullDisplayName," +
             "timestamp,duration,actions[parameters[name,value]]";
-    private static final String BASIC_JOB_INFO = "name,fullName,displayName,fullDisplayName,jobs," + URL + ",color,buildable,inQueue,healthReport[description,iconUrl],lastBuild[" + BASIC_BUILD_INFO + "],lastFailedBuild[" + URL + "],lastSuccessfulBuild[" + URL + "],property[parameterDefinitions[name,type,defaultParameterValue[value],description,choices]]";
+    private static final String BASIC_JOB_INFO = "name,fullName,displayName,fullDisplayName,jobs," + URL + ",color,buildable,inQueue,healthReport[description,iconUrl],lastBuild[" + BASIC_BUILD_INFO + "],lastFailedBuild[" + URL + "],lastSuccessfulBuild[" + URL + "],property[parameterDefinitions[name,type,defaultParameterValue[*],description,choices]]";
     private static final String BASIC_VIEW_INFO = "name," + URL + ",jobs[" + BASIC_JOB_INFO + "]";
     private static final String CLOUDBEES_VIEW_INFO = "name," + URL + ",views[jobs[" + BASIC_JOB_INFO + "]]";
     private static final String TEST_CONNECTION_REQUEST = "?tree=nodeName,url,description,primaryView[name,url]";
@@ -71,6 +73,11 @@ public class UrlBuilder {
 
     public URL createRunJobUrl(String jobBuildUrl, JenkinsAppSettings configuration) {
         return buildUrl(jobBuildUrl, encodePathQuery(String.format("%s?delay=%dsec", BUILD, configuration.getBuildDelay())));
+    }
+
+    public URL createRunJobWithParamsUrl(String jobBuildUrl, JenkinsAppSettings configuration) {
+        return buildUrl(jobBuildUrl, encodePathQuery(String.format("%s?delay=%dsec",
+                BUILD_WITHPARAMETERS, configuration.getBuildDelay())));
     }
 
     @SneakyThrows
@@ -128,6 +135,15 @@ public class UrlBuilder {
 
     public URL createJobUrl(String jobUrl) {
         return buildUrl(jobUrl, encodePathQuery(API_JSON + TREE_PARAM + BASIC_JOB_INFO));
+    }
+
+    public URL createLastSuccessfulBuildNumberUrl(String jobUrl) {
+        return buildUrl(jobUrl, encodePathQuery(LAST_SUCCESSFUL_BUILD_NUMBER_API));
+    }
+
+    public URL createOldBuildUrl(String jobUrl) {
+        //这里只取50个
+        return buildUrl(jobUrl, encodePathQuery(API_JSON + TREE_PARAM + "builds[number,status,result]{0,50}"));
     }
 
     public URL createBuildUrl(String buildUrl) {
