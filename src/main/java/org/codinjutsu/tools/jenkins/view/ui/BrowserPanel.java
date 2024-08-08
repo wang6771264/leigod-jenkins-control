@@ -570,6 +570,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
             }
             final List<Job> jobList;
             final View viewToLoadJobs = currentSelectedView;
+            //fixme 根据view去更新,这里需要加一个根据选中的选项更新状态
             if (viewToLoadJobs instanceof FavoriteView) {
                 jobList = requestManager.loadFavoriteJobs(jenkinsSettings.getFavoriteJobs());
             } else {
