@@ -17,7 +17,6 @@
 package org.codinjutsu.tools.jenkins.view.ui;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.actions.CopyAction;
 import com.intellij.lang.LangBundle;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -31,6 +30,7 @@ import com.intellij.ui.PopupHandler;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.codinjutsu.tools.jenkins.*;
+import org.codinjutsu.tools.jenkins.common.CopyBuildNumberAction;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.logic.*;
@@ -368,7 +368,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     private void installActionsInPopupMenu() {
         //fixme 列表添加菜单
         DefaultActionGroup popupGroup = new DefaultActionGroup("JenkinsPopupAction", true);
-        final CopyAction copyAction = new CopyAction();
+        final CopyBuildNumberAction copyAction = new CopyBuildNumberAction(this);
         copyAction.getTemplatePresentation().setText(LangBundle.message("popup.title.copy"));
         copyAction.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
         popupGroup.add(copyAction);

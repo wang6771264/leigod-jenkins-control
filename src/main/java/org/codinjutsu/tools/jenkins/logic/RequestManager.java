@@ -43,6 +43,7 @@ import org.codinjutsu.tools.jenkins.model.jenkins.*;
 import org.codinjutsu.tools.jenkins.security.JenkinsSecurityClient;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
 import org.codinjutsu.tools.jenkins.security.SecurityClientFactory;
+import org.codinjutsu.tools.jenkins.util.SymbolPool;
 import org.codinjutsu.tools.jenkins.view.parameter.renderer.NodeParameterRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.VisibleForTesting;
@@ -376,7 +377,15 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         loadConsoleTextFor(getBuildForType(buildTypeEnum).apply(getJob(job)), buildConsoleStreamListener, job::getNameToRenderSingleJob);
     }
 
-    private void loadConsoleTextFor(com.offbytwo.jenkins.model.Build build, BuildLogConsoleStreamListener buildConsoleStreamListener, @NotNull Supplier<String> logName) {
+    private static final String HYPERLINK_FORMAT = "<html><a href=\"%s\">%s</a></html>";
+
+    private String getHyperlink(String url, String displayName) {
+        return String.format(HYPERLINK_FORMAT, url, displayName);
+    }
+
+    private void loadConsoleTextFor(com.offbytwo.jenkins.model.Build build,
+                                    BuildLogConsoleStreamListener buildConsoleStreamListener,
+                                    @NotNull Supplier<String> logName) {
         try {
             final int pollingInSeconds = 1;
             final int poolingTimeout = Math.toIntExact(TimeUnit.HOURS.toSeconds(1));
@@ -385,7 +394,8 @@ public class RequestManager implements RequestManagerInterface, Disposable {
                 buildConsoleStreamListener.onData("No Build available\n");
                 buildConsoleStreamListener.finished();
             } else {
-                buildConsoleStreamListener.onData("Log for Build " + build.getUrl() + "console\n");
+                String hyperlink = getHyperlink(build.getUrl(), SymbolPool.HASH + build.getNumber());
+                buildConsoleStreamListener.onData("Log for Build " + build.getUrl() + "console\n, buildNumber:" + hyperlink);
                 streamConsoleOutput(build.details(), buildConsoleStreamListener, pollingInSeconds, poolingTimeout);
             }
         } catch (IOException | InterruptedException e) {
