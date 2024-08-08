@@ -14,4 +14,9 @@ public class StringUtil {
     public static boolean isNotBlank(String str) {
         return !isBlank(str);
     }
+
+    public static String defaultIfBlank(String str, String defaultStr) {
+        return isBlank(str) ? defaultStr : str;
+    }
+
 }

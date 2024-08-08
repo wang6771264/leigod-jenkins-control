@@ -1,9 +1,9 @@
 package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
-import org.apache.commons.lang3.StringUtils;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
+import org.codinjutsu.tools.jenkins.util.StringUtil;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderers;
 import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
@@ -53,7 +53,7 @@ public class GitParameterRenderer extends AbstractParameterRenderer implements J
         if (projectJob == null) {
             return JobParameterRenderers.createComboBoxIfChoicesExists(jobParameter, defaultValue);
         } else {
-            jobParameter.setDefaultValue(StringUtils.defaultIfBlank(defaultValue, "origin/master"));
+            jobParameter.setDefaultValue(StringUtil.defaultIfBlank(defaultValue, "origin/master"));
             return JobParameterRenderers.createGitParameterChoices(projectJob).apply(jobParameter);
         }
     }

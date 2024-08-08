@@ -2,10 +2,10 @@ package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
+import org.codinjutsu.tools.jenkins.util.StringUtil;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderers;
 import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
@@ -76,12 +76,12 @@ public class ExtendedChoiceParameterRenderer extends AbstractParameterRenderer i
             if (CollectionUtils.isEmpty(jobParameter.getChoices())) {
                 jobParameter.setChoices(ENV_LIST);
             }
-            defaultValue = StringUtils.defaultIfBlank(defaultValue, DEFAULT_ENV);
+            defaultValue = StringUtil.defaultIfBlank(defaultValue, DEFAULT_ENV);
         }else if (SKIP_TEST.equals(jobParameter.getName())){
             if (CollectionUtils.isEmpty(jobParameter.getChoices())) {
                 jobParameter.setChoices(Lists.newArrayList(SKIP_TEST_VALUE));
             }
-            defaultValue = StringUtils.defaultIfBlank(defaultValue, SKIP_TEST_VALUE);
+            defaultValue = StringUtil.defaultIfBlank(defaultValue, SKIP_TEST_VALUE);
         }
         return biFunction.apply(jobParameter, defaultValue);
     }
