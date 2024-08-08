@@ -15,11 +15,13 @@ import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
+import org.codinjutsu.tools.jenkins.util.SymbolPool;
 import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
 import org.codinjutsu.tools.jenkins.view.parameter.PasswordComponent;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +29,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -99,20 +104,11 @@ public final class JobParameterRenderers {
         return new JobParameterComponent<>(jobParameter, comboBox, asString(JComboBox::getSelectedItem));
     }
 
-    private static final List<JCheckBox> DEFAULT_K8S_ENV_CHOICE_LIST = Lists.newArrayList(
-            new JCheckBox("test", true),
-            new JCheckBox("test1", true),
-            new JCheckBox("prod", false),
-            new JCheckBox("test2", false)
-    );
-
-    private static final JCheckBox[] DEFAULT_K8S_ENV_CHOICES = DEFAULT_K8S_ENV_CHOICE_LIST.toArray(new JCheckBox[0]);
-
-    private static JCheckBox[] convertJCheckBoxList(List<String> choices){
+    private static JCheckBox[] convertJCheckBoxList(List<String> choices) {
         return convertJCheckBoxList(choices, null);
     }
 
-    private static JCheckBox[] convertJCheckBoxList(List<String> choices, List<String> selectedChoices){
+    private static JCheckBox[] convertJCheckBoxList(List<String> choices, List<String> selectedChoices) {
         JCheckBox[] checkBoxes = new JCheckBox[choices.size()];
         int index = 0;
         boolean hasSeleted = selectedChoices != null;
@@ -126,20 +122,50 @@ public final class JobParameterRenderers {
 
     private static final String K8S_ENV_EQUAL_TRUE = "=true";
 
+
+    private List<String> getCheckBoxText(JCheckBox[] choices, CheckBoxList<String> list) {
+        List<String> res = new ArrayList<>();
+        for (int i = 0; i < choices.length; i++) {
+            JCheckBox choice = choices[i];
+            if (list.getModel().getElementAt(i).isSelected()) {
+                res.add(choice.getText());
+            }
+        }
+        return res;
+    }
+
+    /**
+     * fixme 该方法不通用,只能用于k8s环境变量
+     *
+     * @param jobParameter
+     * @param defaultValue
+     * @return
+     */
     @NotNull
     public static JobParameterComponent<String> createCheckBoxList(@NotNull JobParameter jobParameter,
                                                                    String defaultValue) {
-        JCheckBox[] choices = DEFAULT_K8S_ENV_CHOICES;
+        JCheckBox[] choices = new JCheckBox[]{};
         if (CollectionUtils.isNotEmpty(jobParameter.getChoices())) {
-            choices = convertJCheckBoxList(jobParameter.getChoices());
+            //添加choices，包含默认值
+            choices = convertJCheckBoxList(jobParameter.getChoices(),
+                    Arrays.stream(defaultValue.split(",")).toList());
         }
         CheckBoxList<String> list = new CheckBoxList<>();
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        list.setListData(choices);
-        return new JobParameterComponent<>(jobParameter, list, asString(o ->{
-            List<JCheckBox> selected = o.getSelectedValuesList();
-            return selected.parallelStream().map(select -> select.getText() + K8S_ENV_EQUAL_TRUE)
-                    .collect(Collectors.joining("&"));
+        DefaultListModel<JCheckBox> models = new DefaultListModel<>();
+        for (JCheckBox choice : choices) {
+            models.addElement(choice);
+        }
+        list.setModel(models);
+        JCheckBox[] finalChoices = choices;
+        return new JobParameterComponent<>(jobParameter, list, asString(o -> {
+            List<String> checkBoxText = getCheckBoxText(finalChoices, o);
+            if ("K8S_ENV".equals(jobParameter.getName())) {
+                return checkBoxText.stream().map(select -> select + K8S_ENV_EQUAL_TRUE)
+                        .collect(Collectors.joining(SymbolPool.AMPERSAND));
+            } else {
+                return String.join(",", checkBoxText);
+            }
         }));
     }
 
@@ -199,20 +225,48 @@ public final class JobParameterRenderers {
         return jobParameter -> createGitParameterChoices(projectJob, jobParameter, jobParameter.getDefaultValue());
     }
 
+    /**
+     * 可以显示的分支
+     */
+    private final List<String> FILTER_BRANCH_INCLUDE =
+            Lists.newArrayList("master", "develop", "test1", "test", "test2");
+    /**
+     * 默认的分支
+     */
+    private final String DEFAULT_BRANCH_INCLUDE = "test1";
+
+    private boolean isBranchInclude(String branch) {
+        for (String filterBranch : FILTER_BRANCH_INCLUDE) {
+            if (branch.endsWith(filterBranch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @NotNull
     public static JobParameterComponent<String> createGitParameterChoices(@NotNull ProjectJob projectJob,
                                                                           @NotNull JobParameter jobParameter,
                                                                           String defaultValue) {
         if (jobParameter.getChoices().isEmpty()) {
             final RequestManagerInterface requestManager = RequestManager.getInstance(projectJob.getProject());
+            AtomicReference<String> ars = new AtomicReference<>("origin/master");
+            List<String> choices = requestManager.getGitParameterChoices(projectJob.getJob(), jobParameter);
+            choices = choices.stream().filter(JobParameterRenderers::isBranchInclude).toList();
+            for (String branch : choices) {
+                if (StringUtils.endsWith(branch, DEFAULT_BRANCH_INCLUDE)) {
+                    ars.set(branch);
+                    break;
+                }
+            }
             JobParameter gitParameter = JobParameter.builder()
                     .name(jobParameter.getName())
                     .description(jobParameter.getDescription())
                     .jobParameterType(jobParameter.getJobParameterType())
-                    .defaultValue(jobParameter.getDefaultValue())
-                    .choices(requestManager.getGitParameterChoices(projectJob.getJob(), jobParameter))
+                    .defaultValue(ars.get())
+                    .choices(choices)
                     .build();
-            return createComboBoxIfChoicesExists(gitParameter, defaultValue);
+            return createComboBoxIfChoicesExists(gitParameter, ars.get());
         } else {
             return createComboBoxIfChoicesExists(jobParameter, defaultValue);
         }

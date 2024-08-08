@@ -200,8 +200,6 @@ public class BuildParamDialog extends DialogWrapper {
                 valueByNameMap.put(jobParameter.getName(), value);
             });
         }
-        //fixme 默认传入一个跳过测试
-        valueByNameMap.put("SKIP_TEST", "-Dmaven.test.skip=true");
         return valueByNameMap;
     }
 

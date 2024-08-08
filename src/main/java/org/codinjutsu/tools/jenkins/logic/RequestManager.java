@@ -285,8 +285,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         }
     }
 
-    private void runBuildWithParams(Job job, JenkinsAppSettings configuration,
-                                    Collection<RequestData> requestData) {
+    private void runBuildWithParams(Job job, JenkinsAppSettings configuration, Collection<RequestData> requestData) {
         if (handleNotYetLoggedInState()) return;
         URL url = urlBuilder.createRunJobWithParamsUrl(job.getUrl(), configuration);
         final var response = jenkinsSecurityClient.executeFormData(url, requestData);
@@ -583,9 +582,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         BuildsHistories histories;
         try {
             histories = JSON.parseObject(jsonData, BuildsHistories.class);
-            return Optional.ofNullable(histories.getBuilds()).stream().flatMap(Collection::stream)
-                    .filter(buildHistory -> BuildStatusEnum.SUCCESS.equalsByStatus(buildHistory.getResult()))
-                    .collect(Collectors.toList());
+            return Optional.ofNullable(histories.getBuilds()).stream().flatMap(Collection::stream).filter(buildHistory -> BuildStatusEnum.SUCCESS.equalsByStatus(buildHistory.getResult())).collect(Collectors.toList());
         } catch (Exception e) {
             logger.info("最近50个成功构建失败", e);
         }

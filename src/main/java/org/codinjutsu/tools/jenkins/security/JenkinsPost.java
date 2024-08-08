@@ -13,6 +13,7 @@ import org.codinjutsu.tools.jenkins.model.jenkins.FileParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.RequestData;
 import org.codinjutsu.tools.jenkins.model.jenkins.StringParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.VirtualFilePart;
+import org.codinjutsu.tools.jenkins.util.SymbolPool;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -56,13 +57,19 @@ public class JenkinsPost extends HttpPost {
             final var formParams = new ArrayList<BasicNameValuePair>();
             for (RequestData datum : data) {
                 StringParameter param = (StringParameter) datum;
-                formParams.add(new BasicNameValuePair(param.getName(), param.getValue()));
+                String value = param.getValue();
+                if (value.contains(SymbolPool.AMPERSAND)) {
+                    String[] split = value.split(SymbolPool.AMPERSAND);
+                    formParams.add(new BasicNameValuePair(param.getName(), split[0]));
+                    formParams.add(new BasicNameValuePair(param.getName(), split[1]));
+                }else{
+                    formParams.add(new BasicNameValuePair(param.getName(), value));
+                }
             }
             final var formEntity = new UrlEncodedFormEntity(formParams, StandardCharsets.UTF_8);
             this.setEntity(formEntity);
         }
     }
-
 
     private void addMultipartBinaryBody(FileParameter fileParameter,
                                         MultipartEntityBuilder multipartEntityBuilder) {
