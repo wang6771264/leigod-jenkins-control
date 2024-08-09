@@ -22,22 +22,26 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.RowIcon;
 import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.util.text.DateFormatUtil;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Delegate;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.BuildParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.util.SymbolPool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.function.Function;
 
 @AllArgsConstructor
@@ -129,8 +133,26 @@ public class JenkinsTreeRenderer extends ColoredTreeCellRenderer {
 
         final String buildNumberDisplay = build.getDisplayNumber();
         final Optional<Long> duration = Optional.ofNullable(build.getDuration());
-        return String.format("%s (%s) duration: %s%s", buildNumberDisplay,
-                DateFormatUtil.formatDateTime(build.getTimestamp()),
+        //fixme 构建树节点名称
+        if (build.getFullDisplayName() != null && build.getFullDisplayName().contains("leigod-java-test")) {
+            List<BuildParameter> buildParameterList = build.getBuildParameterList();
+            StringJoiner joiner = new StringJoiner(SymbolPool.SEMICOLON);
+            for (BuildParameter buildParameter : buildParameterList) {
+                String name = buildParameter.getName();
+                String value = buildParameter.getValue();
+                if (value == null) {
+                    continue;
+                }
+                if(Objects.equals(name, "relativePath")){
+                    int index = value.indexOf("/");
+                    value = index == -1 ? value : value.substring(0, value.indexOf("/"));
+                }
+                joiner.add(value);
+            }
+            return String.format("%s (duration: %s%s)", joiner,
+                    NlsMessages.formatDuration(duration.orElse(0L)), status);
+        }
+        return String.format("%s (duration: %s%s)", build.getFullDisplayName(),
                 NlsMessages.formatDuration(duration.orElse(0L)), status);
     }
 
@@ -149,7 +171,7 @@ public class JenkinsTreeRenderer extends ColoredTreeCellRenderer {
     }
 
     @NotNull
-    public static String  buildLabel(Job job, Function<Job, String> jobName, Function<Build, String> buildName) {
+    public static String buildLabel(Job job, Function<Job, String> jobName, Function<Build, String> buildName) {
         Build build = job.getLastBuild();
         if (build == null) {
             return jobName.apply(job);
