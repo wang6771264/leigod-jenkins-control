@@ -75,7 +75,8 @@ public class BuildParamDialog extends DialogWrapper {
         setAutoAdjustable(false);
     }
 
-    public static void showDialog(@NotNull Project project, final Job job, final JenkinsAppSettings configuration,
+    public static void showDialog(@NotNull Project project, final Job job,
+                                  final JenkinsAppSettings configuration,
                                   final RequestManagerInterface requestManager,
                                   final RunBuildCallback runBuildCallback) {
         ApplicationManager.getApplication().invokeLater(() -> {

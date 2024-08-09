@@ -27,6 +27,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ui.tree.TreeUtil;
+import lombok.Getter;
 import org.codinjutsu.tools.jenkins.*;
 import org.codinjutsu.tools.jenkins.common.CopyHyperlinkAction;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
@@ -75,6 +76,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     private final JenkinsTree jobTree;
     @NotNull
     private final Runnable refreshViewJob;
+    @Getter
     @NotNull
     private final Project project;
     private final JenkinsAppSettings jenkinsAppSettings;

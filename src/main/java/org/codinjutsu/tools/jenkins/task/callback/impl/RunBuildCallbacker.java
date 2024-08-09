@@ -2,9 +2,11 @@ package org.codinjutsu.tools.jenkins.task.callback.impl;
 
 import com.intellij.openapi.diagnostic.Logger;
 import lombok.Data;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.exception.AuthenticationException;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.task.callback.RunBuildCallback;
+import org.codinjutsu.tools.jenkins.view.action.LogToolWindow;
 import org.codinjutsu.tools.jenkins.view.action.RunBuildAction;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +24,8 @@ public class RunBuildCallbacker implements RunBuildCallback {
         browserPanel.notifyInfoJenkinsToolWindow(job.getNameToRenderSingleJob() + " build is on going",
                 job.getUrl());
         browserPanel.loadJob(job);
+        final LogToolWindow logToolWindow = new LogToolWindow(browserPanel.getProject());
+        logToolWindow.showLog(BuildTypeEnum.LAST, job);
     }
 
     @Override
