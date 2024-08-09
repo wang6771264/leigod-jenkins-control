@@ -76,7 +76,10 @@
         <action id="Jenkins.CopyHyperlink" class="org.codinjutsu.tools.jenkins.common.CopyHyperlinkAction"
                 icon="AllIcons.Actions.Copy">
             <override-text place="GoToAction"/>
-            <keyboard-shortcut first-keystroke="control C" keymap="$default"/>
+        </action>
+        <action id="Jenkins.RetryLastSuccessfulBuild" class="org.codinjutsu.tools.jenkins.view.action.RetryLastSuccessfulBuildAction"
+                icon="AllIcons.Actions.Execute">
+            <override-text place="GoToAction"/>
         </action>
         <action id="Jenkins.RunBuild" class="org.codinjutsu.tools.jenkins.view.action.RunBuildAction"
                 icon="AllIcons.Actions.Execute">

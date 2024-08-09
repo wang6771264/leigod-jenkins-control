@@ -20,20 +20,17 @@ import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.DimensionService;
 import com.intellij.openapi.util.text.StringUtil;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
-import org.codinjutsu.tools.jenkins.JobTracker;
-import org.codinjutsu.tools.jenkins.TraceableBuildJob;
-import org.codinjutsu.tools.jenkins.TraceableBuildJobFactory;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
+import org.codinjutsu.tools.jenkins.task.RunBuild;
+import org.codinjutsu.tools.jenkins.task.callback.RunBuildCallback;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderers;
 import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
@@ -183,7 +180,8 @@ public class BuildParamDialog extends DialogWrapper {
     }
 
     private void onOK() {
-        new RunBuild(project, job, configuration, getParamValueMap(), requestManager, runBuildCallback).queue();
+        new RunBuild(project, job, configuration, getParamValueMap(),
+                requestManager, runBuildCallback).queue();
     }
 
     private void saveLastSize() {
@@ -209,13 +207,6 @@ public class BuildParamDialog extends DialogWrapper {
         return contentPane;
     }
 
-    public interface RunBuildCallback {
-
-        void notifyOnOk(Job job);
-
-        void notifyOnError(Job job, Throwable ex);
-    }
-
     public class DefaultRenderer implements JobParameterRenderer {
 
         @NotNull
@@ -227,48 +218,6 @@ public class BuildParamDialog extends DialogWrapper {
         @Override
         public boolean isForJobParameter(@NotNull JobParameter jobParameter) {
             return true;
-        }
-    }
-
-    private static class RunBuild extends Task.Backgroundable {
-
-        private final Job job;
-        private final JenkinsAppSettings configuration;
-        private final Map<String, ?> paramValueMap;
-        private final RequestManagerInterface requestManager;
-        private final RunBuildCallback runBuildCallback;
-
-        RunBuild(Project project, Job job, JenkinsAppSettings configuration, Map<String, ?> paramValueMap,
-                 RequestManagerInterface requestManager, RunBuildCallback runBuildCallback) {
-            super(project, "Running Jenkins build", false);
-            this.job = job;
-            this.configuration = configuration;
-            this.paramValueMap = paramValueMap;
-            this.requestManager = requestManager;
-            this.runBuildCallback = runBuildCallback;
-        }
-
-        @Override
-        public void onSuccess() {
-            super.onSuccess();
-            runBuildCallback.notifyOnOk(job);
-        }
-
-        @Override
-        public void onThrowable(@NotNull Throwable error) {
-            logger.warn("Exception occured while trying to invoke build", error);
-            runBuildCallback.notifyOnError(job, error);
-        }
-
-        @Override
-        public void run(@NotNull ProgressIndicator indicator) {
-            indicator.setIndeterminate(true);
-
-            TraceableBuildJob buildJob = TraceableBuildJobFactory.newBuildJob(job, configuration,
-                    paramValueMap, requestManager);
-
-            JobTracker.getInstance().registerJob(buildJob);
-            buildJob.run();
         }
     }
 }

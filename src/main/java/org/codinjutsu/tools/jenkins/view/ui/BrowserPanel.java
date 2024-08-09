@@ -38,7 +38,6 @@ import org.codinjutsu.tools.jenkins.util.GuiUtil;
 import org.codinjutsu.tools.jenkins.view.JenkinsStatusBarWidget;
 import org.codinjutsu.tools.jenkins.view.JenkinsTreeNode;
 import org.codinjutsu.tools.jenkins.view.action.*;
-import org.codinjutsu.tools.jenkins.view.action.buildConfig.BuilcConfigAction;
 import org.codinjutsu.tools.jenkins.view.action.settings.SortByStatusAction;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -366,15 +365,12 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     private void installActionsInPopupMenu() {
         //fixme 列表添加菜单
         DefaultActionGroup popupGroup = new DefaultActionGroup("JenkinsPopupAction", true);
-        final CopyHyperlinkAction copyAction = new CopyHyperlinkAction();
-//        copyAction.getTemplatePresentation().setText(LangBundle.message("popup.title.copy"));
-//        copyAction.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
-//        popupGroup.add(copyAction);
         popupGroup.add(ActionManager.getInstance().getAction(CopyHyperlinkAction.ACTION_ID));
         popupGroup.addSeparator();
         popupGroup.add(ActionManager.getInstance().getAction(RunBuildAction.ACTION_ID));
+        popupGroup.add(ActionManager.getInstance().getAction(RetryLastSuccessfulBuildAction.ACTION_ID));
         popupGroup.add(ActionManager.getInstance().getAction(StopBuildAction.ACTION_ID));
-        popupGroup.add(ActionManager.getInstance().getAction(BuilcConfigAction.ACTION_ID));
+//        popupGroup.add(ActionManager.getInstance().getAction(BuilcConfigAction.ACTION_ID));
         popupGroup.addSeparator();
         popupGroup.add(new ShowLogAction(BuildTypeEnum.LAST));
         popupGroup.add(new ShowLogAction(BuildTypeEnum.LAST_SUCCESSFUL));

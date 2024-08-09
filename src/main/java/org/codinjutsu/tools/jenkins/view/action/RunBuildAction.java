@@ -23,14 +23,14 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
-import org.codinjutsu.tools.jenkins.exception.AuthenticationException;
+import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.logic.ExecutorService;
 import org.codinjutsu.tools.jenkins.logic.JenkinsBackgroundTask;
 import org.codinjutsu.tools.jenkins.logic.JenkinsBackgroundTaskFactory;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
-import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.task.callback.impl.RunBuildCallbacker;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.codinjutsu.tools.jenkins.view.ui.BuildParamDialog;
@@ -104,7 +104,7 @@ public class RunBuildAction extends AnAction implements DumbAware {
                     @Override
                     public void run(@NotNull RequestManagerInterface requestManager) {
                         if (job.hasParameters()) {
-                            GuiUtil.runInSwingThread(() -> browserPanel.loadJob(job,//
+                            GuiUtil.runInSwingThread(() -> browserPanel.loadJob(job,
                                     reloadedJob -> showRunDialog(project, reloadedJob, browserPanel)));
                         } else {
                             requestManager.runBuild(job, JenkinsAppSettings.getSafeInstance(project),
@@ -143,21 +143,6 @@ public class RunBuildAction extends AnAction implements DumbAware {
     private void showRunDialog(@NotNull Project project, @NotNull Job job, @NotNull BrowserPanel browserPanel) {
         RequestManagerInterface requestManager = browserPanel.getJenkinsManager();
         BuildParamDialog.showDialog(project, job, JenkinsAppSettings.getSafeInstance(project),
-                requestManager, new BuildParamDialog.RunBuildCallback() {
-
-                    public void notifyOnOk(Job job) {
-                        notifyOnGoingMessage(browserPanel, job);
-                        browserPanel.loadJob(job);
-                    }
-
-                    public void notifyOnError(Job job, Throwable ex) {
-                        if (ex instanceof AuthenticationException) {
-                            LOG.debug(((AuthenticationException) ex).getResponseBody(), ex);
-                        }
-                        browserPanel.notifyErrorJenkinsToolWindow("Build '" + job.getNameToRenderSingleJob() + "' cannot be run: " + ex.getMessage());
-                        browserPanel.loadJob(job);
-                    }
-
-                });
+                requestManager, new RunBuildCallbacker(browserPanel));
     }
 }
