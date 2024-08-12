@@ -21,8 +21,8 @@ import com.intellij.openapi.vcs.changes.ChangeListDecorator;
 import com.intellij.openapi.vcs.changes.LocalChangeList;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
-import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +42,7 @@ public class WatchedJobsDecorator implements ChangeListDecorator {
     public void decorateChangeList(@NotNull LocalChangeList changeList,
                                    @NotNull ColoredTreeCellRenderer cellRenderer,
                                    boolean selected, boolean expanded, boolean hasFocus) {
+        //添加查看项目变化的代码
         final BrowserPanel browserPanel = BrowserPanel.getInstance(project);
         final Map<String, Job> jobs = browserPanel.getWatched();
         Optional.ofNullable(jobs.get(changeList.getName()))

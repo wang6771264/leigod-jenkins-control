@@ -19,11 +19,14 @@ def readPropertyString = (key) -> property(key).toString()
 
 group readPropertyString('pluginGroup')
 version "${readPropertyString('pluginVersion')}-${readPropertyString('pluginSincePlatformVersion')}"
-apply plugin: 'org.jetbrains.intellij'
-apply plugin: 'org.jetbrains.changelog'
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: "io.freefair.lombok"
+//test push for prepushhandler
+apply {
+    plugin("idea")
+    plugin("java")
+    plugin("org.jetbrains.intellij")
+    plugin("org.jetbrains.changelog")
+    plugin("io.freefair.lombok")
+}
 
 intellij {
     pluginName.set(readPropertyString('pluginName'))

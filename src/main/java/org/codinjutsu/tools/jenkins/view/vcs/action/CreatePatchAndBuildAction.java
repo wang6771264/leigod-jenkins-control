@@ -55,7 +55,6 @@ public class CreatePatchAndBuildAction extends AnAction {
     private void showDialog(ProjectChangeList projectChangeList) {
         SwingUtilities.invokeLater(() -> {
             final BrowserPanel browserPanel = BrowserPanel.getInstance(projectChangeList.getProject());
-
             SelectJobDialog dialog = new SelectJobDialog(projectChangeList.getChangeLists(),
                     browserPanel.getAllJobs(), projectChangeList.getProject());
             dialog.setLocationRelativeTo(null);

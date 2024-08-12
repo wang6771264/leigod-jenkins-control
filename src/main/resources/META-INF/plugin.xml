@@ -8,7 +8,9 @@
         mcmics
     </vendor>
     <resource-bundle>messages.JenkinsControl</resource-bundle>
-    <idea-version since-build="232.8660"/>
+    <idea-version since-build="232.8660.185"/>
+
+    <depends>com.intellij.modules.vcs</depends>
 
     <depends>com.intellij.modules.platform</depends>
     <depends optional="true" config-file="org.codinjutsu.tools.jenkins-VcsSupport.xml">com.intellij.modules.vcs
@@ -20,6 +22,7 @@
                 xpointer="xpointer(/idea-plugin/*)"/>
 
     <extensions defaultExtensionNs="com.intellij">
+        <prePushHandler implementation="org.codinjutsu.tools.jenkins.extensions.MarkJobPrePushHandler"/>
         <projectConfigurable parentId="tools" groupWeight="110" dynamic="true"
                              bundle="messages.JenkinsControl" key="plugin.name"
                              id="preferences.Jenkins" instance="org.codinjutsu.tools.jenkins.settings.JenkinsComponent">

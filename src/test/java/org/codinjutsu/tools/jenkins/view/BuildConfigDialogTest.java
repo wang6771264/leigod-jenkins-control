@@ -29,6 +29,7 @@ import org.codinjutsu.tools.jenkins.logic.JobBuilder;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildInJobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.task.callback.RunBuildCallback;
 import org.codinjutsu.tools.jenkins.view.ui.BuildParamDialog;
 import org.jetbrains.annotations.NonNls;
 import org.junit.After;
@@ -52,7 +53,7 @@ public class BuildConfigDialogTest {
     private RequestManager requestManager;
 
     @Mock
-    private BuildParamDialog.RunBuildCallback callbackRun;
+    private RunBuildCallback callbackRun;
 
     private JenkinsAppSettings configuration;
 
