@@ -14,7 +14,7 @@ import java.util.List;
  * ==========================
  */
 @Data
-public class BuildsHistories implements Serializable {
+public class BuildHistories implements Serializable {
     /**
      * 构建历史
      */

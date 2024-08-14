@@ -21,19 +21,17 @@ public class ActiveChoicesParameterRenderer extends AbstractParameterRenderer im
     private static final String TYPE_CLASS_PREFIX = "org.biouno.unochoice.";
 
     public static final JobParameterType CHOICE_PARAMETER = createTypeForClassPrefix("ChoiceParameter", TYPE_CLASS_PREFIX);
-    public static final JobParameterType CASCADE_CHOICE_PARAMETER = createTypeForClassPrefix("CascadeChoiceParameter", TYPE_CLASS_PREFIX);
     public static final JobParameterType DYNAMIC_REFERENCE_PARAMETER = createTypeForClassPrefix("DynamicReferenceParameter", TYPE_CLASS_PREFIX);
     private final Map<JobParameterType, BiFunction<JobParameter, String, JobParameterComponent<String>>> converter =
             new HashMap<>();
 
     public ActiveChoicesParameterRenderer() {
         converter.put(CHOICE_PARAMETER, JobParameterRenderers::createComboBoxIfChoicesExists);
-        converter.put(CASCADE_CHOICE_PARAMETER, JobParameterRenderers::createComboBoxIfChoicesExists);
         converter.put(DYNAMIC_REFERENCE_PARAMETER, JobParameterRenderers::createLabel);
     }
 
     @Override
-    protected JobParameterComponent getJobParameterComponent(JobParameter jobParameter, ProjectJob projectJob, String defaultValue) {
+    protected JobParameterComponent<String> getJobParameterComponent(JobParameter jobParameter, ProjectJob projectJob, String defaultValue) {
         return converter.getOrDefault(jobParameter.getJobParameterType(), JobParameterRenderers::createTextField)
                 .apply(jobParameter, defaultValue);
     }

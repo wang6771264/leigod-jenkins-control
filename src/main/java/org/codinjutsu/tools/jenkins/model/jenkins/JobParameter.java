@@ -20,6 +20,7 @@ import com.github.cliftonlabs.json_simple.JsonObject;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+import org.codinjutsu.tools.jenkins.example.SearchableComboBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,11 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 public class JobParameter {
+
+    /**
+     * 唯一标识
+     */
+    private final String uniqueId;
 
     @NotNull
     private final String name;
@@ -46,4 +52,8 @@ public class JobParameter {
     @NotNull
     @Singular
     private List<String> choices;
+    /**
+     * 如果已有下拉列表则直接用已经有的
+     */
+    private SearchableComboBox cascadeComboBox;
 }

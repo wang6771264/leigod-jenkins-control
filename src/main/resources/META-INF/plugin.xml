@@ -22,7 +22,6 @@
                 xpointer="xpointer(/idea-plugin/*)"/>
 
     <extensions defaultExtensionNs="com.intellij">
-        <prePushHandler implementation="org.codinjutsu.tools.jenkins.extensions.MarkJobPrePushHandler"/>
         <projectConfigurable parentId="tools" groupWeight="110" dynamic="true"
                              bundle="messages.JenkinsControl" key="plugin.name"
                              id="preferences.Jenkins" instance="org.codinjutsu.tools.jenkins.settings.JenkinsComponent">

@@ -51,7 +51,7 @@ public class UrlBuilder {
     private static final String CLOUDBEES_VIEW_INFO = "name," + URL + ",views[jobs[" + BASIC_JOB_INFO + "]]";
     private static final String TEST_CONNECTION_REQUEST = "?tree=nodeName,url,description,primaryView[name,url]";
     private static final String BASIC_BUILDS_INFO = "builds[" + BASIC_BUILD_INFO + "]";
-    private static final String NESTED_JOBS_INFO =  URL + "name,displayName,fullDisplayName,jobs[" + BASIC_JOB_INFO + "]";
+    private static final String NESTED_JOBS_INFO = URL + "name,displayName,fullDisplayName,jobs[" + BASIC_JOB_INFO + "]";
     private static final String COMPUTER = "/computer";
     private static final String COMPUTER_INFO = "computer[displayName,description,offline,assignedLabels[name]]";
     /**
@@ -91,8 +91,7 @@ public class UrlBuilder {
             try {
                 query = new URI(null, null, null, query, null)
                         .toASCIIString().substring(1);  // remove leading ?
-            }
-            catch (URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 LOG.debug(e.getMessage(), e);
             }
             //return com.intellij.util.io.URLUtil.encodeQuery(query);
@@ -109,8 +108,7 @@ public class UrlBuilder {
     private static String encodePath(String unescaped) {
         try {
             return new URI(null, null, unescaped, null, null).toASCIIString();
-        }
-        catch (URISyntaxException e) {
+        } catch (URISyntaxException e) {
             return unescaped;
         }
         //return com.intellij.util.io.URLUtil.encodePath(unescaped);
@@ -141,9 +139,22 @@ public class UrlBuilder {
         return buildUrl(jobUrl, encodePathQuery(LAST_SUCCESSFUL_BUILD_NUMBER_API));
     }
 
-    public URL createOldBuildUrl(String jobUrl) {
+    public URL createBuildHistoryUrl(String jobUrl, int limit) {
         //这里只取50个
-        return buildUrl(jobUrl, encodePathQuery(API_JSON + TREE_PARAM + "builds[number,status,result]{0,50}"));
+        return buildUrl(jobUrl, encodePathQuery(API_JSON + TREE_PARAM +
+                "builds[number,status,result]{0,%s}".formatted(limit)));
+    }
+
+    /**
+     * 创建获取构建成功后的包的url
+     *
+     * @param jobUrl      作业url
+     * @param buildNumber 构建号
+     * @return
+     */
+    public URL createArtifactsUrl(String jobUrl, String buildNumber) {
+        //获取构建成功后的包
+        return buildUrl(jobUrl, encodePathQuery(buildNumber + API_JSON + TREE_PARAM + "artifacts[*]"));
     }
 
     public URL createBuildUrl(String buildUrl) {

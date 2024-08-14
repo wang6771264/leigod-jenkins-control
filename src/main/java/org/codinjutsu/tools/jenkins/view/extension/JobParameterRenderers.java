@@ -218,6 +218,17 @@ public final class JobParameterRenderers {
         return renderer.apply(jobParameter, defaultValue);
     }
 
+    @NotNull
+    public static JobParameterComponent<String> createCascadeComboBoxIfExists(@NotNull JobParameter jobParameter,
+                                                                              String defaultValue) {
+        if (jobParameter.getCascadeComboBox() == null) {
+            return JobParameterRenderers.createTextField(jobParameter, defaultValue);
+        } else {
+            return new JobParameterComponent<>(jobParameter,
+                    jobParameter.getCascadeComboBox().getSelects(), asString(ComboBox::getSelectedItem));
+        }
+    }
+
 
     @NotNull
     public static Function<JobParameter, JobParameterComponent<String>> createGitParameterChoices(

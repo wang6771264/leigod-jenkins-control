@@ -577,24 +577,48 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         return jenkinsSecurityClient.executeForJson(url);
     }
 
-    /**
-     * 获取最近50个成功构建
-     *
-     * @param job
-     * @return 最近50个成功构建
-     */
     public List<BuildHistory> findRecently50SuccessBuilds(Job job) {
-        URL url = urlBuilder.createOldBuildUrl(job.getUrl());
+        return this.findRecentlySuccessBuilds(job, 50);
+    }
+
+    public List<BuildHistory> findRecently5SuccessBuilds(Job job) {
+        return this.findRecentlySuccessBuilds(job, 5);
+    }
+
+    public List<BuildArtifacts.Artifact> findArtifactsByBuildNumber(Job job, String buildNumber) {
+        URL url = urlBuilder.createArtifactsUrl(job.getUrl(), buildNumber);
         String jsonData = jenkinsSecurityClient.executeForJson(url);
         if (StringUtils.isBlank(jsonData)) {
             return Collections.emptyList();
         }
-        BuildsHistories histories;
+        BuildArtifacts artifacts;
         try {
-            histories = JSON.parseObject(jsonData, BuildsHistories.class);
+            artifacts = JSON.parseObject(jsonData, BuildArtifacts.class);
+            return artifacts.getArtifacts();
+        } catch (Exception e) {
+            logger.info("获取{%s}-{%s}构建的组件失败".formatted(job.getUrl(), buildNumber), e);
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * 获取最近{limit}个成功构建
+     *
+     * @param job
+     * @return 最近{limit}个成功构建
+     */
+    private List<BuildHistory> findRecentlySuccessBuilds(Job job, int limit) {
+        URL url = urlBuilder.createBuildHistoryUrl(job.getUrl(), limit);
+        String jsonData = jenkinsSecurityClient.executeForJson(url);
+        if (StringUtils.isBlank(jsonData)) {
+            return Collections.emptyList();
+        }
+        BuildHistories histories;
+        try {
+            histories = JSON.parseObject(jsonData, BuildHistories.class);
             return Optional.ofNullable(histories.getBuilds()).stream().flatMap(Collection::stream).filter(buildHistory -> BuildStatusEnum.SUCCESS.equalsByStatus(buildHistory.getResult())).collect(Collectors.toList());
         } catch (Exception e) {
-            logger.info("最近50个成功构建失败", e);
+            logger.info("最近%s个成功构建失败".formatted(limit), e);
         }
         return Collections.emptyList();
     }

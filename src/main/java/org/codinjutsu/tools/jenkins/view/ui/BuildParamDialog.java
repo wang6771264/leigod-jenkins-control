@@ -128,6 +128,7 @@ public class BuildParamDialog extends DialogWrapper {
         contentPanel.setLayout(new SpringLayout());
         List<JobParameter> parameters = job.getParameters();
         System.out.println(JSON.toJSONString(parameters));
+        //缓存构建参数的记录
         final AtomicInteger rows = new AtomicInteger(0);
         for (JobParameter jobParameter : parameters) {
             //跳过测试是必然的

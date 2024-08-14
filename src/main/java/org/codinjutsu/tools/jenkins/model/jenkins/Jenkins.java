@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Jenkins {
 
@@ -34,6 +35,9 @@ public class Jenkins {
     @Getter
     @Setter
     private List<Job> jobs;
+
+    private Map<String, Job> jobMap;
+
     @Setter
     @Getter
     private List<View> views;
@@ -47,7 +51,6 @@ public class Jenkins {
         this.jobs = new LinkedList<>();
         this.views = new LinkedList<>();
     }
-
 
     public @Nullable String getName() {
         return name;

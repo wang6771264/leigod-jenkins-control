@@ -9,13 +9,13 @@
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.PatchParameterRenderer" />
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.GitParameterRenderer" />
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.DepolyRunParameterRenderer" />
-        <buildParameterRenderer
-                implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.PersistentParameterRenderer"/>
+        <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.PersistentParameterRenderer"/>
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.ListGitBranchesParameterRenderer" />
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.ExtendedChoiceParameterRenderer" />
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.DateParameterRenderer" />
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.ExtensibleChoiceParameterRenderer" />
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.ActiveChoicesParameterRenderer" />
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.ValidatingStringParameterRenderer" />
+        <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.CascadeChoiceParameterRenderer" />
     </extensions>
 </idea-plugin>
