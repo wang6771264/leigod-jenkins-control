@@ -1,7 +1,8 @@
 package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
 import com.intellij.openapi.project.Project;
-import org.codinjutsu.tools.jenkins.example.SearchableComboBox;
+import org.codinjutsu.tools.jenkins.example.CascadeRadioComponent;
+import org.codinjutsu.tools.jenkins.example.CascadeSearchableComboBox;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
@@ -40,7 +41,7 @@ public class CascadeChoiceParameterRenderer extends AbstractParameterRenderer im
     /**
      * 存储级联的下拉列表
      */
-    private final Map<String, SearchableComboBox> cascadeMap = new ConcurrentHashMap<>();
+    private final Map<String, CascadeRadioComponent> cascadeMap = new ConcurrentHashMap<>();
 
     public CascadeChoiceParameterRenderer() {
         validTypes.add(CASCADE_CHOICE_PARAMETER_DEFINITION);
@@ -64,22 +65,22 @@ public class CascadeChoiceParameterRenderer extends AbstractParameterRenderer im
             jobParameter.setChoices(buildJobNames);
             jobParameter.setDefaultValue(defaultValue);
             //如果参数是BUILD_VER和relativePath,则不处理写入一个空的列表
-            SearchableComboBox artifactsCombo = new SearchableComboBox(RELATIVE_PATH,
+            CascadeRadioComponent artifactsCombo = new CascadeRadioComponent(RELATIVE_PATH,
                     List.of(), projectJob, null);
-            SearchableComboBox buildVerCombo = new SearchableComboBox(BUILD_VER,
+            CascadeRadioComponent buildVerCombo = new CascadeRadioComponent(BUILD_VER,
                     List.of(), projectJob, artifactsCombo);
-            SearchableComboBox jobNameCombo = new SearchableComboBox(JOB_NAME,
+            CascadeSearchableComboBox jobNameCombo = new CascadeSearchableComboBox(JOB_NAME,
                     buildJobNames, projectJob, buildVerCombo);
             //设置父级的下拉
-            buildVerCombo.setParentComboBox(jobNameCombo);
-            artifactsCombo.setParentComboBox(buildVerCombo);
+            buildVerCombo.setParent(jobNameCombo);
+            artifactsCombo.setParent(buildVerCombo);
             //设置当前参数的下拉
             jobParameter.setCascadeComboBox(jobNameCombo);
             // 为父级联下拉列表添加选项变化监听器
             cascadeMap.put(BUILD_VER, buildVerCombo);
             cascadeMap.put(RELATIVE_PATH, artifactsCombo);
         } else {
-            SearchableComboBox cascadeCombo = cascadeMap.get(jobParameter.getName());
+            CascadeRadioComponent cascadeCombo = cascadeMap.get(jobParameter.getName());
             //fixme 可能存在没有的情况,后续处理
             jobParameter.setCascadeComboBox(cascadeCombo);
         }

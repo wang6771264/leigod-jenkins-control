@@ -224,8 +224,10 @@ public final class JobParameterRenderers {
         if (jobParameter.getCascadeComboBox() == null) {
             return JobParameterRenderers.createTextField(jobParameter, defaultValue);
         } else {
+            //fixme 级联获取值目前只能从toolTipText中获取,后续需要修正
             return new JobParameterComponent<>(jobParameter,
-                    jobParameter.getCascadeComboBox().getSelects(), asString(ComboBox::getSelectedItem));
+                    jobParameter.getCascadeComboBox().getComponent(),
+                    asString(JComponent::getToolTipText));
         }
     }
 

@@ -1,8 +1,6 @@
 package org.codinjutsu.tools.jenkins.example;
 
 import com.intellij.openapi.ui.ComboBox;
-import lombok.Getter;
-import lombok.Setter;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildArtifacts;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildHistory;
@@ -20,34 +18,46 @@ import java.util.Optional;
 import static org.codinjutsu.tools.jenkins.view.parameter.renderer.CascadeChoiceParameterRenderer.BUILD_VER;
 import static org.codinjutsu.tools.jenkins.view.parameter.renderer.CascadeChoiceParameterRenderer.JOB_NAME;
 
-@Getter
-public class SearchableComboBox {
+public class CascadeSearchableComboBox extends CascadeSelectComponent {
+    /**
+     * 输入框下拉列表
+     */
+    private final SelectComboBox selects;
 
-    private static final List<Character> symbols = List.of('_', '-');
-
-    private final String id;
-    private final ComboBox<String> selects;
-    @Setter
-    private SearchableComboBox parentComboBox;
-    private final SearchableComboBox childComboBox;
-    private final ProjectJob projectJob;
-
-    public SearchableComboBox(String id, List<String> items,
-                              ProjectJob projectJob, SearchableComboBox childComboBox) {
-        this.id = id;
-        this.projectJob = projectJob;
-        this.selects = new ComboBox<>(new DefaultComboBoxModel<>());
-        this.selects.setEditable(true);
-        this.childComboBox = childComboBox;
-        for (String item : items) {
-            this.selects.addItem(item);
-        }
-        //添加输入框的变化
+    public CascadeSearchableComboBox(String id, List<String> items,
+                                     ProjectJob projectJob, CascadeSelectComponent childComboBox) {
+        super(id, childComboBox, projectJob);
+        this.selects = initItemSelectable(items);
+        //添加监听器
         this.addKeyListener(items);
         //添加下拉选项监听
         if (childComboBox != null) {
             this.addItemListener();
         }
+    }
+
+    @Override
+    public ComboBox<String> getSelects() {
+        return this.selects;
+    }
+
+    @Override
+    public JComponent getComponent() {
+        return this.selects;
+    }
+
+    @Override
+    protected String getSelectedItem() {
+        return (String) this.selects.getSelectedItem();
+    }
+
+    private SelectComboBox initItemSelectable(List<String> items) {
+        SelectComboBox selects = new SelectComboBox(new DefaultComboBoxModel<>());
+        selects.setEditable(true);
+        for (String item : items) {
+            selects.addItem(item);
+        }
+        return selects;
     }
 
     private void addKeyListener(List<String> items) {
@@ -67,8 +77,8 @@ public class SearchableComboBox {
                     return;
                 }
                 char keyChar = e.getKeyChar();
-                // 检查字符是否是字母或数字
-                if (!Character.isLetterOrDigit(keyChar) && !symbols.contains(keyChar)) {
+                // 既不是数字字母也不是符号条件的符号直接返回
+                if (!Character.isLetterOrDigit(keyChar) && SYMBOLS.indexOf(keyChar) == -1) {
                     return;
                 }
                 SwingUtilities.invokeLater(() -> {
@@ -86,15 +96,16 @@ public class SearchableComboBox {
         });
     }
 
-    private void addItemListener() {
-        if (childComboBox == null) {
+    @Override
+    protected void addItemListener() {
+        if (child == null) {
             return;
         }
         this.selects.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
+                this.selects.setToolTipText((String) e.getItem());
                 // 根据父级联下拉列表的选中项更新子级联下拉列表的选项
-                String selectedParentItem = (String) e.getItem();
-                updateChildComboBox(childComboBox.getSelects(), selectedParentItem);
+                child.cascadeUpdate((String) e.getItem());
             }
         });
     }
@@ -102,15 +113,15 @@ public class SearchableComboBox {
     /**
      * 根据父级联下拉列表的选中项更新子级联下拉列表的选项
      *
-     * @param childComboBox      子列表组件
      * @param parentSelectedItem 父级联下拉列表的选中项
      */
-    private void updateChildComboBox(ComboBox<String> childComboBox, String parentSelectedItem) {
+    @Override
+    protected void cascadeUpdate(String parentSelectedItem) {
         if (parentSelectedItem == null || parentSelectedItem.isBlank()) {
             return;
         }
         // 根据 parentSelectedItem 更新 childComboBox 的模型
-        DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) childComboBox.getModel();
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) this.getSelects().getModel();
         model.removeAllElements(); // 清空现有项
         // 假设根据 parentSelectedItem 获取子选项列表
         if (JOB_NAME.equals(this.id)) {
@@ -125,7 +136,7 @@ public class SearchableComboBox {
         // 构建版本号的子集更新
         if (BUILD_VER.equals(this.id)) {
             //根据选项获取job名称
-            String jobName = (String) parentComboBox.getSelects().getSelectedItem();
+            String jobName = this.parent.parent.getSelectedItem();
             Optional<Job> job = BrowserPanel.getInstance(this.projectJob.getProject())
                     .getJob(jobName);
             if (job.isPresent()) {

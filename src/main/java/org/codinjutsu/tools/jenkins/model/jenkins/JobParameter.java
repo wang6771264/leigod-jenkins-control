@@ -20,7 +20,8 @@ import com.github.cliftonlabs.json_simple.JsonObject;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-import org.codinjutsu.tools.jenkins.example.SearchableComboBox;
+import org.codinjutsu.tools.jenkins.example.CascadeRadioComponent;
+import org.codinjutsu.tools.jenkins.example.CascadeSelectComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,5 +56,5 @@ public class JobParameter {
     /**
      * 如果已有下拉列表则直接用已经有的
      */
-    private SearchableComboBox cascadeComboBox;
+    private CascadeSelectComponent cascadeComboBox;
 }
