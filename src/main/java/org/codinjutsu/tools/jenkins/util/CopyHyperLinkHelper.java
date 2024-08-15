@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.example;
+package org.codinjutsu.tools.jenkins.util;
 
 import javax.swing.*;
 import javax.swing.text.html.HTMLEditorKit;

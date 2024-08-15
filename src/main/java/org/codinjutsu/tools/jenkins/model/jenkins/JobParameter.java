@@ -20,8 +20,7 @@ import com.github.cliftonlabs.json_simple.JsonObject;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-import org.codinjutsu.tools.jenkins.example.CascadeRadioComponent;
-import org.codinjutsu.tools.jenkins.example.CascadeSelectComponent;
+import org.codinjutsu.tools.jenkins.component.CascadeSelectComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

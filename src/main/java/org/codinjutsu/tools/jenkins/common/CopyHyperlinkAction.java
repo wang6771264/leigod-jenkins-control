@@ -7,7 +7,7 @@ import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.DumbAware;
-import org.codinjutsu.tools.jenkins.example.CopyHyperLinkHelper;
+import org.codinjutsu.tools.jenkins.util.CopyHyperLinkHelper;
 import org.codinjutsu.tools.jenkins.util.SymbolPool;
 import org.codinjutsu.tools.jenkins.view.action.ActionUtil;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;

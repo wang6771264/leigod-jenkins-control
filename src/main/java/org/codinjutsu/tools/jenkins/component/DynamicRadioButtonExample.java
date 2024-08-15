@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.example;
+package org.codinjutsu.tools.jenkins.component;
 
 import javax.swing.*;
 import java.awt.*;

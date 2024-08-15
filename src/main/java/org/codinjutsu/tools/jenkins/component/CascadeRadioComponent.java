@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.example;
+package org.codinjutsu.tools.jenkins.component;
 
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildArtifacts;

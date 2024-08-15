@@ -21,6 +21,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.DimensionService;
 import com.intellij.openapi.util.text.StringUtil;
@@ -37,9 +38,12 @@ import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
 import org.codinjutsu.tools.jenkins.view.util.SpringUtilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,6 +52,7 @@ import java.util.function.Function;
 public class BuildParamDialog extends DialogWrapper {
     private static final String LAST_SIZE = "jenkins.build.parameter";
     private static final Logger logger = Logger.getInstance(BuildParamDialog.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(BuildParamDialog.class);
     private final Job job;
     private final @NotNull Project project;
     private final JenkinsAppSettings configuration;
@@ -73,6 +78,15 @@ public class BuildParamDialog extends DialogWrapper {
         addParameterInputs();
         setModal(true);
         setAutoAdjustable(false);
+        // 添加一个组件监听器，监听窗口大小变化
+//        contentPanel.addComponentListener(new ComponentAdapter() {
+//            @Override
+//            public void componentResized(ComponentEvent e) {
+//                // 当窗口大小变化时，手动调用 revalidate 和 repaint
+//                contentPanel.revalidate(); // 重新验证布局
+//                contentPanel.repaint(); // 重新绘制组件
+//            }
+//        });
     }
 
     public static void showDialog(@NotNull Project project, final Job job,
@@ -131,10 +145,6 @@ public class BuildParamDialog extends DialogWrapper {
         //缓存构建参数的记录
         final AtomicInteger rows = new AtomicInteger(0);
         for (JobParameter jobParameter : parameters) {
-            //跳过测试是必然的
-//            if (jobParameter.getName().equals("SKIP_TEST")) {
-//                continue;
-//            }
             final JobParameterRenderer jobParameterRenderer = JobParameterRenderer.findRenderer(jobParameter)
                     .orElseGet(DefaultRenderer::new);
             final ProjectJob projectJob = ProjectJob.builder()
@@ -152,6 +162,11 @@ public class BuildParamDialog extends DialogWrapper {
                         .map(BuildParamDialog::appendColonIfMissing)
                         .orElseGet(JLabel::new);
                 contentPanel.add(label);
+                if(jobParameterComponent.getViewElement() instanceof ComboBox<?>){
+                    //下拉列表的高度设置理想高度
+                    jobParameterComponent.getViewElement().setPreferredSize(new Dimension(-1, 35));
+                    jobParameterComponent.getViewElement().setMaximumSize(new Dimension(-1, 35));
+                }
                 contentPanel.add(jobParameterComponent.getViewElement());
 
                 final String description = jobParameter.getDescription();

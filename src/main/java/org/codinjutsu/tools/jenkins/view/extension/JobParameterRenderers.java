@@ -157,6 +157,8 @@ public final class JobParameterRenderers {
             models.addElement(choice);
         }
         list.setModel(models);
+        list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+        list.setVisibleRowCount(1); // 设置为1行可见
         JCheckBox[] finalChoices = choices;
         return new JobParameterComponent<>(jobParameter, list, asString(o -> {
             List<String> checkBoxText = getCheckBoxText(finalChoices, o);

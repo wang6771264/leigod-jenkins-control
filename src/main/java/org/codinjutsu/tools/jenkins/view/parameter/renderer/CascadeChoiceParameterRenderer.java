@@ -1,8 +1,8 @@
 package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
 import com.intellij.openapi.project.Project;
-import org.codinjutsu.tools.jenkins.example.CascadeRadioComponent;
-import org.codinjutsu.tools.jenkins.example.CascadeSearchableComboBox;
+import org.codinjutsu.tools.jenkins.component.CascadeRadioComponent;
+import org.codinjutsu.tools.jenkins.component.CascadeSearchableComboBox;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;

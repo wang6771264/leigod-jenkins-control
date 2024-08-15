@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.example;
+package org.codinjutsu.tools.jenkins.component;
 
 import com.intellij.openapi.ui.ComboBox;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;

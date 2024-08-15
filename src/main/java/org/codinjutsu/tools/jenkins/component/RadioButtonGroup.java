@@ -1,4 +1,7 @@
-package org.codinjutsu.tools.jenkins.example;
+package org.codinjutsu.tools.jenkins.component;
+
+import com.intellij.ui.components.JBRadioButton;
+import com.intellij.ui.components.JBScrollPane;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +15,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RadioButtonGroup extends JComponent implements ItemSelectable, SelectComponent, Serializable {
     private final ButtonGroup buttonGroup = new ButtonGroup();
-    private final List<JRadioButton> selects = new ArrayList<>();
+    private final List<JBRadioButton> selects = new ArrayList<>();
+    private final JBScrollPane scrollPane = new JBScrollPane();
     private final JPanel panel = new JPanel();
     private int selectedIndex = -1;
     private String selectItem = "";
@@ -31,6 +35,7 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
         this.selectItem = Optional.ofNullable(selectItem).orElse(this.selectItem);
 
         panel.setLayout(new BoxLayout(panel, layout)); // 水平布局
+        scrollPane.setViewportView(panel);
         items.forEach(this::addElement);
 
         // 将JPanel添加到当前组件
@@ -38,6 +43,8 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
         this.add(panel, BorderLayout.CENTER);
 
         // 通知布局管理器重新计算布局
+        this.setPreferredSize(new Dimension(-1, 150));
+        this.setMinimumSize(new Dimension(-1, 150));
         revalidate();
         repaint();
     }
@@ -47,7 +54,7 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
     }
 
     public void addElement(String text, ItemListener listener) {
-        JRadioButton radio = new JRadioButton(text);
+        JBRadioButton radio = new JBRadioButton(text);
         if (listener != null) {
             radio.addItemListener(listener);
         }

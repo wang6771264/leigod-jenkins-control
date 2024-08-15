@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.example;
+package org.codinjutsu.tools.jenkins.component;
 
 import lombok.Setter;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
@@ -6,7 +6,6 @@ import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * ==========================
