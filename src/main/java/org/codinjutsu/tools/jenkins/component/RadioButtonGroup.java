@@ -42,9 +42,11 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
         this.setLayout(new BorderLayout());
         this.add(panel, BorderLayout.CENTER);
 
-        // 通知布局管理器重新计算布局
-        this.setPreferredSize(new Dimension(-1, 150));
-        this.setMinimumSize(new Dimension(-1, 150));
+        // 如果是垂直布局要预留高度
+        if (layout == BoxLayout.Y_AXIS) {
+            this.setPreferredSize(new Dimension(-1, 150));
+            this.setMinimumSize(new Dimension(-1, 150));
+        }
         revalidate();
         repaint();
     }
@@ -66,7 +68,7 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
     /**
      * 更新UI
      */
-    public void updateUI(){
+    public void updateUI() {
         // 通知布局管理器重新计算布局
         revalidate();
         repaint();
@@ -172,14 +174,14 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
         if (index == -1) {
             this.selects.forEach(radio -> {
                 radio.setSelected(false);
-                if(radio.isSelected()){
+                if (radio.isSelected()) {
                     fireItemStateChanged(new ItemEvent(radio, ItemEvent.ITEM_STATE_CHANGED, radio, ItemEvent.DESELECTED));
                 }
             });
-        }else{
+        } else {
             this.selects.forEach(radio -> {
                 radio.setSelected(false);
-                if(radio.isSelected()){
+                if (radio.isSelected()) {
                     fireItemStateChanged(new ItemEvent(radio, ItemEvent.ITEM_STATE_CHANGED, radio, ItemEvent.DESELECTED));
                 }
             });
