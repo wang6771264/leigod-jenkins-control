@@ -582,19 +582,24 @@ public class RequestManager implements RequestManagerInterface, Disposable {
     }
 
     public List<BuildHistory> findRecently5SuccessBuilds(Job job) {
-        return this.findRecentlySuccessBuilds(job, 5);
+        List<BuildHistory> successBuilds = this.findRecentlySuccessBuilds(job, 10);
+        return successBuilds.stream().limit(5).collect(Collectors.toList());
     }
 
+    private static final String DOT_REPOSITORY_PREFIX = ".repository";
+
     public List<BuildArtifacts.Artifact> findArtifactsByBuildNumber(Job job, String buildNumber) {
-        URL url = urlBuilder.createArtifactsUrl(job.getUrl(), buildNumber);
-        String jsonData = jenkinsSecurityClient.executeForJson(url);
-        if (StringUtils.isBlank(jsonData)) {
-            return Collections.emptyList();
-        }
-        BuildArtifacts artifacts;
+        BuildArtifacts buildArtifacts;
         try {
-            artifacts = JSON.parseObject(jsonData, BuildArtifacts.class);
-            return artifacts.getArtifacts();
+            URL url = urlBuilder.createArtifactsUrl(job.getUrl(), buildNumber);
+            String jsonData = jenkinsSecurityClient.executeForJson(url);
+            if (StringUtils.isBlank(jsonData)) {
+                return Collections.emptyList();
+            }
+            buildArtifacts = JSON.parseObject(jsonData, BuildArtifacts.class);
+            List<BuildArtifacts.Artifact> artifacts = buildArtifacts.getArtifacts();
+            return artifacts.stream().filter(artifact -> !artifact.getRelativePath()
+                    .startsWith(DOT_REPOSITORY_PREFIX)).collect(Collectors.toList());
         } catch (Exception e) {
             logger.info("获取{%s}-{%s}构建的组件失败".formatted(job.getUrl(), buildNumber), e);
         }

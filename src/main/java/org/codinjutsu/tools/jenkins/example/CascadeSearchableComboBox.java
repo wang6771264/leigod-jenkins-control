@@ -24,16 +24,27 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
      */
     private final SelectComboBox selects;
 
-    public CascadeSearchableComboBox(String id, List<String> items,
-                                     ProjectJob projectJob, CascadeSelectComponent childComboBox) {
-        super(id, childComboBox, projectJob);
-        this.selects = initItemSelectable(items);
+    public CascadeSearchableComboBox(String id, ProjectJob projectJob, CascadeSelectComponent child) {
+        super(id, child, projectJob);
+        this.selects = initItemSelectable();
+    }
+
+    /**
+     * 初始化model数据
+     *
+     * @param items
+     */
+    public void initItems(List<String> items) {
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) this.selects.getModel();
+        model.removeAllElements();
+        items.forEach(model::addElement);
         //添加监听器
         this.addKeyListener(items);
         //添加下拉选项监听
-        if (childComboBox != null) {
-            this.addItemListener();
-        }
+        this.addItemListener();
+        //默认将第一个选项选中
+        this.selects.setSelectedIndex(-1);
+        this.selects.setSelectedIndex(0);
     }
 
     @Override
@@ -51,12 +62,9 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
         return (String) this.selects.getSelectedItem();
     }
 
-    private SelectComboBox initItemSelectable(List<String> items) {
+    private SelectComboBox initItemSelectable() {
         SelectComboBox selects = new SelectComboBox(new DefaultComboBoxModel<>());
         selects.setEditable(true);
-        for (String item : items) {
-            selects.addItem(item);
-        }
         return selects;
     }
 
@@ -68,12 +76,7 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
             @Override
             public void keyReleased(KeyEvent e) {
                 String searchText = textField.getText().toLowerCase();
-                DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) selects.getModel();
                 if (searchText.isBlank()) {
-                    model.removeAllElements(); // 清空现有项
-                    for (String item : items) {
-                        model.addElement(item);
-                    }
                     return;
                 }
                 char keyChar = e.getKeyChar();
@@ -81,15 +84,21 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
                 if (!Character.isLetterOrDigit(keyChar) && SYMBOLS.indexOf(keyChar) == -1) {
                     return;
                 }
+                DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) selects.getModel();
                 SwingUtilities.invokeLater(() -> {
-                    model.removeAllElements(); // 清空现有项
+                    // 清空现有项
+                    model.removeAllElements();
 
                     // 根据输入过滤项
                     items.stream().filter(item -> item.toLowerCase().contains(searchText))
                             .forEach(model::addElement);
-
                     if (model.getSize() > 0) {
+                        selects.setSelectedIndex(-1);
                         selects.showPopup();
+                        textField.setText(searchText);
+                        // 通知布局管理器重新计算布局
+                        selects.revalidate();
+                        selects.repaint();
                     }
                 });
             }
@@ -98,14 +107,13 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
 
     @Override
     protected void addItemListener() {
-        if (child == null) {
-            return;
-        }
         this.selects.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 this.selects.setToolTipText((String) e.getItem());
                 // 根据父级联下拉列表的选中项更新子级联下拉列表的选项
-                child.cascadeUpdate((String) e.getItem());
+                if (child != null) {
+                    child.cascadeUpdate((String) e.getItem());
+                }
             }
         });
     }
@@ -131,6 +139,7 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
                 List<BuildHistory> buildHistories = RequestManager.getInstance(this.projectJob.getProject()).
                         findRecently5SuccessBuilds(job.get());
                 buildHistories.stream().map(BuildHistory::getNumber).forEach(model::addElement);
+                this.addItemListener();
             }
         }
         // 构建版本号的子集更新
@@ -145,6 +154,7 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
                         .findArtifactsByBuildNumber(job.get(), parentSelectedItem);
                 artifacts.stream().map(BuildArtifacts.Artifact::getRelativePath)
                         .forEach(model::addElement);
+                this.addItemListener();
             }
         }
     }

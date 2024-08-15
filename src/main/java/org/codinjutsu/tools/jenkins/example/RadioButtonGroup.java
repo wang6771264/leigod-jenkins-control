@@ -17,23 +17,24 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
     private int selectedIndex = -1;
     private String selectItem = "";
 
-    private final List<ItemListener> listeners = new ArrayList<>();
-
     public RadioButtonGroup(List<String> items) {
-        this(items, null, null);
+        this(items, BoxLayout.Y_AXIS);
     }
 
-    public RadioButtonGroup(List<String> items, Integer selectedIndex, String selectItem) {
+    public RadioButtonGroup(List<String> items, Integer layout) {
+        this(items, layout, null, null);
+    }
+
+    public RadioButtonGroup(List<String> items, Integer layout,
+                            Integer selectedIndex, String selectItem) {
         this.selectedIndex = Optional.ofNullable(selectedIndex).orElse(this.selectedIndex);
         this.selectItem = Optional.ofNullable(selectItem).orElse(this.selectItem);
 
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); // 垂直布局
+        panel.setLayout(new BoxLayout(panel, layout)); // 水平布局
         items.forEach(this::addElement);
 
         // 将JPanel添加到当前组件
         this.setLayout(new BorderLayout());
-        //添加监听器
-        this.addItemListener(e -> radioSelectedCallback());
         this.add(panel, BorderLayout.CENTER);
 
         // 通知布局管理器重新计算布局
@@ -42,11 +43,26 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
     }
 
     public void addElement(String text) {
+        this.addElement(text, null);
+    }
+
+    public void addElement(String text, ItemListener listener) {
         JRadioButton radio = new JRadioButton(text);
-        radio.addItemListener(listeners.get(0));
+        if (listener != null) {
+            radio.addItemListener(listener);
+        }
         buttonGroup.add(radio);
         selects.add(radio);
         panel.add(radio);
+    }
+
+    /**
+     * 更新UI
+     */
+    public void updateUI(){
+        // 通知布局管理器重新计算布局
+        revalidate();
+        repaint();
     }
 
     @Override
@@ -90,18 +106,15 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
 
     @Override
     public void addItemListener(ItemListener listener) {
-        listeners.add(listener);
         AtomicBoolean isFirst = new AtomicBoolean(false);
-        this.selects.forEach(radio -> {
-            radio.addItemListener(e -> {
-                //所有的子属性都添加一个状态变更监听器
-                listener.itemStateChanged(e);
-                //给父级也添加一个状态变更监听器
-                if (isFirst.compareAndSet(false, true)) {
-                    fireItemStateChanged(e);
-                }
-            });
-        });
+        this.selects.forEach(radio -> radio.addItemListener(e -> {
+            //所有的子属性都添加一个状态变更监听器
+            listener.itemStateChanged(e);
+            //给父级也添加一个状态变更监听器
+            if (isFirst.compareAndSet(false, true)) {
+                fireItemStateChanged(e);
+            }
+        }));
     }
 
     @Override
@@ -139,7 +152,34 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
         });
     }
 
-    public void removeItems() {
+    public void removeAll() {
+        this.selects.clear();
         this.panel.removeAll();
+    }
+
+    public void setSelectedIndex(int index) {
+        if (this.selects.isEmpty()) {
+            return;
+        }
+        this.selectedIndex = index;
+        if (index == -1) {
+            this.selects.forEach(radio -> {
+                radio.setSelected(false);
+                if(radio.isSelected()){
+                    fireItemStateChanged(new ItemEvent(radio, ItemEvent.ITEM_STATE_CHANGED, radio, ItemEvent.DESELECTED));
+                }
+            });
+        }else{
+            this.selects.forEach(radio -> {
+                radio.setSelected(false);
+                if(radio.isSelected()){
+                    fireItemStateChanged(new ItemEvent(radio, ItemEvent.ITEM_STATE_CHANGED, radio, ItemEvent.DESELECTED));
+                }
+            });
+            JRadioButton radio = this.selects.get(index);
+            radio.setSelected(true);
+            this.selectItem = radio.getText();
+            fireItemStateChanged(new ItemEvent(radio, ItemEvent.ITEM_STATE_CHANGED, radio, ItemEvent.SELECTED));
+        }
     }
 }

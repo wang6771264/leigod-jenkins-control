@@ -17,11 +17,17 @@ import static org.codinjutsu.tools.jenkins.view.parameter.renderer.CascadeChoice
 import static org.codinjutsu.tools.jenkins.view.parameter.renderer.CascadeChoiceParameterRenderer.RELATIVE_PATH;
 
 public class CascadeRadioComponent extends CascadeSelectComponent {
-    private final RadioButtonGroup selects = new RadioButtonGroup(new ArrayList<>());
+    private final RadioButtonGroup selects;
 
     public CascadeRadioComponent(String id, List<String> items,
                                  ProjectJob projectJob, CascadeSelectComponent childComboBox) {
+        this(id, items, BoxLayout.Y_AXIS, projectJob, childComboBox);
+    }
+
+    public CascadeRadioComponent(String id, List<String> items, Integer layout,
+                                 ProjectJob projectJob, CascadeSelectComponent childComboBox) {
         super(id, childComboBox, projectJob);
+        this.selects = new RadioButtonGroup(items, layout);
         initItemSelectable(items);
         //添加下拉选项监听
         if (childComboBox != null) {
@@ -45,21 +51,36 @@ public class CascadeRadioComponent extends CascadeSelectComponent {
     }
 
     private void initItemSelectable(List<String> items) {
+        this.addAll(items);
+    }
+
+    private void addAll(List<String> items) {
         for (String item : items) {
-            selects.addElement(item);
+            selects.addElement(item, e -> {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    String text = ((JRadioButton) e.getItem()).getText();
+                    this.selects.setToolTipText(text);
+                    // 根据父级联下拉列表的选中项更新子级联下拉列表的选项
+                    if (child != null) {
+                        child.cascadeUpdate(text);
+                    }
+                }
+            });
         }
+        selects.setSelectedIndex(0);
+        selects.updateUI();
     }
 
     @Override
     protected void addItemListener() {
-        if (child == null) {
-            return;
-        }
         this.selects.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                this.selects.setToolTipText((String) e.getItem());
+                String text = ((JRadioButton) e.getItem()).getText();
+                this.selects.setToolTipText(text);
                 // 根据父级联下拉列表的选中项更新子级联下拉列表的选项
-                child.cascadeUpdate((String) e.getItem());
+                if (child != null) {
+                    child.cascadeUpdate(text);
+                }
             }
         });
     }
@@ -76,7 +97,8 @@ public class CascadeRadioComponent extends CascadeSelectComponent {
         }
         // 清空现有项
         RadioButtonGroup radioButtonGroup = this.getSelects();
-        radioButtonGroup.removeItems();
+        radioButtonGroup.removeAll();
+        List<String> items = new ArrayList<>();
         // 假设根据 parentSelectedItem 获取子选项列表
         if (BUILD_VER.equals(this.id)) {
             //根据选项获取job名称
@@ -85,7 +107,7 @@ public class CascadeRadioComponent extends CascadeSelectComponent {
             if (job.isPresent()) {
                 List<BuildHistory> buildHistories = RequestManager.getInstance(this.projectJob.getProject()).
                         findRecently5SuccessBuilds(job.get());
-                buildHistories.stream().map(BuildHistory::getNumber).forEach(radioButtonGroup::addElement);
+                buildHistories.stream().map(BuildHistory::getNumber).forEach(items::add);
             }
         }
         // 构建版本号的子集更新
@@ -98,10 +120,10 @@ public class CascadeRadioComponent extends CascadeSelectComponent {
                 List<BuildArtifacts.Artifact> artifacts = RequestManager
                         .getInstance(this.projectJob.getProject())
                         .findArtifactsByBuildNumber(job.get(), parentSelectedItem);
-                artifacts.stream().map(BuildArtifacts.Artifact::getRelativePath)
-                        .forEach(radioButtonGroup::addElement);
+                artifacts.stream().map(BuildArtifacts.Artifact::getRelativePath).forEach(items::add);
             }
         }
+        //添加全部选项
+        this.addAll(items);
     }
-
 }

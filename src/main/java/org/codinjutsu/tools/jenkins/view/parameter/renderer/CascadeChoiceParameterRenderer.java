@@ -14,6 +14,7 @@ import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -68,12 +69,13 @@ public class CascadeChoiceParameterRenderer extends AbstractParameterRenderer im
             CascadeRadioComponent artifactsCombo = new CascadeRadioComponent(RELATIVE_PATH,
                     List.of(), projectJob, null);
             CascadeRadioComponent buildVerCombo = new CascadeRadioComponent(BUILD_VER,
-                    List.of(), projectJob, artifactsCombo);
+                    List.of(), BoxLayout.X_AXIS, projectJob, artifactsCombo);
             CascadeSearchableComboBox jobNameCombo = new CascadeSearchableComboBox(JOB_NAME,
-                    buildJobNames, projectJob, buildVerCombo);
+                    projectJob, buildVerCombo);
             //设置父级的下拉
             buildVerCombo.setParent(jobNameCombo);
             artifactsCombo.setParent(buildVerCombo);
+            jobNameCombo.initItems(buildJobNames);
             //设置当前参数的下拉
             jobParameter.setCascadeComboBox(jobNameCombo);
             // 为父级联下拉列表添加选项变化监听器
