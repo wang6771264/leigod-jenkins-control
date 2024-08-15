@@ -1,6 +1,6 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
-        <prePushHandler implementation="org.codinjutsu.tools.jenkins.extensions.MarkJobPrePushHandler" order="last"/>
+<!--        <prePushHandler implementation="org.codinjutsu.tools.jenkins.extensions.MarkJobPrePushHandler" order="last"/>-->
         <vcs.changeListDecorator implementation="org.codinjutsu.tools.jenkins.view.vcs.WatchedJobsDecorator" />
     </extensions>
     <actions>

@@ -160,10 +160,13 @@ public class BuildParamDialog extends DialogWrapper {
                         .map(BuildParamDialog::appendColonIfMissing)
                         .orElseGet(JLabel::new);
                 contentPanel.add(label);
-                if(jobParameterComponent.getViewElement() instanceof ComboBox<?>){
-                    //下拉列表的高度设置理想高度
-                    jobParameterComponent.getViewElement().setPreferredSize(new Dimension(-1, 35));
-                    jobParameterComponent.getViewElement().setMaximumSize(new Dimension(-1, 35));
+                //fixme 这里需要注意的是如果只有一个组件的时候这样设置会导致组件显示不出来,具体原因未知
+                if (parameters.size() > 1) {
+                    if (jobParameterComponent.getViewElement() instanceof ComboBox<?>) {
+                        //下拉列表的高度设置理想高度
+                        jobParameterComponent.getViewElement().setPreferredSize(new Dimension(-1, 35));
+                        jobParameterComponent.getViewElement().setMaximumSize(new Dimension(-1, 35));
+                    }
                 }
                 contentPanel.add(jobParameterComponent.getViewElement());
 
