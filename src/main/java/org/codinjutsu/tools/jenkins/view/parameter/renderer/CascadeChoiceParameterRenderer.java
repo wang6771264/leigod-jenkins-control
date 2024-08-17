@@ -1,6 +1,7 @@
 package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
 import com.intellij.openapi.project.Project;
+import org.codinjutsu.tools.jenkins.cache.JobCache;
 import org.codinjutsu.tools.jenkins.component.CascadeRadioComponent;
 import org.codinjutsu.tools.jenkins.component.CascadeSearchableComboBox;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
@@ -75,7 +76,8 @@ public class CascadeChoiceParameterRenderer extends AbstractParameterRenderer im
             //设置父级的下拉
             buildVerCombo.setParent(jobNameCombo);
             artifactsCombo.setParent(buildVerCombo);
-            jobNameCombo.initItems(buildJobNames);
+            jobNameCombo.initItems(buildJobNames,
+                    JobCache.getParamRecentlyValue(projectJob.getJob().getName(), JOB_NAME));
             //设置当前参数的下拉
             jobParameter.setCascadeComboBox(jobNameCombo);
             // 为父级联下拉列表添加选项变化监听器

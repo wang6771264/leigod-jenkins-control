@@ -19,6 +19,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JobCache implements Serializable {
     private static final Map<String, Job> JOB_FULL_NAME_MAPPING = new ConcurrentHashMap<>();
 
+    private static final Map<String, ConcurrentHashMap<String, String>> JOB_PARAM_DEFAULT_VALUE = new ConcurrentHashMap<>();
+
+    public static void addParamDefault(String jobName, String paramName, String value) {
+        JOB_PARAM_DEFAULT_VALUE.putIfAbsent(jobName, new ConcurrentHashMap<>());
+        JOB_PARAM_DEFAULT_VALUE.get(jobName).put(paramName, value);
+    }
+
+    public static String getParamRecentlyValue(String jobName, String paramName) {
+        ConcurrentHashMap<String, String> paramMap = JOB_PARAM_DEFAULT_VALUE.get(jobName);
+        return paramMap == null ? null : paramMap.get(paramName);
+    }
+
     public static void putIfAbsent(String fullName, Job job) {
         JOB_FULL_NAME_MAPPING.putIfAbsent(fullName, job);
     }

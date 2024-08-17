@@ -26,6 +26,8 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.DimensionService;
 import com.intellij.openapi.util.text.StringUtil;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.cache.JobCache;
+import org.codinjutsu.tools.jenkins.component.SelectComponent;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
@@ -85,6 +87,22 @@ public class BuildParamDialog extends DialogWrapper {
 //                contentPanel.repaint(); // 重新绘制组件
 //            }
 //        });
+    }
+
+    @Override
+    protected void doOKAction() {
+        super.doOKAction();
+        //保存构建的参数
+        for (JobParameterComponent<?> inputField : inputFields) {
+            //fixme 目前只处理自定义的下拉列表
+            if(!(inputField.getViewElement() instanceof SelectComponent)){
+                continue;
+            }
+            String parameter = inputField.getJobParameter().getName();
+            String value = (String) inputField.getValueProvider().apply(inputField.getViewElement());
+            System.out.printf("add job parameter,job:%s,param:%s,value:%s%n", job.getName(), parameter, value);
+            JobCache.addParamDefault(job.getName(), parameter, value);
+        }
     }
 
     public static void showDialog(@NotNull Project project, final Job job,

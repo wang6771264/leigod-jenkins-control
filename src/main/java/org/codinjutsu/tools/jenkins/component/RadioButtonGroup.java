@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class RadioButtonGroup extends JComponent implements ItemSelectable, SelectComponent, Serializable {
     private final ButtonGroup buttonGroup = new ButtonGroup();
     private final List<JBRadioButton> selects = new ArrayList<>();
-    private final JBScrollPane scrollPane = new JBScrollPane();
     private final JPanel panel = new JPanel();
     private int selectedIndex = -1;
     private String selectItem = "";
@@ -35,12 +34,18 @@ public class RadioButtonGroup extends JComponent implements ItemSelectable, Sele
         this.selectItem = Optional.ofNullable(selectItem).orElse(this.selectItem);
 
         panel.setLayout(new BoxLayout(panel, layout)); // 水平布局
-        scrollPane.setViewportView(panel);
         items.forEach(this::addElement);
 
         // 将JPanel添加到当前组件
         this.setLayout(new BorderLayout());
-        this.add(panel, BorderLayout.CENTER);
+        // 垂直布局需要添加滚动条
+        if (layout == BoxLayout.Y_AXIS) {
+            JBScrollPane scrollPane = new JBScrollPane();
+            scrollPane.setViewportView(panel);
+            this.add(scrollPane, BorderLayout.CENTER);
+        } else {
+            this.add(panel, BorderLayout.CENTER);
+        }
 
         // 如果是垂直布局要预留高度
         if (layout == BoxLayout.Y_AXIS) {

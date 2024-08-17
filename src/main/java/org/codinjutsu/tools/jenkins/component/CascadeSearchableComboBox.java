@@ -1,24 +1,23 @@
 package org.codinjutsu.tools.jenkins.component;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.ComboBox;
-import org.codinjutsu.tools.jenkins.logic.RequestManager;
-import org.codinjutsu.tools.jenkins.model.jenkins.BuildArtifacts;
-import org.codinjutsu.tools.jenkins.model.jenkins.BuildHistory;
-import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
-import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
+import org.codinjutsu.tools.jenkins.util.SymbolPool;
+import org.codinjutsu.tools.jenkins.view.ui.BuildParamDialog;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static org.codinjutsu.tools.jenkins.view.parameter.renderer.CascadeChoiceParameterRenderer.BUILD_VER;
-import static org.codinjutsu.tools.jenkins.view.parameter.renderer.CascadeChoiceParameterRenderer.JOB_NAME;
+import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class CascadeSearchableComboBox extends CascadeSelectComponent {
+
+    private static final Logger logger = Logger.getInstance(BuildParamDialog.class);
     /**
      * 输入框下拉列表
      */
@@ -34,17 +33,24 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
      *
      * @param items
      */
-    public void initItems(List<String> items) {
+    public void initItems(List<String> items, String selectedItem) {
         DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) this.selects.getModel();
         model.removeAllElements();
-        items.forEach(model::addElement);
+        int index = 0;
+        for (int i = 0; i < items.size(); i++) {
+            String item = items.get(i);
+            if(item.equals(selectedItem)){
+                index = i;
+            }
+            model.addElement(item);
+        }
         //添加监听器
         this.addKeyListener(items);
         //添加下拉选项监听
         this.addItemListener();
         //默认将第一个选项选中
         this.selects.setSelectedIndex(-1);
-        this.selects.setSelectedIndex(0);
+        this.selects.setSelectedIndex(index);
     }
 
     @Override
@@ -69,6 +75,7 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
     }
 
     private void addKeyListener(List<String> items) {
+        AtomicReference<String> aRefString = new AtomicReference<>(String.join(SymbolPool.COMMA, items));
         // 监听输入框的变化
         // 获取编辑组件
         JTextField textField = (JTextField) this.selects.getEditor().getEditorComponent();
@@ -81,25 +88,45 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
                 }
                 char keyChar = e.getKeyChar();
                 // 既不是数字字母也不是符号条件的符号直接返回
-                if (!Character.isLetterOrDigit(keyChar) && SYMBOLS.indexOf(keyChar) == -1) {
+                if (!Character.isLetterOrDigit(keyChar) && SYMBOLS.indexOf(keyChar) == -1
+                        && e.getKeyCode() != KeyEvent.VK_BACK_SPACE) {
                     return;
                 }
-                DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) selects.getModel();
                 SwingUtilities.invokeLater(() -> {
+                    // 根据输入过滤项
+                    List<String> newItems = new ArrayList<>();
+                    StringJoiner joiner = new StringJoiner(SymbolPool.COMMA);
+                    for (String item : items) {
+                        if(item.toLowerCase().contains(searchText.toLowerCase())){
+                            newItems.add(item);
+                            joiner.add(item);
+                        }
+                    }
+                    textField.setText(searchText);
+                    //如果选项没有任何变化就不处理
+                    String newItemString = joiner.toString();
+                    if(aRefString.get().equals(newItemString)){
+                        selects.showPopup();
+                        return;
+                    }
+                    aRefString.set(newItemString);
+                    DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) selects.getModel();
                     // 清空现有项
                     model.removeAllElements();
-
-                    // 根据输入过滤项
-                    items.stream().filter(item -> item.toLowerCase().contains(searchText))
-                            .forEach(model::addElement);
-                    if (model.getSize() > 0) {
-                        selects.setSelectedIndex(-1);
+                    if (!newItems.isEmpty()) {
+                        newItems.forEach(model::addElement);
                         selects.showPopup();
-                        textField.setText(searchText);
                         // 通知布局管理器重新计算布局
                         selects.revalidate();
                         selects.repaint();
+                    }else{
+                        //当没有任何选项时也需要更新下级列表
+                        if (child != null) {
+                            child.cascadeUpdate(null);
+                        }
                     }
+                    selects.setSelectedIndex(-1);
+                    textField.setText(searchText);
                 });
             }
         });
@@ -125,37 +152,16 @@ public class CascadeSearchableComboBox extends CascadeSelectComponent {
      */
     @Override
     protected void cascadeUpdate(String parentSelectedItem) {
-        if (parentSelectedItem == null || parentSelectedItem.isBlank()) {
-            return;
+        List<String> items = new ArrayList<>();
+        if (parentSelectedItem != null && !parentSelectedItem.isBlank()) {
+            items = this.findItems(parentSelectedItem);
         }
         // 根据 parentSelectedItem 更新 childComboBox 的模型
         DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) this.getSelects().getModel();
         model.removeAllElements(); // 清空现有项
-        // 假设根据 parentSelectedItem 获取子选项列表
-        if (JOB_NAME.equals(this.id)) {
-            //根据选项获取job名称
-            Optional<Job> job = BrowserPanel.getInstance(this.projectJob.getProject()).getJob(parentSelectedItem);
-            if (job.isPresent()) {
-                List<BuildHistory> buildHistories = RequestManager.getInstance(this.projectJob.getProject()).
-                        findRecently5SuccessBuilds(job.get());
-                buildHistories.stream().map(BuildHistory::getNumber).forEach(model::addElement);
-                this.addItemListener();
-            }
-        }
-        // 构建版本号的子集更新
-        if (BUILD_VER.equals(this.id)) {
-            //根据选项获取job名称
-            String jobName = this.parent.parent.getSelectedItem();
-            Optional<Job> job = BrowserPanel.getInstance(this.projectJob.getProject())
-                    .getJob(jobName);
-            if (job.isPresent()) {
-                List<BuildArtifacts.Artifact> artifacts = RequestManager
-                        .getInstance(this.projectJob.getProject())
-                        .findArtifactsByBuildNumber(job.get(), parentSelectedItem);
-                artifacts.stream().map(BuildArtifacts.Artifact::getRelativePath)
-                        .forEach(model::addElement);
-                this.addItemListener();
-            }
+        if(!items.isEmpty()){
+            items.forEach(model::addElement); // 添加新项
+            this.addItemListener();
         }
     }
 
