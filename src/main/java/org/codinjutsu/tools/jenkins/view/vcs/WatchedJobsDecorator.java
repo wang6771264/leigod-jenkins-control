@@ -30,6 +30,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * ==========================
+ * 开发：maple
+ * 创建时间：2024/8/19 17:13
+ * 版本：1.0
+ * 描述：打开git的changelist后，正在监听的项目变化，显示在changelist上
+ * ==========================
+ */
 public class WatchedJobsDecorator implements ChangeListDecorator {
 
     private final Project project;

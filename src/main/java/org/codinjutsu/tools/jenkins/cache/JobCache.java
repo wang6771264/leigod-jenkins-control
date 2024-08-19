@@ -6,6 +6,7 @@ import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * ==========================
@@ -18,6 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class JobCache implements Serializable {
     private static final Map<String, Job> JOB_FULL_NAME_MAPPING = new ConcurrentHashMap<>();
+
+    private static final CopyOnWriteArraySet<String> NEED_BUILD = new CopyOnWriteArraySet<>();
 
     private static final Map<String, ConcurrentHashMap<String, String>> JOB_PARAM_DEFAULT_VALUE = new ConcurrentHashMap<>();
 
@@ -37,5 +40,21 @@ public class JobCache implements Serializable {
 
     public static Job get(String fullName) {
         return JOB_FULL_NAME_MAPPING.get(fullName);
+    }
+
+    public static void addNeedBuild(String searchText) {
+        for (Map.Entry<String, Job> entry : JOB_FULL_NAME_MAPPING.entrySet()) {
+            if(entry.getKey().contains(searchText)){
+                NEED_BUILD.add(entry.getKey());
+            }
+        }
+    }
+
+    public static boolean hasNeedBuild(String fullName) {
+        return NEED_BUILD.contains(fullName);
+    }
+
+    public static void removeNeedBuild(String fullName) {
+        NEED_BUILD.remove(fullName);
     }
 }

@@ -103,6 +103,8 @@ public class BuildParamDialog extends DialogWrapper {
             System.out.printf("add job parameter,job:%s,param:%s,value:%s%n", job.getName(), parameter, value);
             JobCache.addParamDefault(job.getName(), parameter, value);
         }
+        //删除需要构建的标识
+        JobCache.removeNeedBuild(job.getName());
     }
 
     public static void showDialog(@NotNull Project project, final Job job,

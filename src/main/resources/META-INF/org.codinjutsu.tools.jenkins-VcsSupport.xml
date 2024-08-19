@@ -1,7 +1,7 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
-<!--        <prePushHandler implementation="org.codinjutsu.tools.jenkins.extensions.MarkJobPrePushHandler" order="last"/>-->
-        <vcs.changeListDecorator implementation="org.codinjutsu.tools.jenkins.view.vcs.WatchedJobsDecorator" />
+        <prePushHandler implementation="org.codinjutsu.tools.jenkins.extensions.MarkJobPrePushHandler" order="last"/>
+<!--        <vcs.changeListDecorator implementation="org.codinjutsu.tools.jenkins.view.vcs.WatchedJobsDecorator" />-->
     </extensions>
     <actions>
         <action id="Jenkins.CreatePatchAndBuildOnJenkins" class="org.codinjutsu.tools.jenkins.view.vcs.action.CreatePatchAndBuildAction"

@@ -25,6 +25,7 @@ import com.intellij.ui.SimpleTextAttributes;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Delegate;
+import org.codinjutsu.tools.jenkins.cache.JobCache;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
@@ -38,10 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.function.Function;
 
 @AllArgsConstructor
@@ -204,11 +202,16 @@ public class JenkinsTreeRenderer extends ColoredTreeCellRenderer {
         final Job job = jobNode.job();
         append(buildLabel(job, parent.flatMap(this::getJenkinsTreeNode)), getAttribute(job));
         setToolTipText(job.getHealthDescription());
-        if (favoriteJobDetector.isFavoriteJob(job)) {
-            setIcon(new CompositeIcon(getBuildStatusColor(job), job.getHealthIcon(), FAVORITE_ICON));
-        } else {
-            setIcon(new CompositeIcon(getBuildStatusColor(job), job.getHealthIcon()));
+        List<Icon> icons = new ArrayList<>();
+        if(JobCache.hasNeedBuild(job.getFullName())){
+            icons.add(AllIcons.Nodes.Deploy);
         }
+        icons.add(getBuildStatusColor(job));
+        icons.add(job.getHealthIcon());
+        if (favoriteJobDetector.isFavoriteJob(job)) {
+            icons.add(FAVORITE_ICON);
+        }
+        setIcon(new CompositeIcon(icons.toArray(new Icon[0])));
     }
 
     private void render(JenkinsTreeNode.BuildParameterNode buildParameterNode) {
