@@ -19,6 +19,9 @@ public class JenkinsControlIcons {
 
     public static final Icon RSS = getIcon("rss.svg");
 
+    public static final Icon DEPLOY = getIcon("deploy.svg");
+    public static final Icon DEPLOY_DARK = getIcon("deploy_dark.svg");
+
     public static final Icon LOAD_BUILDS = getIcon("builds.svg");
 
     public static Icon getIcon(String iconFilename) {

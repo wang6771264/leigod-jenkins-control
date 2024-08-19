@@ -29,10 +29,13 @@ apply {
 }
 
 intellij {
+    //设置支持的idea最低版本
     pluginName.set(readPropertyString('pluginName'))
     version.set(readPropertyString('platformVersion'))
     type.set(readPropertyString('platformType'))
-    configureDefaultDependencies.set(true)
+    //本地调试时用本地版本
+//    localPath.set("D:\\JetBrains\\IntelliJ IDEA 2024.1.4")
+//    configureDefaultDependencies.set(true)
     plugins.set(Arrays.asList(readPropertyString("platformPlugins").split(',')))
 }
 

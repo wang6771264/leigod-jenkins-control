@@ -80,11 +80,11 @@
             <override-text place="GoToAction"/>
         </action>
         <action id="Jenkins.RetryLastSuccessfulBuild" class="org.codinjutsu.tools.jenkins.view.action.RetryLastSuccessfulBuildAction"
-                icon="AllIcons.Actions.Execute">
+                icon="AllIcons.Actions.Restart">
             <override-text place="GoToAction"/>
         </action>
         <action id="Jenkins.RunBuild" class="org.codinjutsu.tools.jenkins.view.action.RunBuildAction"
-                icon="AllIcons.Actions.Execute">
+                icon="AllIcons.Nodes.Deploy">
             <override-text place="GoToAction"/>
         </action>
         <action id="Jenkins.StopBuild" class="org.codinjutsu.tools.jenkins.view.action.StopBuildAction"
