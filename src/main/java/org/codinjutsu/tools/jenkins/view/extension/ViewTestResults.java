@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 public interface ViewTestResults {
 
-    ExtensionPointName<ViewTestResults> EP_NAME = ExtensionPointName.create("Jenkins Control Plugin.viewTestResults");
+    ExtensionPointName<ViewTestResults> EP_NAME = ExtensionPointName.create("Jenkins Control For Leigod.viewTestResults");
 
     @Nullable
     @Nls(capitalization = Nls.Capitalization.Sentence)

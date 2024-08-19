@@ -24,14 +24,14 @@ public class StartupJenkinsService implements ProjectActivity, DynamicPluginList
     @Override
     public void beforePluginUnload(@NotNull IdeaPluginDescriptor pluginDescriptor, boolean isUpdate) {
         if (isJenkinsPlugin(pluginDescriptor)) {
-            LOG.info("Unload Jenkins Control plugin");
+            LOG.info("Unload Jenkins Control For Leigod");
         }
     }
 
     @Override
     public void checkUnloadPlugin(@NotNull IdeaPluginDescriptor pluginDescriptor) throws CannotUnloadPluginException {
         if (isJenkinsPlugin(pluginDescriptor)) {
-            LOG.debug("check if Jenkins Control plugin could be unloaded");
+            LOG.debug("check if Jenkins Control For Leigod could be unloaded");
         }
     }
 

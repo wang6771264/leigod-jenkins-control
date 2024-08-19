@@ -1,5 +1,5 @@
 <idea-plugin>
-    <extensions defaultExtensionNs="Jenkins Control Plugin">
+    <extensions defaultExtensionNs="Jenkins Control For Leigod">
         <viewTestResults implementation="org.codinjutsu.tools.jenkins.view.extension.ViewTestResultsAsJUnit"/>
     </extensions>
 </idea-plugin>

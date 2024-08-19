@@ -1,5 +1,5 @@
 <idea-plugin>
-    <extensions defaultExtensionNs="Jenkins Control Plugin">
+    <extensions defaultExtensionNs="Jenkins Control For Leigod">
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.BuiltInJobParameterRenderer"
                                 order="first"
                                 id="BUILT_IN_RENDERER" />
