@@ -1,7 +1,7 @@
 <idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude" require-restart="false">
     <!--suppress PluginXmlValidity -->
-    <name>Jenkins Control</name>
-    <id>Jenkins Control For Leigod</id>
+    <name>Leigod Jenkins Control</name>
+    <id>leigod.jenkins.control</id>
     <description>
         <![CDATA[A Jenkins Plugin for Jetbrains IDEs like IntelliJ or CLion. Will be replaced by gradle build]]></description>
     <vendor url="https://github.com/MCMicS/jenkins-control-plugin/issues">
