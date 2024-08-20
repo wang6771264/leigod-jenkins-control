@@ -1,5 +1,6 @@
+<!--jenkins control的ViewTestResults拓展-->
 <idea-plugin>
-    <extensions defaultExtensionNs="Jenkins Control For Leigod">
+    <extensions defaultExtensionNs="leigod.jenkins.control">
         <viewTestResults implementation="org.codinjutsu.tools.jenkins.view.extension.ViewTestResultsAsJUnit"/>
     </extensions>
 </idea-plugin>

@@ -1,5 +1,6 @@
+<!--jenkins control的JobParameterRenderer拓展-->
 <idea-plugin>
-    <extensions defaultExtensionNs="Jenkins Control For Leigod">
+    <extensions defaultExtensionNs="leigod.jenkins.control">
         <buildParameterRenderer implementation="org.codinjutsu.tools.jenkins.view.parameter.renderer.BuiltInJobParameterRenderer"
                                 order="first"
                                 id="BUILT_IN_RENDERER" />
