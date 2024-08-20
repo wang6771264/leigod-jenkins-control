@@ -51,7 +51,7 @@ public class MarkJobPrePushHandler implements PrePushHandler, Serializable {
                          @NotNull List<PushInfo> pushDetails,
                          @NotNull ProgressIndicator indicator) {
         if (pushDetails.isEmpty()) {
-            return Result.ABORT;
+            return Result.OK;
         }
         logger.info("before push:" + project.getName());
         for (PushInfo pushDetail : pushDetails) {
