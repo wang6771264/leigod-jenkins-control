@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface JobParameterRenderer {
 
     ExtensionPointName<JobParameterRenderer> EP_NAME =
-            ExtensionPointName.create("Jenkins Control For Leigod.buildParameterRenderer");
+            ExtensionPointName.create("leigod.jenkins.control.buildParameterRenderer");
 
     @NotNull
     static Optional<JobParameterRenderer> findRenderer(@NotNull JobParameter jobParameter) {

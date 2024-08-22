@@ -7,14 +7,14 @@ import org.jetbrains.annotations.Nullable;
 @Builder
 @Value
 class ServerSetting {
-    private final @Nullable String url;
+    @Nullable String url;
     /**
      * specified in '<a href="http://localhost:8080/jenkins/manage/">http://localhost:8080/jenkins/manage/</a>'
      */
-    private final @Nullable String jenkinsUrl;
-    private final @Nullable String username;
-    private final @Nullable String apiToken;
+    @Nullable String jenkinsUrl;
+    @Nullable String username;
+    @Nullable String apiToken;
     @Builder.Default
-    private final boolean apiTokenModified = false;
-    private final int timeout;
+    boolean apiTokenModified = false;
+    int timeout;
 }

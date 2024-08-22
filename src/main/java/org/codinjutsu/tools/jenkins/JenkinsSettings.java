@@ -88,8 +88,9 @@ public class JenkinsSettings implements PersistentStateComponent<ProjectState> {
     }
 
     public String getPassword() {
-        String password = PasswordSafe.getInstance().getPassword(getPasswordCredentialAttributes());
-        return StringUtil.defaultIfEmpty(password, "");
+//        String password = PasswordSafe.getInstance().getPassword(getPasswordCredentialAttributes());
+        String apiToken = myState.getApiToken();
+        return StringUtil.defaultIfEmpty(apiToken, "");
     }
 
     @Deprecated
