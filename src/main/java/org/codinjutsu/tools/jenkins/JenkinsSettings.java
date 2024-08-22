@@ -67,6 +67,10 @@ public class JenkinsSettings implements PersistentStateComponent<ProjectState> {
         myState.setUsername(username);
     }
 
+    public void setApiToken(String apiToken) {
+        myState.setApiToken(apiToken);
+    }
+
     public @NotNull String getJenkinsUrl() {
         return myState.getJenkinsUrl();
     }
@@ -128,7 +132,7 @@ public class JenkinsSettings implements PersistentStateComponent<ProjectState> {
     }
 
     public boolean isSecurityMode() {
-        return org.codinjutsu.tools.jenkins.util.StringUtil.isNotBlank(getUsername());
+        return StringUtil.isNotEmpty(getUsername());
     }
 
     public JenkinsVersion getVersion() {

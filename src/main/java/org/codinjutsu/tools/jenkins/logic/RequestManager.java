@@ -300,7 +300,10 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         SecurityClientFactory.setVersion(jenkinsSettings.getVersion());
         final int connectionTimout = getConnectionTimout(jenkinsSettings.getConnectionTimeout());
         if (jenkinsSettings.isSecurityMode()) {
-            jenkinsSecurityClient = SecurityClientFactory.basic(jenkinsSettings.getUsername(), jenkinsSettings.getPassword(), jenkinsSettings.getCrumbData(), connectionTimout);
+            jenkinsSecurityClient = SecurityClientFactory.basic(jenkinsSettings.getUsername(),
+                    jenkinsSettings.getPassword(),
+                    jenkinsSettings.getCrumbData(),
+                    connectionTimout);
         } else {
             jenkinsSecurityClient = SecurityClientFactory.none(jenkinsSettings.getCrumbData(), connectionTimout);
         }

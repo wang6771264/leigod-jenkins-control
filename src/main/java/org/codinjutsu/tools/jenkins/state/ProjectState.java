@@ -29,6 +29,8 @@ public class ProjectState implements Serializable {
 
     private String username = RESET_STR_VALUE;
 
+    private String apiToken = RESET_STR_VALUE;
+
     private String crumbData = RESET_STR_VALUE;
 
     private String lastSelectedView;

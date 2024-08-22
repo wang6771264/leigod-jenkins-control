@@ -130,6 +130,7 @@ public class ServerConfigurable implements SearchableConfigurable {
         jenkinsServerSetting.setServerUrl(serverSetting.getUrl());
         jenkinsSettings.setJenkinsUrl(serverSetting.getJenkinsUrl());
         jenkinsSettings.setUsername(serverSetting.getUsername());
+        jenkinsSettings.setApiToken(serverSetting.getApiToken());
         if (serverSetting.isApiTokenModified()) {
             jenkinsSettings.setPassword(serverSetting.getApiToken());
             Optional.ofNullable(serverComponent).ifPresent(ServerComponent::resetApiTokenModified);
