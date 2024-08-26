@@ -7,6 +7,8 @@ import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.DumbAware;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.util.CopyHyperLinkHelper;
 import org.codinjutsu.tools.jenkins.util.SymbolPool;
 import org.codinjutsu.tools.jenkins.view.action.ActionUtil;
@@ -17,6 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.Optional;
 
 /**
  * ==========================
@@ -39,8 +42,17 @@ public class CopyHyperlinkAction extends AnAction implements DumbAware {
     public void actionPerformed(@NotNull AnActionEvent event) {
         ActionUtil.getProject(event).ifPresent(project -> {
             final BrowserPanel browserPanel = BrowserPanel.getInstance(project);
-            browserPanel.getSelectedBuild().ifPresent(build ->
-                    CopyHyperLinkHelper.copy(build.getUrl(), SymbolPool.HASH + build.getNumber()));
+            Optional<Build> selectedBuild = browserPanel.getSelectedBuild();
+            if (selectedBuild.isPresent()) {
+                CopyHyperLinkHelper.copy(selectedBuild.get().getUrl(),
+                        SymbolPool.HASH + selectedBuild.get().getNumber());
+            } else {
+                Job selectedJob = browserPanel.getSelectedJob();
+                if(selectedJob != null && selectedJob.getLastBuild() != null){
+                    Build lastBuild = selectedJob.getLastBuild();
+                    CopyHyperLinkHelper.copy(lastBuild.getUrl(), SymbolPool.HASH + lastBuild.getNumber());
+                }
+            }
         });
     }
 

@@ -30,7 +30,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.stream.Stream;
@@ -63,28 +62,11 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
                 BuildStatusEnumRenderer.getInstance(project)));
         this.tree.setName("jobTree");
 
-        this.tree.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                System.out.println("keyPressed, key:{}" + e.getKeyCode());
-                if ((e.isControlDown() || e.isMetaDown()) && e.getKeyCode() == KeyEvent.VK_C) {
-                    System.out.println("Ctrl+C was pressed");
-                    // 获取选中的节点
-                    DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-                    if (selectedNode != null) {
-                        System.out.println("打印选中节点的菜单");
-                    }
-
-                    // 消耗掉这个事件，防止它被进一步传播
-                    e.consume();
-                }
-            }
-        });
         GuiUtil.runInSwingThread(() -> {
             this.tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode(new JenkinsTreeNode.RootNode(jenkins)), false));
         });
         DataManager.registerDataProvider(this.tree, dataId ->
-                PlatformDataKeys.COPY_PROVIDER.is(dataId) ? new JenkinsTreeCopyProvider(this) : null);
+                PlatformDataKeys.COPY_PROVIDER.is(dataId) ? new JenkinsTreeCopyProvider(project, this) : null);
     }
 
     @NotNull
