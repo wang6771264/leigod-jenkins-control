@@ -1,6 +1,12 @@
 # Changelog
 
 ## [Unreleased]
+## [1.0.5]
+### feature
+- 作业的`Ctrl+C`和作业的`COPY`改为复制最近一次更新的富文本复制内容
+## [1.0.4]
+### feature
+- apiToken改为本地存储
 ## [1.0.3]
 ### feature
 - 增加缓存`job`上次构建参数
