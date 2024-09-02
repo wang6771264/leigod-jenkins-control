@@ -130,6 +130,7 @@ public class RunBuildAction extends AnAction implements DumbAware {
 
                     private void openLogIfRunning(Job jobToCheckIfIsNewer, @Nullable Build previousLastBuild) {
                         final Build lastBuild = jobToCheckIfIsNewer.getLastBuild();
+                        //打开最新的日志和上次构建的日志
                         final boolean isNewerBuild = lastBuild != null &&
                                 (previousLastBuild == null || previousLastBuild.getNumber() < lastBuild.getNumber());
                         if (isNewerBuild && lastBuild.isBuilding()) {
