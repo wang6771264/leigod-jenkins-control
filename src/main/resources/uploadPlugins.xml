@@ -1,6 +1,6 @@
-<!--本地插件地址更新位置-->
 <?xml version="1.0" encoding="UTF-8"?>
 <plugins>
+    <!--本地插件地址更新位置-->
     <!--    id 插件的唯一编号-->
     <!--    url 插件存储的地址-->
     <plugin id="leigod.jenkins.control" name="Leigod Jenkins Control"
