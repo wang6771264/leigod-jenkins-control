@@ -34,6 +34,7 @@ import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.logic.*;
 import org.codinjutsu.tools.jenkins.model.jenkins.*;
+import org.codinjutsu.tools.jenkins.settings.multiServer.MultiJenkinsSettings;
 import org.codinjutsu.tools.jenkins.util.CollectionUtil;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
 import org.codinjutsu.tools.jenkins.view.JenkinsStatusBarWidget;
@@ -47,10 +48,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -82,7 +81,8 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     private final JenkinsAppSettings jenkinsAppSettings;
     @NotNull
     private final JenkinsSettings jenkinsSettings;
-    private final Jenkins jenkins;
+    @Getter
+    private final MultiJenkins multiJenkins;
     private final RequestManagerInterface requestManager;
     private final Map<String, Job> watchedJobs = new ConcurrentHashMap<>();
     private JPanel rootPanel;
@@ -91,7 +91,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     private ScheduledFuture<?> refreshViewFutureTask;
     private FavoriteView favoriteView;
     @Nullable
-    private View currentSelectedView;
+    private ViewV2 currentSelectedView;
 
     public BrowserPanel(@NotNull Project project) {
         super(true);
@@ -105,8 +105,15 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         jenkinsSettings = JenkinsSettings.getSafeInstance(project);
         setProvideQuickActions(false);
 
-        jenkins = Jenkins.byDefault();
-        jobTree = new JenkinsTree(project, jenkinsSettings, jenkins);
+        List<Jenkins> jenkinsList = new ArrayList<>();
+        List<MultiJenkinsSettings> multiSettings = jenkinsSettings.getMultiSettings();
+        multiSettings.forEach(multiSetting -> {
+            Jenkins jenkins = Jenkins.byDefault(multiSetting.getName());
+            jenkins.setServerUrl(multiSetting.getJenkinsServer());
+            jenkinsList.add(jenkins);
+        });
+        this.multiJenkins = new MultiJenkins(jenkinsList);
+        this.jobTree = new JenkinsTree(project, jenkinsSettings, jenkinsList);
         updateDoubleClickAction(getDoubleClickAction(jenkinsAppSettings.getDoubleClickAction()));
 
         jobPanel.setLayout(new BorderLayout());
@@ -186,7 +193,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         executorService.safeTaskCancel(refreshViewFutureTask);
         executor.remove(refreshViewJob);
 
-        if (jenkinsAppSettings.isServerUrlSet() && jenkinsAppSettings.getJobRefreshPeriod() > 0) {
+        if (jenkinsSettings.isServerUrlSet() && jenkinsAppSettings.getJobRefreshPeriod() > 0) {
             refreshViewFutureTask = executor.scheduleWithFixedDelay(refreshViewJob, jenkinsAppSettings.getJobRefreshPeriod(), jenkinsAppSettings.getJobRefreshPeriod(), TimeUnit.MINUTES);
         }
     }
@@ -218,7 +225,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
 
     @NotNull
     public List<Job> getAllJobs() {
-        return CollectionUtil.flattenedJobs(jenkins.getJobs());
+        return CollectionUtil.flattenedJobs(multiJenkins.getJobs());
     }
 
     @NotNull
@@ -240,11 +247,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         jobTree.updateSelection();
     }
 
-    public Jenkins getJenkins() {
-        return jenkins;
-    }
-
-    public @Nullable View getCurrentSelectedView() {
+    public @Nullable ViewV2 getCurrentSelectedView() {
         return currentSelectedView;
     }
 
@@ -290,7 +293,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         BuildStatusAggregator buildStatusAggregator = new BuildStatusAggregator();
         GuiUtil.runInSwingThread(() -> {
             jobTree.updateJobNode(job);
-            CollectionUtil.flattenedJobs(jenkins.getJobs()).forEach(j -> visit(j, buildStatusAggregator));
+            CollectionUtil.flattenedJobs(multiJenkins.getJobs()).forEach(j -> visit(j, buildStatusAggregator));
             JenkinsStatusBarWidget.getInstance(project).updateStatusIcon(buildStatusAggregator);
         });
     }
@@ -332,13 +335,13 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         }
 
         String lastSelectedViewName = jenkinsSettings.getLastSelectedView();
-        View viewToLoad;
+        ViewV2 viewToLoad;
         if (StringUtil.isEmpty(lastSelectedViewName)) {
-            viewToLoad = jenkins.getPrimaryView();
+            viewToLoad = multiJenkins.getPrimaryView();
         } else if (favoriteView != null && lastSelectedViewName.equals(favoriteView.getName())) {
             viewToLoad = favoriteView;
         } else {
-            viewToLoad = jenkins.getViewByName(lastSelectedViewName);
+            viewToLoad = multiJenkins.getViewByName(lastSelectedViewName);
         }
         loadView(viewToLoad);
     }
@@ -396,7 +399,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         PopupHandler.installPopupMenu(jobTree.asComponent(), popupGroup, POPUP_PLACE);
     }
 
-    public void loadView(final View view) {
+    public void loadView(final ViewV2 view) {
         this.currentSelectedView = view;
         if (!SwingUtilities.isEventDispatchThread()) {
             logger.warn("BrowserPanel.loadView called from outside EDT");
@@ -422,7 +425,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         updateSelection();
         if (jenkinsSettings.isFavoriteViewEmpty() && currentSelectedView instanceof FavoriteView) {
             favoriteView = null;
-            loadView(jenkins.getPrimaryView());
+            loadView(multiJenkins.getPrimaryView());
         } else {
             if (currentSelectedView instanceof FavoriteView) {
                 loadView(currentSelectedView);
@@ -441,11 +444,11 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     }
 
     public boolean isConfigured() {
-        return jenkinsAppSettings.isServerUrlSet();
+        return jenkinsSettings.isServerUrlSet();
     }
 
     public void updateWorkspace(Jenkins jenkinsWorkspace) {
-        jenkins.update(jenkinsWorkspace);
+        multiJenkins.update(jenkinsWorkspace);
     }
 
     public void addToWatch(String changeListName, Job job) {
@@ -461,6 +464,9 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         watchedJobs.put(changeListName, job);
     }
 
+    /**
+     * 监听正在运行的job
+     */
     private void watch() {
         if (!SwingUtilities.isEventDispatchThread()) {
             logger.warn("BrowserPanel.watch called from outside EDT");
@@ -539,7 +545,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         public void run(@NotNull RequestManagerInterface requestManager) {
             try {
                 setTreeBusy(true);
-                View viewToLoad = getViewToLoad();
+                ViewV2 viewToLoad = getViewToLoad();
                 if (viewToLoad == null) {
                     return;
                 }
@@ -566,7 +572,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
                 logger.warn("BrowserPanel.loadJobs called from EDT");
             }
             final List<Job> jobList;
-            final View viewToLoadJobs = currentSelectedView;
+            final ViewV2 viewToLoadJobs = currentSelectedView;
             //fixme 根据view去更新,这里需要加一个根据选中的选项更新状态
             if (viewToLoadJobs instanceof FavoriteView) {
                 jobList = requestManager.loadFavoriteJobs(jenkinsSettings.getFavoriteJobs());
@@ -579,19 +585,19 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
                 }
             }
             jenkinsSettings.setLastSelectedView(viewToLoadJobs.getName());
-            jenkins.setJobs(jobList);
+            multiJenkins.setJobs(jobList);
         }
 
         @Nullable
-        private View getViewToLoad() {
+        private ViewV2 getViewToLoad() {
             if (currentSelectedView == null) {
-                return jenkins.getPrimaryView();
+                return multiJenkins.getPrimaryView();
             }
             return currentSelectedView;
         }
 
         private void fillJobTree(final BuildStatusVisitor buildStatusVisitor) {
-            final List<Job> jobList = jenkins.getJobs();
+            final List<Job> jobList = multiJenkins.getJobs();
             jobTree.keepLastState(() -> {
                 jobTree.setJobs(jobList);
                 CollectionUtil.flattenedJobs(jobList).forEach(job -> visit(job, buildStatusVisitor));
@@ -601,7 +607,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         }
 
         private void setTreeBusy(final boolean isBusy) {
-            GuiUtil.runInSwingThread(() -> jobTree.getTree().setPaintBusy(isBusy));
+            GuiUtil.runInSwingThread(() -> jobTree.setPaintBusy(isBusy));
         }
 
         public void queue() {

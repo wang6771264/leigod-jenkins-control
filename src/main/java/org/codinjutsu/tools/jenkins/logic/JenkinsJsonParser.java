@@ -75,7 +75,8 @@ public class JenkinsJsonParser implements JenkinsParser {
     public Jenkins createWorkspace(String jsonData) {
         checkJsonDataAndThrowExceptionIfNecessary(jsonData);
         final JsonObject jsonObject = parseJson(jsonData);
-        final Optional<View> primaryView = Optional.ofNullable((JsonObject) jsonObject.get(PRIMARY_VIEW)).map(this::getView);
+        final Optional<ViewV2> primaryView = Optional.ofNullable((JsonObject) jsonObject.get(PRIMARY_VIEW))
+                .map(this::getView);
 
         final String description = getNonNullStringOrDefaultForNull(jsonObject, SERVER_DESCRIPTION,
                 org.codinjutsu.tools.jenkins.util.StringUtil.EMPTY);
@@ -88,12 +89,12 @@ public class JenkinsJsonParser implements JenkinsParser {
         return jenkins;
     }
 
-    private List<View> getViews(JsonArray viewsObjects, @Nullable View primaryView) {
-        List<View> views = new LinkedList<>();
+    private List<ViewV2> getViews(JsonArray viewsObjects, @Nullable ViewV2 primaryView) {
+        List<ViewV2> views = new LinkedList<>();
         for (Object obj : viewsObjects) {
             JsonObject viewObject = (JsonObject) obj;
-            final View view = getView(viewObject);
-            final var viewUrl = view.getUrl();
+            final ViewV2 view = getView(viewObject);
+            final String viewUrl = view.getUrl();
             if (view.equals(primaryView) && viewUrl != null) {
                 views.add(view.toBuilder()
                         .url(UrlBuilder.createViewUrl(viewUrl, primaryView.getName()).toString())
@@ -106,8 +107,8 @@ public class JenkinsJsonParser implements JenkinsParser {
         return views;
     }
 
-    private View getView(JsonObject viewObject) {
-        final View.ViewBuilder<?, ?> viewBuilder = View.builder();
+    private ViewV2 getView(JsonObject viewObject) {
+        final ViewV2.ViewV2Builder<?, ?> viewBuilder = ViewV2.builder();
         viewBuilder.isNested(false);
         final String unknownViewName = "Unknown";
         viewBuilder.name(viewObject.getStringOrDefault(createJsonKey(VIEW_NAME, unknownViewName)));
@@ -118,7 +119,7 @@ public class JenkinsJsonParser implements JenkinsParser {
         for (Object obj : subViewObjs) {
             JsonObject subviewObj = (JsonObject) obj;
 
-            final View.ViewBuilder<?, ?> nestedViewBuilder = View.builder();
+            final ViewV2.ViewV2Builder<?, ?> nestedViewBuilder = ViewV2.builder();
             nestedViewBuilder.isNested(true);
 
             String currentName = subviewObj.getStringOrDefault(createJsonKey(VIEW_NAME, unknownViewName));
@@ -502,8 +503,8 @@ public class JenkinsJsonParser implements JenkinsParser {
     }
 
     private @NotNull String getServerUrl(JsonObject jsonObject) {
-        final Optional<View> primaryView = Optional.ofNullable((JsonObject) jsonObject.get(PRIMARY_VIEW)).map(this::getView);
-        final String primaryViewUrl = primaryView.map(View::getUrl)
+        final Optional<ViewV2> primaryView = Optional.ofNullable((JsonObject) jsonObject.get(PRIMARY_VIEW)).map(this::getView);
+        final String primaryViewUrl = primaryView.map(ViewV2::getUrl)
                 .orElse(org.codinjutsu.tools.jenkins.util.StringUtil.EMPTY);
         return getNonNullStringOrDefaultForNull(jsonObject, SERVER_URL, primaryViewUrl);
     }

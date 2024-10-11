@@ -27,9 +27,9 @@ import com.intellij.openapi.ui.popup.PopupChooserBuilder;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBList;
 import org.codinjutsu.tools.jenkins.model.jenkins.FavoriteView;
-import org.codinjutsu.tools.jenkins.model.jenkins.View;
-import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
+import org.codinjutsu.tools.jenkins.model.jenkins.ViewV2;
 import org.codinjutsu.tools.jenkins.view.JenkinsViewComboRenderer;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -68,14 +68,14 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
         myPanel.addMouseListener(new MyMouseAdapter());
     }
 
-    private JBList<View> buildViewList(List<View> views, BrowserPanel browserPanel) {
-        List<View> unflattenViews = flatViewList(views);
+    private JBList<ViewV2> buildViewList(List<ViewV2> views, BrowserPanel browserPanel) {
+        List<ViewV2> unflattenViews = flatViewList(views);
 
         if (browserPanel.hasFavoriteJobs()) {
             unflattenViews.add(FavoriteView.create());
         }
 
-        final JBList<View> viewList = new JBList<>(unflattenViews);
+        final JBList<ViewV2> viewList = new JBList<>(unflattenViews);
         viewList.setCellRenderer(new JenkinsViewComboRenderer());
         return viewList;
     }
@@ -83,7 +83,7 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
 
     @Override
     public void update(AnActionEvent e) {
-        View currentSelectedView = browserPanel.getCurrentSelectedView();
+        ViewV2 currentSelectedView = browserPanel.getCurrentSelectedView();
         if (currentSelectedView != null) {
             myLabel.setText(currentSelectedView.getName());
         } else {
@@ -107,12 +107,12 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
         return ActionUpdateThread.BGT;
     }
 
-    private static List<View> flatViewList(List<View> views) {
-        List<View> flattenViewList = new LinkedList<>();
-        for (View view : views) {
+    private static List<ViewV2> flatViewList(List<ViewV2> views) {
+        List<ViewV2> flattenViewList = new LinkedList<>();
+        for (ViewV2 view : views) {
             flattenViewList.add(view);
             if (view.hasNestedView()) {
-                for (View subView : view.getSubViews()) {
+                for (ViewV2 subView : view.getSubViews()) {
                     flattenViewList.add(subView);
                 }
             }
@@ -124,22 +124,22 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
     private class MyMouseAdapter extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            List<View> views = browserPanel.getJenkins().getViews();
+            //选择`view`后加载job
+            List<ViewV2> views = browserPanel.getMultiJenkins().getViews();
             if (views.isEmpty()) {
                 return;
             }
 
-            final JBList<View> viewList = buildViewList(views, browserPanel);
+            final JBList<ViewV2> viewList = buildViewList(views, browserPanel);
 
             JBPopup popup = new PopupChooserBuilder<>(viewList)
                     .setMovable(false)
                     .setCancelKeyEnabled(true)
                     .setItemChosenCallback(() -> {
-                        final View view = viewList.getSelectedValue();
+                        final ViewV2 view = viewList.getSelectedValue();
                         if (view == null || view.hasNestedView()) return;
                         browserPanel.loadView(view);
-                    })
-                    .createPopup();
+                    }).createPopup();
 
             if (e != null) {
                 popup.show(new RelativePoint(e));

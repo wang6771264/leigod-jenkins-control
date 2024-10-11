@@ -8,6 +8,7 @@ import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class BrowserPanelAuthenticationHandler implements AuthenticationNotifier, Disposable {
@@ -34,10 +35,13 @@ public class BrowserPanelAuthenticationHandler implements AuthenticationNotifier
     }
 
     @Override
-    public void afterLogin(Jenkins jenkinsWorkspace) {
+    public void afterLogin(List<Jenkins> jenkinss) {
         executeForCurrentProject((BrowserPanel browser) -> {
-            browser.updateWorkspace(jenkinsWorkspace);
+            for (Jenkins jenkins : jenkinss) {
+                browser.updateWorkspace(jenkins);
+            }
             browser.postAuthenticationInitialization();
+            //初始化定时任务
             browser.initScheduledJobs();
         });
     }

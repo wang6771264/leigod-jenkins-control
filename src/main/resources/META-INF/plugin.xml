@@ -26,9 +26,9 @@
                              bundle="messages.JenkinsControl" key="plugin.name"
                              id="preferences.Jenkins" instance="org.codinjutsu.tools.jenkins.settings.JenkinsComponent">
             <configurable
-                    id="org.codinjutsu.tools.jenkins.servers"
+                    id="org.codinjutsu.tools.jenkins.multiServers"
                     nonDefaultProject="false"
-                    instance="org.codinjutsu.tools.jenkins.settings.ServerConfigurable"/>
+                    instance="org.codinjutsu.tools.jenkins.settings.multiServer.MultiServerConfigurable"/>
         </projectConfigurable>
         <applicationService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsAppSettings"/>
         <applicationService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsSettings"/>

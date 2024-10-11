@@ -11,9 +11,9 @@ import java.util.function.UnaryOperator;
 @Service
 final class UrlMapperService {
 
-    public @NotNull UnaryOperator<String> getMapper(@NotNull JenkinsSettings jenkinsSettings, @NotNull String serverUrl) {
-        return Optional.of(jenkinsSettings.getJenkinsUrl())
-                .filter(StringUtil::isNotEmpty)
+    public @NotNull UnaryOperator<String> getMapper(@NotNull JenkinsSettings jenkinsSettings,
+                                                    @NotNull String serverUrl) {
+        return Optional.of(serverUrl).filter(StringUtil::isNotEmpty)
                 .map(jenkinsUrl -> getMapper(jenkinsUrl, serverUrl))
                 .orElseGet(UnaryOperator::identity);
     }

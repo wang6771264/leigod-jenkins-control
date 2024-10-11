@@ -119,8 +119,8 @@ public class UrlBuilder {
         return buildUrl(buildUrl, encodePath("stop"));
     }
 
-    public URL createJenkinsWorkspaceUrl(JenkinsAppSettings configuration) {
-        return buildUrl(configuration.getServerUrl(), encodePathQuery(API_JSON + TREE_PARAM + BASIC_JENKINS_INFO));
+    public URL createJenkinsWorkspaceUrl(String serverUrl) {
+        return buildUrl(serverUrl, encodePathQuery(API_JSON + TREE_PARAM + BASIC_JENKINS_INFO));
     }
 
     public URL createViewUrl(JenkinsPlateform jenkinsPlateform, String viewUrl) {

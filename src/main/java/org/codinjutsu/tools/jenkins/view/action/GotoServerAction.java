@@ -7,6 +7,8 @@ import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 public class GotoServerAction extends AbstractGotoWebPageAction {
 
     public GotoServerAction(BrowserPanel browserPanel) {
@@ -20,12 +22,15 @@ public class GotoServerAction extends AbstractGotoWebPageAction {
         return browserPanel.getSelectedServer().map(Jenkins::getServerUrl).orElse("");
     }
 
-
     @Override
     public void update(AnActionEvent event) {
-        final var selectedServer = browserPanel.getSelectedServer();
-        final var isServerSelected = selectedServer.isPresent();
-        event.getPresentation().setVisible(isServerSelected && !StringUtil.equals(browserPanel.getJenkins().getServerUrl(),
-                JenkinsAppSettings.DUMMY_JENKINS_SERVER_URL));
+        Optional<Jenkins> selectedServer = browserPanel.getSelectedServer();
+        if(selectedServer.isPresent()){
+            Jenkins jenkins = selectedServer.get();
+            event.getPresentation().setVisible(!StringUtil.equals(jenkins.getServerUrl(),
+                    JenkinsAppSettings.DUMMY_JENKINS_SERVER_URL));
+            return;
+        }
+        event.getPresentation().setVisible(false);
     }
 }

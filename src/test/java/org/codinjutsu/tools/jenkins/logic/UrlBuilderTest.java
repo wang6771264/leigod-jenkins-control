@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import java.net.URL;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class UrlBuilderTest {
     private JenkinsAppSettings configuration;
@@ -36,14 +36,6 @@ public class UrlBuilderTest {
 
         URL url = urlBuilder.createRunJobUrl("http://localhost:8080/jenkins/My%20Job", configuration);
         assertThat(url).hasToString("http://localhost:8080/jenkins/My%20Job/build?delay=20sec");
-    }
-
-    @Test
-    public void createJenkinsWorkspaceUrl() {
-        configuration.setServerUrl("http://localhost:8080/jenkins");
-
-        URL url = urlBuilder.createJenkinsWorkspaceUrl(configuration);
-        assertThat(url).hasToString("http://localhost:8080/jenkins/api/json?tree=url,description,nodeName,nodeDescription,primaryView%5Bname,url%5D,views%5Bname,url,views%5Bname,url%5D%5D");
     }
 
     @Test

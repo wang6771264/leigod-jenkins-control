@@ -16,31 +16,31 @@
 
 package org.codinjutsu.tools.jenkins;
 
-import com.intellij.credentialStore.CredentialAttributes;
-import com.intellij.ide.passwordSafe.PasswordSafe;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import org.apache.commons.lang.StringUtils;
 import org.codinjutsu.tools.jenkins.model.FavoriteJob;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
+import org.codinjutsu.tools.jenkins.settings.multiServer.MultiJenkinsSettings;
 import org.codinjutsu.tools.jenkins.state.ProjectState;
 import org.codinjutsu.tools.jenkins.util.JobUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @State(name = "Jenkins.Settings", storages = {
         @Storage(value = "jenkins_share_setting.xml", roamingType = RoamingType.PER_OS)
 })
 public class JenkinsSettings implements PersistentStateComponent<ProjectState> {
 
-    public static final String JENKINS_SETTINGS_PASSWORD_KEY = "JENKINS_SETTINGS_PASSWORD_KEY";
     private final ProjectState myState = new ProjectState();
 
     public static JenkinsSettings getSafeInstance(Project project) {
@@ -57,50 +57,6 @@ public class JenkinsSettings implements PersistentStateComponent<ProjectState> {
     @Override
     public void loadState(@NotNull ProjectState state) {
         XmlSerializerUtil.copyBean(state, myState);
-    }
-
-    public String getUsername() {
-        return myState.getUsername();
-    }
-
-    public void setUsername(String username) {
-        myState.setUsername(username);
-    }
-
-    public void setApiToken(String apiToken) {
-        myState.setApiToken(apiToken);
-    }
-
-    public @NotNull String getJenkinsUrl() {
-        return myState.getJenkinsUrl();
-    }
-
-    public void setJenkinsUrl(String jenkinsUrl) {
-        myState.setJenkinsUrl(jenkinsUrl);
-    }
-
-    public String getCrumbData() {
-        return myState.getCrumbData();
-    }
-
-    public void setCrumbData(String crumbData) {
-        myState.setCrumbData(crumbData);
-    }
-
-    public String getPassword() {
-//        String password = PasswordSafe.getInstance().getPassword(getPasswordCredentialAttributes());
-        String apiToken = myState.getApiToken();
-        return StringUtil.defaultIfEmpty(apiToken, "");
-    }
-
-    @Deprecated
-    public void setPassword(String password) {
-        PasswordSafe.getInstance().setPassword(getPasswordCredentialAttributes(), org.codinjutsu.tools.jenkins.util.StringUtil.isNotBlank(password) ? password : "");
-    }
-
-    @NotNull
-    private CredentialAttributes getPasswordCredentialAttributes() {
-        return new CredentialAttributes(JenkinsAppSettings.class.getName(), JENKINS_SETTINGS_PASSWORD_KEY, JenkinsAppSettings.class);
     }
 
     public void addFavorite(@NotNull List<Job> jobs) {
@@ -132,10 +88,6 @@ public class JenkinsSettings implements PersistentStateComponent<ProjectState> {
         myState.setLastSelectedView(viewName);
     }
 
-    public boolean isSecurityMode() {
-        return StringUtil.isNotEmpty(getUsername());
-    }
-
     public JenkinsVersion getVersion() {
         return this.myState.getJenkinsVersion();
     }
@@ -160,4 +112,42 @@ public class JenkinsSettings implements PersistentStateComponent<ProjectState> {
         myState.setConnectionTimeout(timeoutInSeconds);
     }
 
+    public void setMultiSettings(List<MultiJenkinsSettings> list) {
+        myState.setMultiSettings(list);
+    }
+
+    public List<MultiJenkinsSettings> getMultiSettings() {
+        return myState.getMultiSettings();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setServerTableStyle(Object serverTableStyle) {
+        if (serverTableStyle != null) {
+            myState.setServerTableStyle((HashMap<String, Integer>) serverTableStyle);
+        }
+    }
+
+    public Integer getServerTableColumnWidth(String columnName) {
+        return Optional.ofNullable(myState.getServerTableStyle())
+                .map(o -> o.get(columnName)).orElse(null);
+    }
+
+    /**
+     * 表格样式是否持久化
+     *
+     * @return
+     */
+    public boolean hasPersistentTableStyle() {
+        return myState.getServerTableStyle() != null && !myState.getServerTableStyle().isEmpty();
+    }
+
+    /**
+     * 是否有连接需要处理
+     *
+     * @return
+     */
+    public boolean isServerUrlSet() {
+        List<MultiJenkinsSettings> multiSettings = this.getMultiSettings();
+        return multiSettings.stream().anyMatch(settings -> StringUtils.isNotBlank(settings.getJenkinsUrl()));
+    }
 }

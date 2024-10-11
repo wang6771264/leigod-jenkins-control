@@ -20,7 +20,7 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 
 @SuperBuilder
-public class FavoriteView extends View {
+public class FavoriteView extends ViewV2 {
 
     private static final String FAVORITE_NAME = "My Favorites";
 

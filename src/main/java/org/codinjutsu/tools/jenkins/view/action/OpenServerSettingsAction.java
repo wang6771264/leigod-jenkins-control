@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import org.codinjutsu.tools.jenkins.settings.ServerConfigurable;
+import org.codinjutsu.tools.jenkins.settings.multiServer.MultiServerConfigurable;
 import org.jetbrains.annotations.NotNull;
 
 public class OpenServerSettingsAction extends DumbAwareAction {
@@ -17,7 +17,7 @@ public class OpenServerSettingsAction extends DumbAwareAction {
     }
 
     private static void showSettingsFor(Project project) {
-        ShowSettingsUtil.getInstance().showSettingsDialog(project, ServerConfigurable.class);
+        ShowSettingsUtil.getInstance().showSettingsDialog(project, MultiServerConfigurable.class);
     }
 
     @Override

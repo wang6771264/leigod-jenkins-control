@@ -24,8 +24,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
+@Setter
 public class Jenkins {
 
     private @Nullable String name;
@@ -33,37 +33,21 @@ public class Jenkins {
     private String serverUrl;
 
     @Getter
-    @Setter
     private List<Job> jobs;
 
-    private Map<String, Job> jobMap;
-
-    @Setter
     @Getter
-    private List<View> views;
+    private List<ViewV2> views;
     @Getter
-    @Setter
-    private View primaryView;
+    private ViewV2 primaryView;
 
     public Jenkins(@Nullable String description, String serverUrl) {
         this.name = description;
         this.serverUrl = serverUrl;
         this.jobs = new LinkedList<>();
-        this.views = new LinkedList<>();
     }
 
     public @Nullable String getName() {
         return name;
-    }
-
-    public View getViewByName(String lastSelectedViewName) {
-        for (View view : views) {
-            if (StringUtil.equals(lastSelectedViewName, view.getName())) {
-                return view;
-            }
-        }
-
-        return null;
     }
 
     public void update(Jenkins jenkins) {
@@ -71,13 +55,13 @@ public class Jenkins {
         this.serverUrl = jenkins.getServerUrl();
         this.jobs.clear();
         this.jobs.addAll(jenkins.getJobs());
-        this.views.clear();
-        this.views.addAll(jenkins.getViews());
+
+        this.views = jenkins.getViews();
         this.primaryView = jenkins.getPrimaryView();
     }
 
-    public static Jenkins byDefault() {
-        return new Jenkins("", JenkinsAppSettings.DUMMY_JENKINS_SERVER_URL);
+    public static Jenkins byDefault(String name) {
+        return new Jenkins(name, JenkinsAppSettings.DUMMY_JENKINS_SERVER_URL);
     }
 
     public String getNameToRender() {
@@ -88,5 +72,12 @@ public class Jenkins {
             label.append(description);
         }
         return label.toString();
+    }
+
+    public void addJob(Job job) {
+        if (this.jobs == null) {
+            this.jobs = new LinkedList<>();
+        }
+        this.jobs.add(job);
     }
 }

@@ -16,10 +16,12 @@
 
 package org.codinjutsu.tools.jenkins.model.jenkins;
 
+import lombok.Getter;
 import lombok.Singular;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import lombok.experimental.SuperBuilder;
+import org.codinjutsu.tools.jenkins.logic.JenkinsClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,20 +30,25 @@ import java.util.List;
 @Value
 @NonFinal
 @SuperBuilder(toBuilder = true)
-public class View {
+public class ViewV2 {
 
     @NotNull
-    private final String name;
+    String name;
     //TODO URL shoud be changed to object representing URL
     @Nullable
-    private final String url;
-
-    private final boolean isNested;
+    String url;
+    JenkinsClient client;
+    boolean isNested;
+    @Getter
+    ViewV2 primaryView;
+    @Getter
+    List<ViewV2> views;
     @NotNull
     @Singular
-    private final List<View> subViews;
+    List<ViewV2> subViews;
 
     public boolean hasNestedView() {
         return !subViews.isEmpty();
     }
+
 }

@@ -22,17 +22,17 @@ import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.list.ListCellBackgroundSupplier;
 import com.intellij.util.ui.UIUtil;
 import org.codinjutsu.tools.jenkins.model.jenkins.FavoriteView;
-import org.codinjutsu.tools.jenkins.model.jenkins.View;
+import org.codinjutsu.tools.jenkins.model.jenkins.ViewV2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class JenkinsViewComboRenderer extends SimpleListCellRenderer<View>
-        implements ListCellBackgroundSupplier<View> {
+public class JenkinsViewComboRenderer extends SimpleListCellRenderer<ViewV2>
+        implements ListCellBackgroundSupplier<ViewV2> {
 
-    public void renderView(View view) {
+    public void renderView(ViewV2 view) {
         final boolean isNestedParent = view.hasNestedView();
         setEnabled(!isNestedParent);
         setFocusable(!isNestedParent);
@@ -48,16 +48,16 @@ public class JenkinsViewComboRenderer extends SimpleListCellRenderer<View>
     }
 
     @Override
-    public void customize(@NotNull JList<? extends View> list, View view, int index, boolean selected, boolean hasFocus) {
+    public void customize(@NotNull JList<? extends ViewV2> list, ViewV2 view, int index, boolean selected, boolean hasFocus) {
         renderView(view);
     }
 
     @Override
-    public @Nullable Color getCellBackground(View view, int row) {
+    public @Nullable Color getCellBackground(ViewV2 view, int row) {
         return view.hasNestedView() ? JBColor.LIGHT_GRAY : null;
     }
 
-    private @NotNull String getText(View view) {
+    private @NotNull String getText(ViewV2 view) {
         final var viewName = view.getName();
         return view.isNested() ? "   " + viewName : viewName;
     }

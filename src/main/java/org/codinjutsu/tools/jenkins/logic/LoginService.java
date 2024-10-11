@@ -8,6 +8,8 @@ import org.codinjutsu.tools.jenkins.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 
 public class LoginService {
 
@@ -23,18 +25,18 @@ public class LoginService {
             logger.warn("LoginService.performAuthentication called from outside of EDT");
         }
         final JenkinsAppSettings settings = JenkinsAppSettings.getSafeInstance(project);
+        JenkinsSettings jenkinsSettings = JenkinsSettings.getSafeInstance(project);
         final AuthenticationNotifier publisher = ApplicationManager.getApplication().getMessageBus()
                 .syncPublisher(AuthenticationNotifier.USER_LOGGED_IN);
-        if (!settings.isServerUrlSet()) {
+        if (!jenkinsSettings.isServerUrlSet()) {
             logger.warn("Jenkins server is not setup, authentication will not happen");
             publisher.emptyConfiguration();
             return;
         }
-        final JenkinsSettings jenkinsSettings = JenkinsSettings.getSafeInstance(project);
         JenkinsBackgroundTaskFactory.getInstance(project).createBackgroundTask("Authenticating jenkins",
                 new JenkinsBackgroundTask.JenkinsTask() {
 
-                    private Jenkins jenkinsWorkspace;
+                    private List<Jenkins> jenkinsWorkspace;
 
                     @Override
                     public void run(@NotNull RequestManagerInterface requestManager) {
@@ -60,6 +62,7 @@ public class LoginService {
                     }
 
                     @Override
+
                     public void onThrowable(Throwable error) {
                         JenkinsBackgroundTask.JenkinsTask.super.onThrowable(error);
                         publisher.loginFailed(error);

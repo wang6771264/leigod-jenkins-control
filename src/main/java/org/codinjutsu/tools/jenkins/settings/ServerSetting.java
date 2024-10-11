@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Builder
 @Value
-class ServerSetting {
+public class ServerSetting {
     @Nullable String url;
     /**
      * specified in '<a href="http://localhost:8080/jenkins/manage/">http://localhost:8080/jenkins/manage/</a>'

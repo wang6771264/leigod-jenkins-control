@@ -4,18 +4,18 @@ import com.offbytwo.jenkins.model.TestResult;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
+import org.codinjutsu.tools.jenkins.model.FavoriteJob;
 import org.codinjutsu.tools.jenkins.model.jenkins.*;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
-import org.codinjutsu.tools.jenkins.model.FavoriteJob;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
 
 public interface RequestManagerInterface {
-    Jenkins loadJenkinsWorkspace(JenkinsAppSettings configuration, JenkinsSettings jenkinsSettings);
+    List<Jenkins> loadJenkinsWorkspace(JenkinsAppSettings configuration, JenkinsSettings jenkinsSettings);
 
-    Map<String, Build> loadJenkinsRssLatestBuilds(JenkinsAppSettings configuration);
+    Map<String, Build> loadJenkinsRssLatestBuilds(JenkinsSettings jenkinsSettings);
 
     void runBuild(Job job, JenkinsAppSettings configuration, Map<String, ?> parameters);
 
@@ -31,7 +31,7 @@ public interface RequestManagerInterface {
     Job loadJob(Job job);
 
     @NotNull
-    List<Job> loadJenkinsView(@NotNull View view);
+    List<Job> loadJenkinsView(@NotNull ViewV2 view);
 
     @NotNull
     Build loadBuild(Build build);
@@ -49,7 +49,7 @@ public interface RequestManagerInterface {
     List<TestResult> loadTestResultsFor(Build build);
 
     @NotNull
-    List<Computer> loadComputer(JenkinsAppSettings settings);
+    List<Computer> loadComputer(JenkinsSettings settings);
 
     List<String> getGitParameterChoices(Job job, JobParameter jobParameter);
 }

@@ -25,9 +25,10 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import lombok.Value;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.JobTracker;
-import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +41,7 @@ public class RssLogic implements Disposable {
 
     private final Project project;
     private final JenkinsAppSettings jenkinsAppSettings;
+    private final JenkinsSettings jenkinsSettings;
     private final Map<String, Build> currentBuildMap = new HashMap<>();
 
     private final Runnable refreshRssBuildsJob;
@@ -49,6 +51,7 @@ public class RssLogic implements Disposable {
     public RssLogic(final Project project) {
         this.project = project;
         this.jenkinsAppSettings = JenkinsAppSettings.getSafeInstance(project);
+        this.jenkinsSettings = JenkinsSettings.getSafeInstance(project);
         this.loadLatestBuildsJob = new LoadLatestBuildsJob(project);
         this.refreshRssBuildsJob = loadLatestBuildsJob::queue;
     }
@@ -58,7 +61,7 @@ public class RssLogic implements Disposable {
     }
 
     public void loadLatestBuilds() {
-        if (jenkinsAppSettings.isServerUrlSet()) {
+        if (jenkinsSettings.isServerUrlSet()) {
             loadLatestBuildsJob.queue();
         }
     }
@@ -71,7 +74,7 @@ public class RssLogic implements Disposable {
 
         executor.remove(refreshRssBuildsJob);
 
-        if (jenkinsAppSettings.isServerUrlSet() && jenkinsAppSettings.getRssRefreshPeriod() > 0) {
+        if (jenkinsSettings.isServerUrlSet() && jenkinsAppSettings.getRssRefreshPeriod() > 0) {
             refreshRssBuildFutureTask = executor.scheduleWithFixedDelay(refreshRssBuildsJob, 0,
                     jenkinsAppSettings.getRssRefreshPeriod(), TimeUnit.MINUTES);
         }
@@ -79,7 +82,7 @@ public class RssLogic implements Disposable {
 
     @SuppressWarnings({"java:S3824", "java:S3398"})
     private Map<String, Build> loadAndReturnNewLatestBuilds(RequestManagerInterface requestManager) {
-        final Map<String, Build> latestBuildMap = requestManager.loadJenkinsRssLatestBuilds(jenkinsAppSettings);
+        final Map<String, Build> latestBuildMap = requestManager.loadJenkinsRssLatestBuilds(jenkinsSettings);
         final Map<String, Build> newBuildMap = new HashMap<>();
         for (Map.Entry<String, Build> entry : latestBuildMap.entrySet()) {
             String jobName = entry.getKey();

@@ -8,7 +8,10 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.TreeUIHelper;
+import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.containers.Convertor;
 import com.intellij.util.ui.tree.TreeUtil;
@@ -29,9 +32,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
@@ -39,34 +41,42 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
     private static final String UNAVAILABLE = "No Jenkins server available";
     private static final TreeState NO_TREE_STATE = null;
     private static final Logger LOG = Logger.getInstance(JenkinsTree.class);
-    private final SimpleTree tree;
+    private final JBList<SimpleTree> list;
+    private final Map<String, JobClickHandler> clickHandlerMap = new HashMap<>();
     @NotNull
     private JenkinsTreeState state = new JenkinsTreeState();
     @Nullable
     private TreeState lastTreeState = NO_TREE_STATE;
-    @Nullable
-    private JobClickHandler clickHandler;
 
-    /**
-     * 创建一个组合键Ctrl+C
-     */
-    private KeyStroke ctrlC = KeyStroke.getKeyStroke(
-            KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK
-    );
-
-    public JenkinsTree(Project project, @NotNull JenkinsSettings jenkinsSettings, Jenkins jenkins) {
-        this.tree = new TreeWithoutDefaultSearch();
-
-        this.tree.getEmptyText().setText(LOADING);
-        this.tree.setCellRenderer(new JenkinsTreeRenderer(jenkinsSettings::isFavoriteJob,
-                BuildStatusEnumRenderer.getInstance(project)));
-        this.tree.setName("jobTree");
-
-        GuiUtil.runInSwingThread(() -> {
-            this.tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode(new JenkinsTreeNode.RootNode(jenkins)), false));
+    public JenkinsTree(Project project, @NotNull JenkinsSettings jenkinsSettings, List<Jenkins> jenkinsList) {
+        this.list = new JBList<>();
+        DefaultListModel<SimpleTree> listModel = new DefaultListModel<>();
+        this.list.setModel(listModel);
+        // 设置自定义渲染器
+        list.setCellRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            value.setBackground(isSelected ? JBColor.LIGHT_GRAY : JBColor.WHITE);
+            return new JBScrollPane(value);
         });
-        DataManager.registerDataProvider(this.tree, dataId ->
-                PlatformDataKeys.COPY_PROVIDER.is(dataId) ? new JenkinsTreeCopyProvider(project, this) : null);
+        for (Jenkins jenkins : jenkinsList) {
+            SimpleTree tree = new TreeWithoutDefaultSearch();
+            tree.getEmptyText().setText(LOADING);
+            tree.setCellRenderer(new JenkinsTreeRenderer(jenkinsSettings::isFavoriteJob,
+                    BuildStatusEnumRenderer.getInstance(project)));
+            tree.setName(jenkins.getServerUrl());
+            GuiUtil.runInSwingThread(() -> {
+                tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode(new JenkinsTreeNode.RootNode(jenkins)), false));
+            });
+            DataManager.registerDataProvider(tree, dataId -> {
+                // 复制功能
+                return PlatformDataKeys.COPY_PROVIDER.is(dataId) ? new JenkinsTreeCopyProvider(project, this) : null;
+            });
+            listModel.addElement(tree);
+        }
+        if (listModel.isEmpty()) {
+            SimpleTree tree = new TreeWithoutDefaultSearch();
+            tree.setName("无");
+            tree.getEmptyText().setText(tree.getName());
+        }
     }
 
     @NotNull
@@ -153,7 +163,7 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
 
     @NotNull
     public JComponent asComponent() {
-        return getTree();
+        return this.list;
     }
 
     public void clear() {
@@ -163,17 +173,31 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
 
     @NotNull
     public SimpleTree getTree() {
-        return tree;
+        return this.getSelectedTree();
+    }
+
+    public void setPaintBusy(boolean isBusy) {
+        ListModel<SimpleTree> model = list.getModel();
+        for (int i = 0; i < model.getSize(); i++) {
+            model.getElementAt(i).setPaintBusy(isBusy);
+        }
     }
 
     @Nullable
     public DefaultMutableTreeNode getLastSelectedPathComponent() {
+        SimpleTree tree = this.getSelectedTree();
         return Optional.ofNullable(tree.getLastSelectedPathComponent())
                 .filter(DefaultMutableTreeNode.class::isInstance)
                 .map(DefaultMutableTreeNode.class::cast).orElse(null);
     }
 
+    private SimpleTree getSelectedTree() {
+        int selectedIndex = Math.max(0, list.getSelectedIndex());
+        return list.getModel().getElementAt(selectedIndex);
+    }
+
     public @NotNull Stream<DefaultMutableTreeNode> getSelectedPathComponents() {
+        SimpleTree tree = this.getSelectedTree();
         return Optional.ofNullable(tree.getSelectionPaths())
                 .stream().flatMap(Arrays::stream)
                 .map(TreePath::getLastPathComponent)
@@ -190,14 +214,24 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
 
     @Nullable
     public DefaultMutableTreeNode getModelRoot() {
-        return (DefaultMutableTreeNode) getModel().getRoot();
+        return (DefaultMutableTreeNode) this.getSelectedTree().getModel().getRoot();
     }
 
     public void setJobs(@NotNull final Collection<Job> jobs) {
-        Optional.ofNullable(getModelRoot()).ifPresent(rootNode -> setJobs(jobs, rootNode));
+        jobs.forEach(job -> {
+            String url = job.getUrl();
+            this.treeForeach(tree -> {
+                String name = tree.getName();
+                if (url.startsWith(name)) {
+                    DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
+                    Optional.ofNullable(rootNode).ifPresent(root -> setJobs(jobs, tree, root));
+                }
+            });
+        });
     }
 
-    private void setJobs(@NotNull final Collection<Job> jobs, @NotNull DefaultMutableTreeNode rootNode) {
+    private void setJobs(@NotNull final Collection<Job> jobs, SimpleTree tree,
+                         @NotNull DefaultMutableTreeNode rootNode) {
         rootNode.removeAllChildren();
         jobs.stream().map(JenkinsTree::createJobTree).forEach(rootNode::add);
         tree.setRootVisible(true);
@@ -206,7 +240,10 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
     public void keepLastState(@NotNull final Runnable runnable) {
         final Optional<TreeState> treeState = getLastTreeState();
         runnable.run();
-        treeState.ifPresent(t -> t.applyTo(tree, getModelRoot()));
+        this.treeForeach(tree -> {
+            //保存当前树的状态
+            treeState.ifPresent(t -> t.applyTo(tree, getModelRoot()));
+        });
         saveLastTreeState();
     }
 
@@ -215,14 +252,29 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
     }
 
     public void setJobsUnavailable() {
-        tree.setRootVisible(false);
-        tree.getEmptyText().setText(UNAVAILABLE);
+        this.treeForeach(tree -> {
+            tree.setRootVisible(false);
+            tree.getEmptyText().setText(UNAVAILABLE);
+        });
     }
 
+    private void treeForeach(Consumer<SimpleTree> consumer) {
+        int itemsCount = list.getItemsCount();
+        ListModel<SimpleTree> model = list.getModel();
+        for (int i = 0; i < itemsCount; i++) {
+            SimpleTree tree = model.getElementAt(i);
+            consumer.accept(tree);
+        }
+    }
+
+
     public void updateSelection() {
-        Optional.ofNullable(tree.getSelectionPath()).map(TreePath::getLastPathComponent)
-                .map(TreeNode.class::cast)
-                .ifPresent(node -> getModel().nodeChanged(node));
+        this.treeForeach(tree -> {
+            //树节点发生变更后更新选中
+            Optional.ofNullable(tree.getSelectionPath()).map(TreePath::getLastPathComponent)
+                    .map(TreeNode.class::cast)
+                    .ifPresent(node -> getModel().nodeChanged(node));
+        });
     }
 
     @Nullable
@@ -242,12 +294,17 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
 
     @NotNull
     public Optional<TreeState> getTreeState() {
-        return Optional.ofNullable(getModelRoot()).map(modelRoot -> TreeState.createOn(tree, modelRoot));
+        return Optional.ofNullable(getModelRoot()).map(modelRoot -> {
+            //获取选取的状态
+            return TreeState.createOn(this.getSelectedTree(), modelRoot);
+        });
     }
 
     @NotNull
     private Optional<TreeState> getLastTreeState() {
-        final Integer childCount = Optional.ofNullable(getModelRoot()).map(DefaultMutableTreeNode::getChildCount).orElse(0);
+        final Integer childCount = Optional.ofNullable(getModelRoot())
+                .map(DefaultMutableTreeNode::getChildCount)
+                .orElse(0);
         return childCount == 0 ? Optional.ofNullable(lastTreeState) : getTreeState();
     }
 
@@ -284,7 +341,7 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
 
     @NotNull
     private DefaultTreeModel getModel() {
-        return (DefaultTreeModel) tree.getModel();
+        return (DefaultTreeModel) this.getSelectedTree().getModel();
     }
 
     private boolean isSameJob(Job job1, Job job2) {
@@ -298,9 +355,14 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
     }
 
     public void updateDoubleClickAction(@NotNull JobAction doubleClickAction) {
-        Optional.ofNullable(clickHandler).ifPresent(this.tree::removeMouseListener);
-        this.clickHandler = new JobClickHandler(doubleClickAction);
-        this.tree.addMouseListener(clickHandler);
+        this.treeForeach(tree -> {
+            String name = tree.getName();
+            JobClickHandler clickHandler = clickHandlerMap.get(name);
+            Optional.ofNullable(clickHandler).ifPresent(tree::removeMouseListener);
+            clickHandler = new JobClickHandler(doubleClickAction);
+            tree.addMouseListener(clickHandler);
+        });
+
     }
 
     @SuppressWarnings("java:S110")

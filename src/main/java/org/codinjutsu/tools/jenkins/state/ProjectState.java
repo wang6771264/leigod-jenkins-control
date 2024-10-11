@@ -4,6 +4,7 @@ import lombok.Data;
 import org.codinjutsu.tools.jenkins.model.FavoriteJob;
 import org.codinjutsu.tools.jenkins.model.JobBuildConfig;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
+import org.codinjutsu.tools.jenkins.settings.multiServer.MultiJenkinsSettings;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -27,12 +28,6 @@ public class ProjectState implements Serializable {
 
     private static final int DEFAULT_CONNECTION_TIMEOUT = 10;
 
-    private String username = RESET_STR_VALUE;
-
-    private String apiToken = RESET_STR_VALUE;
-
-    private String crumbData = RESET_STR_VALUE;
-
     private String lastSelectedView;
 
     private List<FavoriteJob> favoriteJobs = new LinkedList<>();
@@ -40,6 +35,10 @@ public class ProjectState implements Serializable {
      * 每个job的构建配置
      */
     private Map<String, JobBuildConfig> jobBuildConfigMapping = new HashMap<>();
+    /**
+     * 多个jenkins配置
+     */
+    private List<MultiJenkinsSettings> multiSettings = new LinkedList<>();
 
     private JenkinsVersion jenkinsVersion = JenkinsVersion.VERSION_1;
 
@@ -47,6 +46,11 @@ public class ProjectState implements Serializable {
 
     @NotNull
     private String jenkinsUrl = RESET_STR_VALUE;
+
+    /**
+     * jenkins服务配置表格的样式缓存
+     */
+    private HashMap<String, Integer> serverTableStyle = new HashMap<>();
 
     public void clearFavoriteJobs() {
         favoriteJobs.clear();

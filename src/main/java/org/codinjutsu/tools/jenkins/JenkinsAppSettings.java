@@ -22,7 +22,6 @@ import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import lombok.Data;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
@@ -57,33 +56,8 @@ public class JenkinsAppSettings implements PersistentStateComponent<JenkinsAppSe
     }
 
     @Override
-    public void loadState(State state) {
+    public void loadState(@NotNull State state) {
         XmlSerializerUtil.copyBean(state, myState);
-    }
-
-    /**
-     * @deprecated move to server setting class (maybe {@link JenkinsSettings} or {@link org.codinjutsu.tools.jenkins.settings.ServerSetting})
-     */
-    @Deprecated(since = "0.13.18")
-    public String getServerUrl() {
-        return myState.getServerUrl();
-    }
-
-    /**
-     * @deprecated move to server setting class (maybe {@link JenkinsSettings} or {@link org.codinjutsu.tools.jenkins.settings.ServerSetting})
-     */
-    @Deprecated(since = "0.13.18")
-    public void setServerUrl(String serverUrl) {
-        myState.setServerUrl(serverUrl);
-    }
-
-    /**
-     * @deprecated move to server setting class (maybe {@link JenkinsSettings} or {@link org.codinjutsu.tools.jenkins.settings.ServerSetting})
-     */
-    @Deprecated(since = "0.13.18")
-    public boolean isServerUrlSet() {
-        final String serverUrl = myState.getServerUrl();
-        return StringUtil.isNotEmpty(serverUrl) && !DUMMY_JENKINS_SERVER_URL.equals(serverUrl);
     }
 
     public int getBuildDelay() {
@@ -221,7 +195,6 @@ public class JenkinsAppSettings implements PersistentStateComponent<JenkinsAppSe
     @Data
     public static class State {
 
-        private String serverUrl = DUMMY_JENKINS_SERVER_URL;
         private int delay = DEFAULT_BUILD_DELAY;
         private int jobRefreshPeriod = RESET_PERIOD_VALUE;
         private int rssRefreshPeriod = RESET_PERIOD_VALUE;

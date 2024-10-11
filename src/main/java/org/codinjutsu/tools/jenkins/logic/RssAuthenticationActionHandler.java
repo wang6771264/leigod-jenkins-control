@@ -6,6 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBusConnection;
 import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 
+import java.util.List;
+
 public class RssAuthenticationActionHandler implements AuthenticationNotifier, Disposable {
     private final Project project;
     private final MessageBusConnection connection;
@@ -29,7 +31,7 @@ public class RssAuthenticationActionHandler implements AuthenticationNotifier, D
     }
 
     @Override
-    public void afterLogin(Jenkins jenkinsWorkspace) {
+    public void afterLogin(List<Jenkins> jenkinss) {
         RssLogic rssLogic = RssLogic.getInstance(project);
         rssLogic.initScheduledJobs();
     }
