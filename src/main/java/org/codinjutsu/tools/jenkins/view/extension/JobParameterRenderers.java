@@ -16,6 +16,7 @@ import com.intellij.ui.components.JBTextField;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.codinjutsu.tools.jenkins.constant.BuildConst;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
@@ -122,7 +123,6 @@ public final class JobParameterRenderers {
 
     private static final String K8S_ENV_EQUAL_TRUE = "=true";
 
-
     private List<String> getCheckBoxText(JCheckBox[] choices, CheckBoxList<String> list) {
         List<String> res = new ArrayList<>();
         for (int i = 0; i < choices.length; i++) {
@@ -162,7 +162,7 @@ public final class JobParameterRenderers {
         JCheckBox[] finalChoices = choices;
         return new JobParameterComponent<>(jobParameter, list, asString(o -> {
             List<String> checkBoxText = getCheckBoxText(finalChoices, o);
-            if ("K8S_ENV".equals(jobParameter.getName())) {
+            if (BuildConst.isEnvProp(jobParameter.getName())) {
                 return checkBoxText.stream().map(select -> select + K8S_ENV_EQUAL_TRUE)
                         .collect(Collectors.joining(SymbolPool.AMPERSAND));
             } else {

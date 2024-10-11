@@ -1,9 +1,9 @@
 package org.codinjutsu.tools.jenkins.settings.multiServer;
 
+import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.JenkinsWindowManager;
 import org.codinjutsu.tools.jenkins.exception.ConfigurationException;
@@ -15,6 +15,8 @@ import org.codinjutsu.tools.jenkins.view.annotation.FormValidator;
 import org.jetbrains.annotations.*;
 
 import javax.swing.*;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class MultiServerConfigurable implements SearchableConfigurable {
@@ -69,10 +71,9 @@ public class MultiServerConfigurable implements SearchableConfigurable {
 
     @Override
     public boolean isModified() {
-        final var jenkinsAppSettings = JenkinsAppSettings.getSafeInstance(project);
-        final var jenkinsSettings = JenkinsSettings.getSafeInstance(project);
+        final JenkinsSettings jenkinsSettings = JenkinsSettings.getSafeInstance(project);
         return readSettingFromUi()
-                .map(serverSetting -> isModified(serverSetting, jenkinsAppSettings, jenkinsSettings))
+                .map(serverSetting -> isModified(serverSetting, jenkinsSettings))
                 .orElse(false);
     }
 
@@ -80,10 +81,11 @@ public class MultiServerConfigurable implements SearchableConfigurable {
         return Optional.ofNullable(serverComponent).map(MultiServerSettingComponent::getMultiServerSettings);
     }
 
-    public static boolean isModified(MultiServerSettings serverSetting, JenkinsAppSettings appSettings,
-                                     JenkinsSettings jenkinsSettings) {
-        // TODO 判断表格是否修改过
-        return false;
+    public boolean isModified(MultiServerSettings uiSetting, JenkinsSettings jenkinsSettings) {
+        List<MultiJenkinsSettings> newSettings = uiSetting.getSettings();
+        List<MultiJenkinsSettings> oldSettings = jenkinsSettings.getMultiSettings();
+        //fixme 转成json之后比较看看是否修改过
+        return !Objects.equals(JSON.toJSONString(newSettings), JSON.toJSONString(oldSettings));
     }
 
     @Override
@@ -98,10 +100,8 @@ public class MultiServerConfigurable implements SearchableConfigurable {
     }
 
     private void apply(MultiServerSettings serverSettings) throws ConfigurationException {
-        final JenkinsAppSettings appSettings = JenkinsAppSettings.getSafeInstance(project);
         final JenkinsSettings jenkinsSettings = JenkinsSettings.getSafeInstance(project);
-        //TODO 检查ui和持久化的数据是否一致,不一致则保存
-
+        //检查ui和持久化的数据是否一致,不一致则保存
         jenkinsSettings.setMultiSettings(serverSettings.getSettings());
         jenkinsSettings.setConnectionTimeout(serverSettings.getConnectedTimeout());
     }

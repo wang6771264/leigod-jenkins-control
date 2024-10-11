@@ -131,7 +131,6 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
             }
 
             final JBList<ViewV2> viewList = buildViewList(views, browserPanel);
-
             JBPopup popup = new PopupChooserBuilder<>(viewList)
                     .setMovable(false)
                     .setCancelKeyEnabled(true)

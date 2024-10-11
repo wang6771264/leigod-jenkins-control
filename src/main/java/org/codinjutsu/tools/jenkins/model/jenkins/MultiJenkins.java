@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MultiJenkins {
 
@@ -59,13 +60,16 @@ public class MultiJenkins {
     }
 
     public void setJobs(List<Job> jobList) {
-        //TODO 将job列表分流到对应的`jenkins`
-        for (Job job : jobList) {
-            for (Jenkins jenkins : jenkinss) {
-                if (job.getUrl().startsWith(jenkins.getServerUrl())) {
-                    jenkins.addJob(job);
-                    break;
-                }
+        Map<String, List<Job>> jenkinsJobMap = jobList.stream().collect(Collectors.groupingBy(job -> {
+            //服务链接
+            return this.jenkinss.stream()
+                    .filter(jenkins -> job.getUrl().startsWith(jenkins.getServerUrl()))
+                    .findFirst().map(Jenkins::getServerUrl).orElse("");
+        }));
+        for (Jenkins jenkins : this.jenkinss) {
+            List<Job> jobs = jenkinsJobMap.get(jenkins.getServerUrl());
+            if (jobs != null && !jobs.isEmpty()) {
+                jenkins.setJobs(jobs);
             }
         }
     }

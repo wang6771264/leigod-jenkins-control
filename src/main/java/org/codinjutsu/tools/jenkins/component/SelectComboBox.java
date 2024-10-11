@@ -24,4 +24,5 @@ public class SelectComboBox extends ComboBox<String> implements SelectComponent,
     public String selectedItem() {
         return (String) this.getSelectedItem();
     }
+
 }

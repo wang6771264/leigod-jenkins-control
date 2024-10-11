@@ -1,10 +1,8 @@
 package org.codinjutsu.tools.jenkins.component;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.ComboBox;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.codinjutsu.tools.jenkins.util.SymbolPool;
-import org.codinjutsu.tools.jenkins.view.ui.BuildParamDialog;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;
@@ -17,7 +15,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class CascadeSearchableComboBox extends CascadeSelectComponent {
 
-    private static final Logger logger = Logger.getInstance(BuildParamDialog.class);
     /**
      * 输入框下拉列表
      */

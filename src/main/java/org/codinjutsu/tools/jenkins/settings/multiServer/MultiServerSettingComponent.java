@@ -45,7 +45,6 @@ import static org.codinjutsu.tools.jenkins.view.validator.ValidatorTypeEnum.POSI
 public class MultiServerSettingComponent implements FormValidationPanel {
     private final JPanel mainPanel;
     private final JBTable table;
-    private final Project project;
     @GuiField(validators = POSITIVE_INTEGER)
     private final JBIntSpinner connectionTimeout = new JBIntSpinner(10, 5, 300);
     private final JButton testConnection = new JButton(JenkinsControlBundle.message("settings.server.test_connection"));
@@ -56,7 +55,6 @@ public class MultiServerSettingComponent implements FormValidationPanel {
     private boolean apiTokenModified;
 
     public MultiServerSettingComponent(Project project, ServerConnectionValidator serverConnectionValidator) {
-        this.project = project;
         BeanDataTableModel<JenkinsServerTableItem> model = new BeanDataTableModel<>(JenkinsServerTableItem.class);
         this.table = new JBTable(model) {
             @Override
@@ -144,7 +142,7 @@ public class MultiServerSettingComponent implements FormValidationPanel {
         textPane.setBackground(JBColor.WHITE);
         final HTMLEditorKit simple = HTMLEditorKitBuilder.simple();
         textPane.setEditorKit(simple);
-        textPane.getDocument().putProperty("IgnoreCharsetDirective", Boolean.valueOf(true));
+        textPane.getDocument().putProperty("IgnoreCharsetDirective", Boolean.TRUE);
         return textPane;
     }
 

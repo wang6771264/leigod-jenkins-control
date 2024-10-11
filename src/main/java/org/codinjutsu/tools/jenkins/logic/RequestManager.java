@@ -297,8 +297,14 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         final AtomicInteger fileCount = new AtomicInteger();
 
         final Collection<RequestData> requestData = new LinkedHashSet<>(parameters.size());
-        parameters.entrySet().stream().filter(entry -> entry.getValue() instanceof VirtualFile).map(entry -> new FileParameter(entry.getKey(), (VirtualFile) entry.getValue(), () -> String.format("file%d", fileCount.getAndIncrement()))).forEach(requestData::add);
-        parameters.entrySet().stream().filter(entry -> entry.getValue() instanceof String).map(entry -> new StringParameter(entry.getKey(), (String) entry.getValue())).forEach(requestData::add);
+        parameters.entrySet().stream()
+                .filter(entry -> entry.getValue() instanceof VirtualFile)
+                .map(entry -> new FileParameter(entry.getKey(), (VirtualFile) entry.getValue(), () -> String.format("file%d", fileCount.getAndIncrement())))
+                .forEach(requestData::add);
+        parameters.entrySet().stream()
+                .filter(entry -> entry.getValue() instanceof String)
+                .map(entry -> new StringParameter(entry.getKey(), (String) entry.getValue()))
+                .forEach(requestData::add);
         //有参构建
         runBuildWithParams(job, configuration, requestData);
     }

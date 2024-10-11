@@ -73,11 +73,4 @@ public class Jenkins {
         }
         return label.toString();
     }
-
-    public void addJob(Job job) {
-        if (this.jobs == null) {
-            this.jobs = new LinkedList<>();
-        }
-        this.jobs.add(job);
-    }
 }

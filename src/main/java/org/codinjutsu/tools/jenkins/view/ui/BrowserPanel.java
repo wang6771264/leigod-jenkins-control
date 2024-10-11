@@ -46,6 +46,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.util.List;
@@ -607,7 +608,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         }
 
         private void setTreeBusy(final boolean isBusy) {
-            GuiUtil.runInSwingThread(() -> jobTree.setPaintBusy(isBusy));
+            GuiUtil.runInSwingThread(() -> jobTree.getTree().setPaintBusy(isBusy));
         }
 
         public void queue() {

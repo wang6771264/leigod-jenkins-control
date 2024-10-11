@@ -2,6 +2,7 @@ package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.codinjutsu.tools.jenkins.constant.BuildConst;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
@@ -14,30 +15,15 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
+
+import static org.codinjutsu.tools.jenkins.constant.BuildConst.*;
 
 public class ExtendedChoiceParameterRenderer extends AbstractParameterRenderer implements JobParameterRenderer {
 
     @NonNls
     private static final String TYPE_CLASS = "com.cwctravel.hudson.plugins.extended_choice_parameter.ExtendedChoiceParameterDefinition";
-
-    private static final String K8S_ENV = "K8S_ENV";
-    private static final String SKIP_TEST = "SKIP_TEST";
-
-    private static final List<String> ENV_LIST = Lists.newArrayList("test", "test1", "prod", "test2");
-    private static final String DEFAULT_ENV = "test,test1";
-    private static final String SKIP_TEST_VALUE = " -Dmaven.test.skip=true";
-
-    private static final List<JCheckBox> DEFAULT_K8S_ENV_CHOICE_LIST = Lists.newArrayList(
-            new JCheckBox("test", true),
-            new JCheckBox("test1", true),
-            new JCheckBox("prod", false),
-            new JCheckBox("test2", false)
-    );
-
-    private static final JCheckBox[] DEFAULT_K8S_ENV_CHOICES = DEFAULT_K8S_ENV_CHOICE_LIST.toArray(JCheckBox[]::new);
 
     public static final JobParameterType PT_SINGLE_SELECT = new JobParameterType("PT_SINGLE_SELECT", TYPE_CLASS);
 
@@ -72,12 +58,12 @@ public class ExtendedChoiceParameterRenderer extends AbstractParameterRenderer i
             biFunction = JobParameterRenderers::createTextField;
         }
         //checkbox选项的默认值填充
-        if (K8S_ENV.equals(jobParameter.getName())) {
+        if (BuildConst.isEnvProp(jobParameter.getName())) {
             if (CollectionUtils.isEmpty(jobParameter.getChoices())) {
                 jobParameter.setChoices(ENV_LIST);
             }
             defaultValue = StringUtil.defaultIfBlank(defaultValue, DEFAULT_ENV);
-        }else if (SKIP_TEST.equals(jobParameter.getName())){
+        } else if (SKIP_TEST.equals(jobParameter.getName())) {
             if (CollectionUtils.isEmpty(jobParameter.getChoices())) {
                 jobParameter.setChoices(Lists.newArrayList(SKIP_TEST_VALUE));
             }

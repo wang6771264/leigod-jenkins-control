@@ -23,6 +23,7 @@ import com.github.cliftonlabs.json_simple.Jsoner;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
 import org.apache.commons.lang3.ObjectUtils;
+import org.codinjutsu.tools.jenkins.constant.BuildConst;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
@@ -361,7 +362,12 @@ public class JenkinsJsonParser implements JenkinsParser {
     private JobParameter getJobParameter(JsonObject parameterObj) {
         final JobParameter.JobParameterBuilder jobParameterBuilder = JobParameter.builder();
         String name = parameterObj.getString(createJsonKey(PARAMETER_NAME));
-        jobParameterBuilder.name(name);
+        //fixme 如果name是空值的话需要处理一下
+        if (name.length() == 0) {
+            jobParameterBuilder.name(BuildConst.K8S_ENV);
+        }else{
+            jobParameterBuilder.name(name);
+        }
         JsonObject defaultParamObj = (JsonObject) parameterObj.get(PARAMETER_DEFAULT_PARAM);
         if (defaultParamObj != null && !defaultParamObj.isEmpty()) {
             jobParameterBuilder.defaultParamObj(defaultParamObj);
