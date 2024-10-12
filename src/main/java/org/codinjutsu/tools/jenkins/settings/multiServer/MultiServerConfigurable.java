@@ -1,6 +1,9 @@
 package org.codinjutsu.tools.jenkins.settings.multiServer;
 
 import com.alibaba.fastjson.JSON;
+import com.intellij.openapi.extensions.BaseExtensionPointName;
+import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -14,16 +17,19 @@ import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
 import org.codinjutsu.tools.jenkins.settings.ServerSetting;
 import org.codinjutsu.tools.jenkins.view.annotation.FormValidator;
+import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
+import org.codinjutsu.tools.jenkins.view.extension.ViewTestResults;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
-public class MultiServerConfigurable implements SearchableConfigurable {
+public class MultiServerConfigurable implements SearchableConfigurable, Configurable.WithEpDependencies {
 
+    private static final Logger log = LoggerFactory.getLogger(MultiServerConfigurable.class);
     private final Project project;
     private @Nullable MultiServerSettingComponent serverComponent;
     private FormValidator<JTextField> formValidator;
@@ -141,4 +147,13 @@ public class MultiServerConfigurable implements SearchableConfigurable {
         return "org.codinjutsu.tools.jenkins.multiServers";
     }
 
+    @Override
+    public @NotNull Collection<BaseExtensionPointName<?>> getDependencies() {
+        ExtensionPointName<JobParameterRenderer> renderer = JobParameterRenderer.EP_NAME;
+        ExtensionPointName<ViewTestResults> viewTestResults = ViewTestResults.EP_NAME;
+        List<BaseExtensionPointName<?>> dependencies = new ArrayList<>();
+        dependencies.add(renderer);
+        dependencies.add(viewTestResults);
+        return dependencies;
+    }
 }

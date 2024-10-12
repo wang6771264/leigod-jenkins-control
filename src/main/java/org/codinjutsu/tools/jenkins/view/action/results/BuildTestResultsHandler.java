@@ -23,7 +23,7 @@ import java.util.Collections;
 
 class BuildTestResultsHandler {
     private static final String CLASS_METHOD_SEPARATOR = ":::";
-    private Build build;
+    private final Build build;
     private final Project project;
     private final GeneralTestEventsProcessor testEventsProcessor;
 
@@ -90,7 +90,7 @@ class BuildTestResultsHandler {
     }
 
     private static class MyTestFailed extends TestFailed {
-        private String stacktrace;
+        private final String stacktrace;
 
         MyTestFailed(TestCase c) {
             super(c.getName(), c.getErrorDetails());
