@@ -116,6 +116,20 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
         return new DefaultMutableTreeNode(new JenkinsTreeNode.JobNode(job), allowsChildren);
     }
 
+    /**
+     * 添加jenkins节点
+     *
+     * @param jenkins
+     */
+    public void addJenkinsNode(Jenkins jenkins) {
+        DefaultMutableTreeNode rootNode = this.getModelRoot();
+        if (rootNode == null) {
+            return;
+        }
+        DefaultMutableTreeNode jenkinsNode = new DefaultMutableTreeNode(new JenkinsTreeNode.RootNode(jenkins));
+        rootNode.add(jenkinsNode);
+    }
+
     @NotNull
     private static Comparator<DefaultMutableTreeNode> wrapJobSorter(Comparator<Job> jobComparator) {
         return (node1, node2) -> {
@@ -335,6 +349,13 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
         clickHandler = new JobClickHandler(doubleClickAction);
         this.clickHandlerMap.put(name, clickHandler);
         this.tree.addMouseListener(clickHandler);
+    }
+
+    public void clearJenkinsNode() {
+        DefaultMutableTreeNode modelRoot = this.getModelRoot();
+        if (modelRoot != null) {
+            modelRoot.removeAllChildren();
+        }
     }
 
     @SuppressWarnings("java:S110")

@@ -35,6 +35,10 @@ public class MultiJenkins {
         this.jenkinss = jenkinss;
     }
 
+    public void add(Jenkins jenkins) {
+        this.jenkinss.add(jenkins);
+    }
+
     public List<Job> getJobs() {
         if (this.jenkinss == null) {
             return Collections.emptyList();
@@ -83,5 +87,9 @@ public class MultiJenkins {
 
     public List<ViewV2> getViews() {
         return jenkinss.stream().map(Jenkins::getViews).flatMap(List::stream).toList();
+    }
+
+    public void clear() {
+        this.jenkinss.clear();
     }
 }

@@ -8,10 +8,13 @@ import org.codinjutsu.tools.jenkins.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.JenkinsWindowManager;
 import org.codinjutsu.tools.jenkins.exception.ConfigurationException;
 import org.codinjutsu.tools.jenkins.logic.ConfigurationValidator;
+import org.codinjutsu.tools.jenkins.logic.LoginService;
 import org.codinjutsu.tools.jenkins.logic.RequestManager;
+import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
 import org.codinjutsu.tools.jenkins.settings.ServerSetting;
 import org.codinjutsu.tools.jenkins.view.annotation.FormValidator;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.*;
 
 import javax.swing.*;
@@ -101,9 +104,21 @@ public class MultiServerConfigurable implements SearchableConfigurable {
 
     private void apply(MultiServerSettings serverSettings) throws ConfigurationException {
         final JenkinsSettings jenkinsSettings = JenkinsSettings.getSafeInstance(project);
-        //检查ui和持久化的数据是否一致,不一致则保存
         jenkinsSettings.setMultiSettings(serverSettings.getSettings());
         jenkinsSettings.setConnectionTimeout(serverSettings.getConnectedTimeout());
+        //检查ui和持久化的数据是否一致,不一致则保存
+        BrowserPanel browserPanel = BrowserPanel.getInstance(project);
+        if (browserPanel != null) {
+            browserPanel.clearJenkins();
+            serverSettings.getSettings().forEach(jenkinsSetting -> {
+                Jenkins jenkins = Jenkins.byDefault(jenkinsSetting.getName());
+                jenkins.setServerUrl(jenkinsSetting.getJenkinsServer());
+                browserPanel.addJenkins(jenkins);
+            });
+            final LoginService loginService = LoginService.getInstance(project);
+            loginService.performAuthentication();
+        }
+        Optional.ofNullable(serverComponent).ifPresent(MultiServerSettingComponent::resetApiTokenModified);
     }
 
     @Override

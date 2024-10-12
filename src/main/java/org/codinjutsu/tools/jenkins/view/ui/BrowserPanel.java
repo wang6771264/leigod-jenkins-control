@@ -46,7 +46,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.util.List;
@@ -57,6 +56,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 
 @State(name = "JenkinsBrowserPanel", storages = {
         @Storage(value = StoragePathMacros.PRODUCT_WORKSPACE_FILE, roamingType = RoamingType.DISABLED)
@@ -255,6 +255,14 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     @NotNull
     public RequestManagerInterface getJenkinsManager() {
         return requestManager;
+    }
+
+    private void addJenkinsNode(Jenkins jenkins) {
+        this.jobTree.addJenkinsNode(jenkins);
+    }
+
+    private void clearJenkinsNode() {
+       this.jobTree.clearJenkinsNode();
     }
 
     public void loadJob(final Job job) {
@@ -530,6 +538,16 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         GuiUtil.runInSwingThread(() -> Optional.ofNullable(jobTree.getLastSelectedPathComponent())
                 .filter(node -> node.getUserObject() instanceof JenkinsTreeNode.JobNode)
                 .ifPresent(node -> jobTree.getTree().expandPath(new TreePath(node.getPath()))));
+    }
+
+    public void addJenkins(Jenkins jenkins) {
+        multiJenkins.add(jenkins);
+        this.addJenkinsNode(jenkins);
+    }
+
+    public void clearJenkins() {
+        multiJenkins.clear();
+        this.clearJenkinsNode();
     }
 
     private class LoadSelectedViewJob implements JenkinsBackgroundTask.JenkinsTask {

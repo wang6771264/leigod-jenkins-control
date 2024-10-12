@@ -377,7 +377,13 @@ public class RequestManager implements RequestManagerInterface, Disposable {
         final List<Job> jobs = new LinkedList<>();
         //加载收藏的任务
         for (FavoriteJob favoriteJob : favoriteJobs) {
-            jobs.add(loadJob(favoriteJob.getUrl()));
+            String url = favoriteJob.getUrl();
+            JenkinsClient client = this.getClientByUrl(url);
+            if (client == null) {
+                logger.error("Unable to find JenkinsClient by url: {}", url);
+                continue;
+            }
+            jobs.add(loadJob(url));
         }
         return withNestedJobs(jobs);
     }
