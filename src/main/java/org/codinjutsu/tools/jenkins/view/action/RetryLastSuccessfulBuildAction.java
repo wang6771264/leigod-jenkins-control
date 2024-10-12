@@ -1,11 +1,13 @@
 package org.codinjutsu.tools.jenkins.view.action;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
 import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.task.RunBuild;
 import org.codinjutsu.tools.jenkins.task.callback.impl.RunBuildCallbacker;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
@@ -38,6 +40,23 @@ public class RetryLastSuccessfulBuildAction extends AnAction implements DumbAwar
                         new RunBuildCallbacker(browserPanel)).queue();
             });
         });
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent event) {
+        Optional<BrowserPanel> browserPanelOptl = ActionUtil.getBrowserPanel(event);
+        browserPanelOptl.ifPresent(browserPanel -> {
+            Job job = browserPanel.getSelectedJob();
+            //job不显示这个菜单
+            if (job == null) {
+                event.getPresentation().setVisible(false);
+            }
+        });
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return super.getActionUpdateThread();
     }
 
     /**
