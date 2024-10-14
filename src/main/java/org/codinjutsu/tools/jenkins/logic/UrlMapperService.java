@@ -2,7 +2,7 @@ package org.codinjutsu.tools.jenkins.logic;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.util.text.StringUtil;
-import org.codinjutsu.tools.jenkins.JenkinsSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;

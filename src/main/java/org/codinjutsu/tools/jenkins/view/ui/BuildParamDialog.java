@@ -25,7 +25,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.DimensionService;
 import com.intellij.openapi.util.text.StringUtil;
-import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.cache.JobCache;
 import org.codinjutsu.tools.jenkins.component.SelectComponent;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;

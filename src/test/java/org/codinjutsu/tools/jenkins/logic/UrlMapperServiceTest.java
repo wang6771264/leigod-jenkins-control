@@ -1,7 +1,7 @@
 //package org.codinjutsu.tools.jenkins.logic;
 //
 //
-//import org.codinjutsu.tools.jenkins.JenkinsSettings;
+//import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //

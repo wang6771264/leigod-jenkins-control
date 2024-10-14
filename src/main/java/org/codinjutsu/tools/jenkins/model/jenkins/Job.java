@@ -90,6 +90,8 @@ public class Job {
     @Builder.Default
     @NotNull
     private EnumSet<BuildTypeEnum> availableBuildTypeEnums = EnumSet.noneOf(BuildTypeEnum.class);
+    @Builder.Default
+    private boolean projectJob = false;
 
     @NotNull
     public Icon getHealthIcon() {

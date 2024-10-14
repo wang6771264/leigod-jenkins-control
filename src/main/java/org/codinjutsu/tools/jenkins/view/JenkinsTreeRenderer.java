@@ -48,6 +48,8 @@ public class JenkinsTreeRenderer extends ColoredTreeCellRenderer {
 
     public static final Icon FAVORITE_ICON = AllIcons.Nodes.Favorite;
 
+    public static final Icon PROJECT_ICON = AllIcons.Actions.Colors;
+
     @NotNull
     private final FavoriteJobDetector favoriteJobDetector;
 
@@ -65,6 +67,11 @@ public class JenkinsTreeRenderer extends ColoredTreeCellRenderer {
             @Override
             public void visit(JenkinsTreeNode.RootNode jenkinsServer) {
                 JenkinsTreeRenderer.this.render(jenkinsServer);
+            }
+
+            @Override
+            public void visit(JenkinsTreeNode.ProjectRootNode projectJobs) {
+                JenkinsTreeRenderer.this.render(projectJobs);
             }
 
             @Override
@@ -186,11 +193,19 @@ public class JenkinsTreeRenderer extends ColoredTreeCellRenderer {
         return String.format("%s %s", renderedValue, status);
     }
 
-    private void render(JenkinsTreeNode.RootNode jenkinsServer) {
-        final Jenkins jenkins = jenkinsServer.jenkins();
+    private void render(JenkinsTreeNode.RootNode jenkinsNode) {
+        final Jenkins jenkins = jenkinsNode.jenkins();
         append(jenkins.getNameToRender(), SimpleTextAttributes.REGULAR_ITALIC_ATTRIBUTES);
         setToolTipText(jenkins.getServerUrl());
         setIcon(AllIcons.Webreferences.Server);
+    }
+
+    private void render(JenkinsTreeNode.ProjectRootNode projectNode) {
+        String projectName = Optional.ofNullable(projectNode)
+                .map(JenkinsTreeNode.ProjectRootNode::getName).orElse("ProjectJobs");
+        append(projectName, SimpleTextAttributes.REGULAR_ITALIC_ATTRIBUTES);
+        setToolTipText(projectName);
+        setIcon(AllIcons.Actions.Colors);
     }
 
     private void render(JenkinsTreeNode.BuildNode build) {

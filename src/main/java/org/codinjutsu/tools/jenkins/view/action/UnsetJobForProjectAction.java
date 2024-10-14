@@ -16,36 +16,36 @@
 
 package org.codinjutsu.tools.jenkins.view.action;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
-import org.codinjutsu.tools.jenkins.view.JenkinsTreeRenderer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class SetJobAsFavoriteAction extends AnAction implements DumbAware {
+public class UnsetJobForProjectAction extends AnAction implements DumbAware {
 
     private final BrowserPanel browserPanel;
 
-    public SetJobAsFavoriteAction(BrowserPanel browserPanel) {
-        super("Set as Favorite", "Set the selected job as favorite", JenkinsTreeRenderer.FAVORITE_ICON);
+    public UnsetJobForProjectAction(BrowserPanel browserPanel) {
+        super("Unset as Project Jobs", "Unset the selected job as project jobs", AllIcons.Actions.Colors);
         this.browserPanel = browserPanel;
     }
 
     @Override
     public void actionPerformed(AnActionEvent event) {
         List<Job> selectedJobs = browserPanel.getAllSelectedJobs();
-        browserPanel.setAsFavorite(selectedJobs);
+        browserPanel.removeProjectJob(selectedJobs);
     }
 
     @Override
     public void update(AnActionEvent event) {
         Job selectedJob = browserPanel.getSelectedJob();
-        event.getPresentation().setVisible(selectedJob != null && !browserPanel.isAFavoriteJob(selectedJob));
+        event.getPresentation().setVisible(selectedJob != null && browserPanel.isAProjectJob(selectedJob));
     }
 
     @Override

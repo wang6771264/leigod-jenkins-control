@@ -16,8 +16,8 @@
 
 package org.codinjutsu.tools.jenkins.view;
 
-import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
-import org.codinjutsu.tools.jenkins.JenkinsSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.settings.AppSettingComponent;
 
 public class AppSettingComponentTest {

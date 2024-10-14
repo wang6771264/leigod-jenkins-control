@@ -28,12 +28,17 @@ import com.intellij.ui.PopupHandler;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
-import org.codinjutsu.tools.jenkins.*;
+import org.codinjutsu.tools.jenkins.DoubleClickAction;
+import org.codinjutsu.tools.jenkins.JenkinsTree;
+import org.codinjutsu.tools.jenkins.JenkinsTreeState;
 import org.codinjutsu.tools.jenkins.common.CopyHyperlinkAction;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.logic.*;
 import org.codinjutsu.tools.jenkins.model.jenkins.*;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsProjectSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.settings.multiServer.MultiJenkinsSettings;
 import org.codinjutsu.tools.jenkins.util.CollectionUtil;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
@@ -46,6 +51,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.util.List;
@@ -82,6 +88,8 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     private final JenkinsAppSettings jenkinsAppSettings;
     @NotNull
     private final JenkinsSettings jenkinsSettings;
+    @NotNull
+    private final JenkinsProjectSettings jenkinsProjectSettings;
     @Getter
     private final MultiJenkins multiJenkins;
     private final RequestManagerInterface requestManager;
@@ -101,43 +109,36 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         final LoadSelectedViewJob loadSelectedViewJob = new LoadSelectedViewJob(project);
         this.refreshViewJob = loadSelectedViewJob::queue;
 
-        requestManager = RequestManager.getInstance(project);
-        jenkinsAppSettings = JenkinsAppSettings.getSafeInstance(project);
-        jenkinsSettings = JenkinsSettings.getSafeInstance(project);
+        this.requestManager = RequestManager.getInstance(project);
+        this.jenkinsAppSettings = JenkinsAppSettings.getSafeInstance(project);
+        this.jenkinsSettings = JenkinsSettings.getSafeInstance(project);
+        this.jenkinsProjectSettings = JenkinsProjectSettings.getSafeInstance(project);
         setProvideQuickActions(false);
 
         List<Jenkins> jenkinsList = new ArrayList<>();
-        List<MultiJenkinsSettings> multiSettings = jenkinsSettings.getMultiSettings();
+        List<MultiJenkinsSettings> multiSettings = this.jenkinsSettings.getMultiSettings();
         multiSettings.forEach(multiSetting -> {
             Jenkins jenkins = Jenkins.byDefault(multiSetting.getName());
             jenkins.setServerUrl(multiSetting.getJenkinsServer());
             jenkinsList.add(jenkins);
         });
         this.multiJenkins = new MultiJenkins(jenkinsList);
-        this.jobTree = new JenkinsTree(project, jenkinsSettings, jenkinsList);
-        updateDoubleClickAction(getDoubleClickAction(jenkinsAppSettings.getDoubleClickAction()));
+        this.jobTree = new JenkinsTree(project, this.jenkinsSettings, jenkinsList);
+        this.updateDoubleClickAction(getDoubleClickAction(this.jenkinsAppSettings.getDoubleClickAction()));
 
-        jobPanel.setLayout(new BorderLayout());
-        jobPanel.add(ScrollPaneFactory.createScrollPane(jobTree.asComponent()), BorderLayout.CENTER);
+        this.jobPanel.setLayout(new BorderLayout());
+        this.jobPanel.add(ScrollPaneFactory.createScrollPane(this.jobTree.asComponent()), BorderLayout.CENTER);
 
-        setContent(rootPanel);
+        setContent(this.rootPanel);
     }
 
     @NotNull
     private static JobAction getDoubleClickAction(@NotNull DoubleClickAction doubleClickAction) {
-        final JobAction action;
-        switch (doubleClickAction) {
-            case LOAD_BUILDS:
-                action = JobActions.loadBuilds();
-                break;
-            case SHOW_LAST_LOG:
-                action = JobActions.showLastLog();
-                break;
-            case TRIGGER_BUILD:
-            default:
-                action = JobActions.triggerBuild();
-        }
-        return action;
+        return switch (doubleClickAction) {
+            case LOAD_BUILDS -> JobActions.loadBuilds();
+            case SHOW_LAST_LOG -> JobActions.showLastLog();
+            default -> JobActions.triggerBuild();
+        };
     }
 
     @NotNull
@@ -262,7 +263,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
     }
 
     private void clearJenkinsNode() {
-       this.jobTree.clearJenkinsNode();
+        this.jobTree.clearJenkinsNode();
     }
 
     public void loadJob(final Job job) {
@@ -390,10 +391,15 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         popupGroup.add(new ShowLogAction(BuildTypeEnum.LAST_SUCCESSFUL));
         popupGroup.add(new ShowLogAction(BuildTypeEnum.LAST_FAILED));
         popupGroup.add(new ShowBuildLogAction());
+        //`My Favorites`收藏的`job`
         popupGroup.addSeparator();
         popupGroup.add(new SetJobAsFavoriteAction(this));
-
         popupGroup.add(new UnsetJobAsFavoriteAction(this));
+        popupGroup.addSeparator();
+        //`Project Jobs`收藏的`job`
+        popupGroup.addSeparator();
+        popupGroup.add(new SetJobForProjectAction(this));
+        popupGroup.add(new UnsetJobForProjectAction(this));
         popupGroup.addSeparator();
         popupGroup.add(new GotoServerAction(this));
         popupGroup.add(new GotoJobPageAction(this));
@@ -442,8 +448,36 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         }
     }
 
+    /**
+     * 移除项目job
+     *
+     * @param selectedJobs 选中`jobs`
+     */
+    public void removeProjectJob(final List<Job> selectedJobs) {
+        jenkinsProjectSettings.removeProjectJob(selectedJobs);
+        updateSelection();
+    }
+
     public boolean isAFavoriteJob(@NotNull Job job) {
         return jenkinsSettings.isFavoriteJob(job);
+    }
+
+    public void setAsProject(final List<Job> jobs) {
+        jenkinsProjectSettings.addProjectJob(jobs);
+        DefaultMutableTreeNode projectJobNode = this.jobTree.lastProjectJobNode();
+        if (projectJobNode != null) {
+            jobs.forEach(job -> {
+                //添加job
+                projectJobNode.add(new DefaultMutableTreeNode(new JenkinsTreeNode.JobNode(job)));
+            });
+        } else {
+            this.jobTree.addProjectJobNode(this.project);
+        }
+        updateSelection();
+    }
+
+    public boolean isAProjectJob(@NotNull Job job) {
+        return jenkinsProjectSettings.isFavoriteJob(job);
     }
 
     private void createFavoriteViewIfNecessary() {
@@ -497,9 +531,11 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
                             @Override
                             public void onSuccess() {
                                 JenkinsBackgroundTask.JenkinsTask.super.onSuccess();
-                                if (lastBuild.isBuilding() && !build.isBuilding()) {
-                                    notifyInfoJenkinsToolWindow(String.format("Status of build for Changelist \"%s\" is %s",
-                                            entry.getKey(), build.getStatus().getStatus()));
+                                if (Optional.ofNullable(lastBuild).map(Build::isBuilding).orElse(false)
+                                        && !build.isBuilding()) {
+                                    notifyInfoJenkinsToolWindow(
+                                            String.format("Status of build for Changelist \"%s\" is %s",
+                                                    entry.getKey(), build.getStatus().getStatus()));
                                 }
                                 job.setLastBuild(build);
                             }

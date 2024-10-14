@@ -19,7 +19,7 @@ package org.codinjutsu.tools.jenkins.settings;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBIntSpinner;
-import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.JenkinsWindowManager;
 import org.codinjutsu.tools.jenkins.Version;
 import org.codinjutsu.tools.jenkins.view.annotation.FormValidator;

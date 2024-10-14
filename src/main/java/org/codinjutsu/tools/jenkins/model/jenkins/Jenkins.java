@@ -19,7 +19,7 @@ package org.codinjutsu.tools.jenkins.model.jenkins;
 import com.intellij.openapi.util.text.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
-import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;

@@ -4,6 +4,8 @@ public interface JenkinsTreeNodeVisitor {
 
     void visit(JenkinsTreeNode.RootNode jenkinsServer);
 
+    void visit(JenkinsTreeNode.ProjectRootNode projectJobs);
+
     void visit(JenkinsTreeNode.BuildNode build);
 
     void visit(JenkinsTreeNode.JobNode job);

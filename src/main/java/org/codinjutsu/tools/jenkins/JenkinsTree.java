@@ -13,13 +13,16 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.containers.Convertor;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.val;
+import org.codinjutsu.tools.jenkins.entity.node.ProjectJobs;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
 import org.codinjutsu.tools.jenkins.view.*;
 import org.codinjutsu.tools.jenkins.view.action.JobAction;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,6 +42,7 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
     private static final TreeState NO_TREE_STATE = null;
     private static final Logger LOG = Logger.getInstance(JenkinsTree.class);
     private final SimpleTree tree;
+    private final Project project;
     private final Map<String, JobClickHandler> clickHandlerMap = new HashMap<>();
     @NotNull
     private JenkinsTreeState state = new JenkinsTreeState();
@@ -47,10 +51,11 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
 
     public JenkinsTree(Project project, @NotNull JenkinsSettings jenkinsSettings, List<Jenkins> jenkinsList) {
         this.tree = new TreeWithoutDefaultSearch();
-        tree.getEmptyText().setText(LOADING);
-        tree.setCellRenderer(new JenkinsTreeRenderer(jenkinsSettings::isFavoriteJob,
+        this.tree.getEmptyText().setText(LOADING);
+        this.tree.setCellRenderer(new JenkinsTreeRenderer(jenkinsSettings::isFavoriteJob,
                 BuildStatusEnumRenderer.getInstance(project)));
-        tree.setName("root");
+        this.tree.setName("root");
+        this.project = project;
         GuiUtil.runInSwingThread(() -> {
             DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("根节点");
             DefaultMutableTreeNode templNode = null;
@@ -61,6 +66,11 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
                 }
                 rootNode.add(jenkinsNode);
             }
+            //添加一个项目名称的节点用于储存当前项目的构建build
+            DefaultMutableTreeNode projectJobNode = new DefaultMutableTreeNode(
+                    new JenkinsTreeNode.ProjectRootNode(ProjectJobs.builder().name(project.getName()).build())
+            );
+            rootNode.add(projectJobNode);
             // 选择二级节点
             if (templNode != null) {
                 TreePath path = new TreePath(templNode.getPath());
@@ -128,6 +138,33 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
         }
         DefaultMutableTreeNode jenkinsNode = new DefaultMutableTreeNode(new JenkinsTreeNode.RootNode(jenkins));
         rootNode.add(jenkinsNode);
+    }
+
+    public DefaultMutableTreeNode lastProjectJobNode() {
+        DefaultMutableTreeNode rootNode = this.getModelRoot();
+        if (rootNode == null) {
+            return null;
+        }
+        DefaultMutableTreeNode lastChild = (DefaultMutableTreeNode) rootNode.getLastChild();
+        return Optional.ofNullable(lastChild)
+                .filter(o -> o.getUserObject() instanceof JenkinsTreeNode.ProjectRootNode)
+                .orElse(null);
+    }
+
+    public void addProjectJobNode(Project project) {
+        DefaultMutableTreeNode rootNode = this.getModelRoot();
+        if (rootNode == null) {
+            return;
+        }
+        DefaultMutableTreeNode lastNode = (DefaultMutableTreeNode) rootNode.getLastChild();
+        if (lastNode.getUserObject() instanceof JenkinsTreeNode.ProjectRootNode) {
+            //删除`projectJobNode`
+            rootNode.remove(lastNode);
+        }
+        DefaultMutableTreeNode projectJobNode = new DefaultMutableTreeNode(
+                new JenkinsTreeNode.ProjectRootNode(ProjectJobs.builder().name(project.getName()).build())
+        );
+        rootNode.add(projectJobNode);
     }
 
     @NotNull
@@ -218,12 +255,19 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
     }
 
     public void setJobs(@NotNull final Collection<Job> jobs) {
+        BrowserPanel browserPanel = BrowserPanel.getInstance(project);
         this.treeForeach(node -> {
             //移除所有子节点
             node.removeAllChildren();
-            JenkinsTreeNode.RootNode rootNode = (JenkinsTreeNode.RootNode) node.getUserObject();
-            List<Job> jobList = jobs.stream().filter(job -> job.getUrl().startsWith(rootNode.getUrl())).toList();
-            this.setJobs(jobList, node);
+            Object userObject = node.getUserObject();
+            if (userObject instanceof JenkinsTreeNode.RootNode rootNode) {
+                List<Job> jobList = jobs.stream()
+                        .filter(job -> job.getUrl().startsWith(rootNode.getUrl())).toList();
+                this.setJobs(jobList, node);
+            } else if(userObject instanceof JenkinsTreeNode.ProjectRootNode) {
+                List<Job> jobList = jobs.stream().filter(browserPanel::isAProjectJob).toList();
+                this.setJobs(jobList, node);
+            }
         });
     }
 
@@ -258,11 +302,11 @@ public class JenkinsTree implements PersistentStateComponent<JenkinsTreeState> {
         }
     }
 
-
     public void updateSelection() {
         Optional.ofNullable(tree.getSelectionPath()).map(TreePath::getLastPathComponent)
                 .map(TreeNode.class::cast)
                 .ifPresent(node -> getModel().nodeChanged(node));
+        this.tree.updateUI();
     }
 
     @Nullable

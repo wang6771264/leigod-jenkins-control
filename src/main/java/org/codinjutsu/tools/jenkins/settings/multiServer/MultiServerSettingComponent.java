@@ -14,7 +14,7 @@ import com.intellij.util.ui.HTMLEditorKitBuilder;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.codinjutsu.tools.jenkins.JenkinsControlBundle;
-import org.codinjutsu.tools.jenkins.JenkinsSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.exception.AuthenticationException;
 import org.codinjutsu.tools.jenkins.settings.ServerConnectionValidator;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;

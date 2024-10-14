@@ -24,8 +24,8 @@
 //import lombok.SneakyThrows;
 //import lombok.Value;
 //import org.assertj.core.api.Assertions;
-//import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
-//import org.codinjutsu.tools.jenkins.JenkinsSettings;
+//import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
+//import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 //import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 //import org.codinjutsu.tools.jenkins.exception.ConfigurationException;
 //import org.codinjutsu.tools.jenkins.model.jenkins.Build;

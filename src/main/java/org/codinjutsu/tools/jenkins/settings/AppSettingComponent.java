@@ -11,7 +11,7 @@ import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBDimension;
 import com.intellij.util.ui.JBUI;
 import org.codinjutsu.tools.jenkins.DoubleClickAction;
-import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.JenkinsControlBundle;
 import org.codinjutsu.tools.jenkins.view.DoubleClickActionRenderer;
 import org.codinjutsu.tools.jenkins.view.annotation.FormValidationPanel;

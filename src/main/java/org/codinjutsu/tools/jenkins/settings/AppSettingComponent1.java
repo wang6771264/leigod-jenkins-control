@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.codinjutsu.tools.jenkins.DoubleClickAction;
-import org.codinjutsu.tools.jenkins.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.JenkinsControlBundle;
 import org.codinjutsu.tools.jenkins.view.annotation.FormValidationPanel;
 import org.codinjutsu.tools.jenkins.view.annotation.GuiField;

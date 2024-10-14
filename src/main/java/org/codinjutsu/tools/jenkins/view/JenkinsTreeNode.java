@@ -3,6 +3,7 @@ package org.codinjutsu.tools.jenkins.view;
 import com.intellij.ide.util.treeView.NodeDescriptorProvidingKey;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
+import org.codinjutsu.tools.jenkins.entity.node.ProjectJobs;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
@@ -140,4 +141,24 @@ public interface JenkinsTreeNode extends NodeDescriptorProvidingKey, NavigationI
             return Optional.of(jenkins.getNameToRender());
         }
     }
+
+    record ProjectRootNode(ProjectJobs projectJobs) implements JenkinsTreeNode {
+
+        @NotNull
+        @Override
+        public String getUrl() {
+            return projectJobs.getName();
+        }
+
+        @Override
+        public void render(JenkinsTreeNodeVisitor treeNodeRenderer) {
+            treeNodeRenderer.visit(this);
+        }
+
+        @Override
+        public @NotNull Optional<String> getTextToCopy() {
+            return Optional.empty();
+        }
+    }
+
 }

@@ -30,8 +30,9 @@
                     nonDefaultProject="false"
                     instance="org.codinjutsu.tools.jenkins.settings.multiServer.MultiServerConfigurable"/>
         </projectConfigurable>
-        <applicationService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsAppSettings"/>
-        <applicationService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsSettings"/>
+        <applicationService serviceImplementation="org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings"/>
+        <applicationService serviceImplementation="org.codinjutsu.tools.jenkins.persistent.JenkinsSettings"/>
+        <projectService serviceImplementation="org.codinjutsu.tools.jenkins.persistent.JenkinsProjectSettings"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.ExecutorService"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.logic.LoginService"/>
         <projectService serviceImplementation="org.codinjutsu.tools.jenkins.JenkinsWindowManager"/>
