@@ -4,14 +4,14 @@
     <!--    id 插件的唯一编号-->
     <!--    url 插件存储的地址-->
     <plugin id="leigod.jenkins.control" name="Leigod Jenkins Control"
-            url="http://10.1.2.162:8888/leigod_jenkins_control-1.0.8-eap-2023.2.zip"
-            version="1.0.8-eap">
+            url="http://10.1.2.162:8888/leigod_jenkins_control-1.0.9-eap-2023.2.zip"
+            version="1.0.9-eap">
         <!--名称-->
         <name>Leigod Jenkins Control</name>
         <!--变动的内容-->
         <change-notes>
-            fix:
-            1.`COPY`和`Retry Last ...`菜单显示逻辑 wangwei A minute ago
+            feature:
+            1.增加一个功能支持当前项目可以选择的`build`
         </change-notes>
         <!--插件描述-->
         <description>
