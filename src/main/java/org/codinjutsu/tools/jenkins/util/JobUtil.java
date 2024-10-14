@@ -2,8 +2,8 @@ package org.codinjutsu.tools.jenkins.util;
 
 import com.intellij.openapi.util.text.StringUtil;
 import lombok.experimental.UtilityClass;
-import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.model.FavoriteJob;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.jetbrains.annotations.NotNull;
 
 @UtilityClass

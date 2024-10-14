@@ -3,9 +3,9 @@ package org.codinjutsu.tools.jenkins.logic;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
-import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

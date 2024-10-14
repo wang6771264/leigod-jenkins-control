@@ -1,11 +1,11 @@
 package org.codinjutsu.tools.jenkins.logic;
 
 import com.offbytwo.jenkins.model.TestResult;
-import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
-import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.model.FavoriteJob;
 import org.codinjutsu.tools.jenkins.model.jenkins.*;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.security.JenkinsVersion;
 import org.jetbrains.annotations.NotNull;
 

@@ -24,6 +24,8 @@ public class JenkinsControlIcons {
 
     public static final Icon LOAD_BUILDS = getIcon("builds.svg");
 
+    public static final Icon UNCOLORS = getIcon("nodes/uncolors.svg");
+
     public static Icon getIcon(String iconFilename) {
         return IconLoader.getIcon(ICON_FOLDER + iconFilename, JenkinsControlIcons.class);
     }

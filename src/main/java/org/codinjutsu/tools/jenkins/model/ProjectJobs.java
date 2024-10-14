@@ -1,4 +1,4 @@
-package org.codinjutsu.tools.jenkins.entity.node;
+package org.codinjutsu.tools.jenkins.model;
 
 import lombok.Builder;
 import lombok.Getter;

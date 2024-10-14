@@ -20,8 +20,8 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import org.codinjutsu.tools.jenkins.logic.*;
 import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
-import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.codinjutsu.tools.jenkins.view.JenkinsStatusBarWidget;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;

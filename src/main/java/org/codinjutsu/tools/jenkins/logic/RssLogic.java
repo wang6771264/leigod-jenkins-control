@@ -24,11 +24,11 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import lombok.Value;
-import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
-import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.JobTracker;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

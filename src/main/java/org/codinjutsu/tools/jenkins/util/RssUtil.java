@@ -18,9 +18,9 @@ package org.codinjutsu.tools.jenkins.util;
 
 import com.intellij.openapi.diagnostic.Logger;
 import lombok.experimental.UtilityClass;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.logic.BuildStatusVisitor;
 import org.codinjutsu.tools.jenkins.logic.RssBuildStatusVisitor;
-import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;

@@ -13,7 +13,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.containers.Convertor;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.val;
-import org.codinjutsu.tools.jenkins.entity.node.ProjectJobs;
+import org.codinjutsu.tools.jenkins.model.ProjectJobs;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;

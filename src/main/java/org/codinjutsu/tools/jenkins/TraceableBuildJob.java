@@ -1,10 +1,9 @@
 package org.codinjutsu.tools.jenkins;
 
-import org.codinjutsu.tools.jenkins.model.jenkins.Build;
-import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
-import org.codinjutsu.tools.jenkins.model.jenkins.Job;
-
 import com.google.common.base.Objects;
+import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 
 public class TraceableBuildJob implements Runnable {
     public final Job job;

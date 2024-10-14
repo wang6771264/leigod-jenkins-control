@@ -3,7 +3,7 @@ package org.codinjutsu.tools.jenkins.view;
 import com.intellij.ide.util.treeView.NodeDescriptorProvidingKey;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
-import org.codinjutsu.tools.jenkins.entity.node.ProjectJobs;
+import org.codinjutsu.tools.jenkins.model.ProjectJobs;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.BuildParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;

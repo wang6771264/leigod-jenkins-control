@@ -2,7 +2,7 @@ package org.codinjutsu.tools.jenkins.enums;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Locale;
 
 public enum ColorEnum {
 

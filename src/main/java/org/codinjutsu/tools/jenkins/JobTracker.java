@@ -1,10 +1,10 @@
 package org.codinjutsu.tools.jenkins;
 
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-
-import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 
 public class JobTracker {
     private static JobTracker ourInstance = new JobTracker();

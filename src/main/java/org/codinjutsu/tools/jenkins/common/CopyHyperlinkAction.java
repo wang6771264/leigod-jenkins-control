@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
-import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.util.CopyHyperLinkHelper;
 import org.codinjutsu.tools.jenkins.util.SymbolPool;

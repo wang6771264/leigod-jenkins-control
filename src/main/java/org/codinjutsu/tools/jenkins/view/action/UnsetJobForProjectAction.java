@@ -16,11 +16,11 @@
 
 package org.codinjutsu.tools.jenkins.view.action;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
+import icons.JenkinsControlIcons;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ public class UnsetJobForProjectAction extends AnAction implements DumbAware {
     private final BrowserPanel browserPanel;
 
     public UnsetJobForProjectAction(BrowserPanel browserPanel) {
-        super("Unset as Project Jobs", "Unset the selected job as project jobs", AllIcons.Actions.Colors);
+        super("Unset as Project Jobs", "Unset the selected job as project jobs", JenkinsControlIcons.UNCOLORS);
         this.browserPanel = browserPanel;
     }
 
