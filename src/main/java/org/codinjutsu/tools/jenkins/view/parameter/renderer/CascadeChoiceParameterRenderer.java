@@ -76,8 +76,8 @@ public class CascadeChoiceParameterRenderer extends AbstractParameterRenderer im
             //设置父级的下拉
             buildVerCombo.setParent(jobNameCombo);
             artifactsCombo.setParent(buildVerCombo);
-            jobNameCombo.initItems(buildJobNames,
-                    JobCache.getParamRecentlyValue(projectJob.getJob().getName(), JOB_NAME));
+            jobNameCombo.initItems(buildJobNames, JobCache.getParamRecentlyValue(projectJob.getJob().getName(),
+                    JOB_NAME));
             //设置当前参数的下拉
             jobParameter.setCascadeComboBox(jobNameCombo);
             // 为父级联下拉列表添加选项变化监听器

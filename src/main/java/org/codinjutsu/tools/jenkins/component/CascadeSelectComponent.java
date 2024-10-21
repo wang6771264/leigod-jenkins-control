@@ -92,6 +92,8 @@ public abstract class CascadeSelectComponent implements Serializable {
 
     private static final String DASH_DEPENDENCIES = "-dependencies/";
 
+    private static final String SOURCES_JAR= "-sources.jar";
+
     private List<String> findArtifacts(String parentSelectedItem){
         List<String> items = new ArrayList<>();
         //根据选项获取job名称
@@ -103,7 +105,9 @@ public abstract class CascadeSelectComponent implements Serializable {
                     .getInstance(this.projectJob.getProject())
                     .findArtifactsByBuildNumber(job.get(), parentSelectedItem);
             artifacts.stream().map(BuildArtifacts.Artifact::getRelativePath)
-                    .filter(item -> !item.contains(DASH_DEPENDENCIES)).forEach(items::add);
+                    .filter(item -> !item.contains(DASH_DEPENDENCIES))
+                    .filter(item -> !item.endsWith(SOURCES_JAR))
+                    .forEach(items::add);
         }
         return items;
     }
