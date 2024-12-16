@@ -71,7 +71,7 @@ public interface JenkinsParser {
     String ACTIONS = "actions";
     String PARAMETERS = "parameters";
 
-    Jenkins createWorkspace(String jsonData);
+    Jenkins createWorkspace(JenkinsClient client, String jsonData);
 
     Job createJob(String jsonData);
 

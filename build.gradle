@@ -42,7 +42,7 @@ intellij {
 changelog {
     version = readPropertyString('pluginVersion')
     path = "${project.projectDir}/CHANGELOG.md"
-    header = provider { "[${version.get()}]" }
+    header = provider { "[${version}]" } as Provider<? extends String>
     //headerParserRegex = ~/\d+\.\d+/
     itemPrefix = "-"
     keepUnreleasedSection = true

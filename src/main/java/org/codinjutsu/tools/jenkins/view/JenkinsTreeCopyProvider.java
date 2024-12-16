@@ -13,6 +13,7 @@ import org.codinjutsu.tools.jenkins.JenkinsTree;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.util.CopyHyperLinkHelper;
+import org.codinjutsu.tools.jenkins.util.HtmlClipboard;
 import org.codinjutsu.tools.jenkins.util.SymbolPool;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,7 @@ public class JenkinsTreeCopyProvider implements CopyProvider {
             if (selectedJob != null && selectedJob.getLastBuild() != null) {
                 Build lastBuild = selectedJob.getLastBuild();
                 CopyHyperLinkHelper.copy(lastBuild.getUrl(), SymbolPool.HASH + lastBuild.getNumber());
+                HtmlClipboard.copyHtmlToClipboard(SymbolPool.HASH + lastBuild.getNumber(), lastBuild.getUrl());
             }
 //            return JenkinsTreeCopyProvider.this.getTextLinesToCopy();
             return Collections.emptyList();

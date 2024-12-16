@@ -107,7 +107,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
                 jenkinsPlateform = JenkinsPlateform.CLASSIC;
             }
             client.setJenkinsPlateform(jenkinsPlateform);
-            final Jenkins jenkins = client.getJenkinsParser().createWorkspace(jsonData);
+            final Jenkins jenkins = client.getJenkinsParser().createWorkspace(client, jsonData);
             final var validationResult = ConfigurationValidator.getInstance(project).validate(server, jenkins.getServerUrl());
             if (!validationResult.isValid()) {
                 //TODO 连接校验失败处理

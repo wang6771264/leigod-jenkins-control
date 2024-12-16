@@ -26,18 +26,23 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.PopupChooserBuilder;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBList;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.LinkedList;
+import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import org.codinjutsu.tools.jenkins.model.jenkins.FavoriteView;
 import org.codinjutsu.tools.jenkins.model.jenkins.ViewV2;
 import org.codinjutsu.tools.jenkins.view.JenkinsViewComboRenderer;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Note: Inspiration from git4idea.history.wholeTree.BasePopupAction (git4idea plugin)
@@ -85,7 +90,7 @@ public class SelectViewAction extends DumbAwareAction implements CustomComponent
     public void update(AnActionEvent e) {
         ViewV2 currentSelectedView = browserPanel.getCurrentSelectedView();
         if (currentSelectedView != null) {
-            myLabel.setText(currentSelectedView.getName());
+            myLabel.setText(currentSelectedView.getAlias());
         } else {
             myLabel.setText("");
         }

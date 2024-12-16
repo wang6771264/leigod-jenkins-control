@@ -21,13 +21,12 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.list.ListCellBackgroundSupplier;
 import com.intellij.util.ui.UIUtil;
+import java.awt.Color;
+import javax.swing.JList;
 import org.codinjutsu.tools.jenkins.model.jenkins.FavoriteView;
 import org.codinjutsu.tools.jenkins.model.jenkins.ViewV2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class JenkinsViewComboRenderer extends SimpleListCellRenderer<ViewV2>
         implements ListCellBackgroundSupplier<ViewV2> {
@@ -58,7 +57,7 @@ public class JenkinsViewComboRenderer extends SimpleListCellRenderer<ViewV2>
     }
 
     private @NotNull String getText(ViewV2 view) {
-        final var viewName = view.getName();
+        final var viewName = view.getAlias() != null ? view.getAlias() : view.getName();
         return view.isNested() ? "   " + viewName : viewName;
     }
 }

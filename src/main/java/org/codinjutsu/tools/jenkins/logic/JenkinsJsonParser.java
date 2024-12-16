@@ -22,21 +22,37 @@ import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsoner;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.text.StringUtil;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.codinjutsu.tools.jenkins.constant.BuildConst;
 import org.codinjutsu.tools.jenkins.enums.BuildStatusEnum;
 import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.enums.JobTypeEnum;
 import org.codinjutsu.tools.jenkins.exception.JenkinsPluginRuntimeException;
-import org.codinjutsu.tools.jenkins.model.jenkins.*;
+import org.codinjutsu.tools.jenkins.model.jenkins.Build;
+import org.codinjutsu.tools.jenkins.model.jenkins.BuildParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.Computer;
+import org.codinjutsu.tools.jenkins.model.jenkins.Jenkins;
+import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
+import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
+import org.codinjutsu.tools.jenkins.model.jenkins.ViewV2;
 import org.codinjutsu.tools.jenkins.util.DateUtil;
+import org.codinjutsu.tools.jenkins.util.SymbolPool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 
 public class JenkinsJsonParser implements JenkinsParser {
 
@@ -73,11 +89,13 @@ public class JenkinsJsonParser implements JenkinsParser {
     }
 
     @Override
-    public Jenkins createWorkspace(String jsonData) {
+    public Jenkins createWorkspace(JenkinsClient client, String jsonData) {
         checkJsonDataAndThrowExceptionIfNecessary(jsonData);
         final JsonObject jsonObject = parseJson(jsonData);
-        final Optional<ViewV2> primaryView = Optional.ofNullable((JsonObject) jsonObject.get(PRIMARY_VIEW))
-                .map(this::getView);
+        final Optional<ViewV2> primaryView = Optional.ofNullable((JsonObject) jsonObject.get(PRIMARY_VIEW)).map(json -> {
+            //客户端名称和json
+            return this.getView(client.getName(), json);
+        });
 
         final String description = getNonNullStringOrDefaultForNull(jsonObject, SERVER_DESCRIPTION,
                 org.codinjutsu.tools.jenkins.util.StringUtil.EMPTY);
@@ -86,20 +104,18 @@ public class JenkinsJsonParser implements JenkinsParser {
         primaryView.ifPresent(jenkins::setPrimaryView);
 
         final JsonArray viewsObject = getArray(jsonObject, VIEWS);
-        jenkins.setViews(getViews(viewsObject, primaryView.orElse(null)));
+        jenkins.setViews(getViews(client.getName(), viewsObject, primaryView.orElse(null)));
         return jenkins;
     }
 
-    private List<ViewV2> getViews(JsonArray viewsObjects, @Nullable ViewV2 primaryView) {
+    private List<ViewV2> getViews(String clientName, JsonArray viewsObjects, @Nullable ViewV2 primaryView) {
         List<ViewV2> views = new LinkedList<>();
         for (Object obj : viewsObjects) {
             JsonObject viewObject = (JsonObject) obj;
-            final ViewV2 view = getView(viewObject);
+            final ViewV2 view = getView(clientName, viewObject);
             final String viewUrl = view.getUrl();
             if (view.equals(primaryView) && viewUrl != null) {
-                views.add(view.toBuilder()
-                        .url(UrlBuilder.createViewUrl(viewUrl, primaryView.getName()).toString())
-                        .build());
+                views.add(view.toBuilder().url(UrlBuilder.createViewUrl(viewUrl, primaryView.getName()).toString()).build());
             } else {
                 views.add(view);
             }
@@ -108,11 +124,17 @@ public class JenkinsJsonParser implements JenkinsParser {
         return views;
     }
 
-    private ViewV2 getView(JsonObject viewObject) {
+    private ViewV2 getView(String clientName, JsonObject viewObject) {
         final ViewV2.ViewV2Builder<?, ?> viewBuilder = ViewV2.builder();
         viewBuilder.isNested(false);
         final String unknownViewName = "Unknown";
+        String viewName = viewObject.getStringOrDefault(createJsonKey(VIEW_NAME, unknownViewName));
         viewBuilder.name(viewObject.getStringOrDefault(createJsonKey(VIEW_NAME, unknownViewName)));
+        if (clientName != null && !clientName.isBlank()) {
+            viewBuilder.alias(clientName + SymbolPool.COLON + viewName);
+        } else {
+            viewBuilder.alias(viewName);
+        }
         String url = viewObject.getString(createJsonKey(VIEW_URL));
         viewBuilder.url(url);
 
@@ -132,6 +154,11 @@ public class JenkinsJsonParser implements JenkinsParser {
             viewBuilder.subView(nestedViewBuilder.build());
         }
         return viewBuilder.build();
+    }
+
+    
+    private ViewV2 getView(JsonObject viewObject) {
+        return this.getView(null, viewObject);
     }
 
     @Override

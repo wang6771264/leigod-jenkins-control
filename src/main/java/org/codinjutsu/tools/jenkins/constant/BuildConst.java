@@ -1,7 +1,6 @@
 package org.codinjutsu.tools.jenkins.constant;
 
 import com.google.common.collect.Lists;
-
 import java.util.List;
 
 /**

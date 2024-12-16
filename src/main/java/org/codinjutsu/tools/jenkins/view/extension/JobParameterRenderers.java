@@ -13,6 +13,23 @@ import com.intellij.ui.CheckBoxList;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.text.JTextComponent;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -27,16 +44,6 @@ import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
 import org.codinjutsu.tools.jenkins.view.parameter.PasswordComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import javax.swing.text.JTextComponent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @UtilityClass
 public final class JobParameterRenderers {
@@ -265,12 +272,21 @@ public final class JobParameterRenderers {
                                                                           String defaultValue) {
         if (jobParameter.getChoices().isEmpty()) {
             final RequestManagerInterface requestManager = RequestManager.getInstance(projectJob.getProject());
-            AtomicReference<String> ars = new AtomicReference<>("origin/master");
+            String defaultSelect = "origin/master";
             List<String> choices = requestManager.getGitParameterChoices(projectJob.getJob(), jobParameter);
-            choices = choices.stream().filter(JobParameterRenderers::isBranchInclude).toList();
+            //前置选择
+            List<String> preChoices = new ArrayList<>();
+            choices.removeIf(branch -> {
+                if (isBranchInclude(branch)) {
+                    preChoices.add(branch);
+                    return true;
+                }
+                return false;
+            });
+            choices.addAll(0, preChoices);
             for (String branch : choices) {
                 if (StringUtils.endsWith(branch, DEFAULT_BRANCH_INCLUDE)) {
-                    ars.set(branch);
+                    defaultSelect = branch;
                     break;
                 }
             }
@@ -278,10 +294,10 @@ public final class JobParameterRenderers {
                     .name(jobParameter.getName())
                     .description(jobParameter.getDescription())
                     .jobParameterType(jobParameter.getJobParameterType())
-                    .defaultValue(ars.get())
+                    .defaultValue(defaultSelect)
                     .choices(choices)
                     .build();
-            return createComboBoxIfChoicesExists(gitParameter, ars.get());
+            return createComboBoxIfChoicesExists(gitParameter, defaultSelect);
         } else {
             return createComboBoxIfChoicesExists(jobParameter, defaultValue);
         }

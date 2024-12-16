@@ -4,15 +4,14 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
+import java.util.Optional;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
-import org.codinjutsu.tools.jenkins.util.CopyHyperLinkHelper;
+import org.codinjutsu.tools.jenkins.util.HtmlClipboard;
 import org.codinjutsu.tools.jenkins.util.SymbolPool;
 import org.codinjutsu.tools.jenkins.view.action.ActionUtil;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
 
 /**
  * ==========================
@@ -35,13 +34,12 @@ public class CopyHyperlinkAction extends AnAction implements DumbAware {
             final BrowserPanel browserPanel = BrowserPanel.getInstance(project);
             Optional<Build> selectedBuild = browserPanel.getSelectedBuild();
             if (selectedBuild.isPresent()) {
-                CopyHyperLinkHelper.copy(selectedBuild.get().getUrl(),
-                        SymbolPool.HASH + selectedBuild.get().getNumber());
+                HtmlClipboard.copyHtmlToClipboard(SymbolPool.HASH + selectedBuild.get().getNumber(), selectedBuild.get().getUrl());
             } else {
                 Job selectedJob = browserPanel.getSelectedJob();
                 if (selectedJob != null && selectedJob.getLastBuild() != null) {
                     Build lastBuild = selectedJob.getLastBuild();
-                    CopyHyperLinkHelper.copy(lastBuild.getUrl(), SymbolPool.HASH + lastBuild.getNumber());
+                    HtmlClipboard.copyHtmlToClipboard(SymbolPool.HASH + lastBuild.getNumber(), lastBuild.getUrl());
                 } else {
                     event.getPresentation().setVisible(false);
                 }

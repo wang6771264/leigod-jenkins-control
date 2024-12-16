@@ -34,6 +34,10 @@ public class ViewV2 {
 
     @NotNull
     String name;
+    /**
+     * 显示名字
+     */
+    String alias;
     //TODO URL shoud be changed to object representing URL
     @Nullable
     String url;
