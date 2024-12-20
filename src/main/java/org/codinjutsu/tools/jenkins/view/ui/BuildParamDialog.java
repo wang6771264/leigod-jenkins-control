@@ -25,13 +25,28 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.DimensionService;
 import com.intellij.openapi.util.text.StringUtil;
-import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
+import java.awt.Dimension;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import javax.swing.SwingConstants;
 import org.codinjutsu.tools.jenkins.cache.JobCache;
 import org.codinjutsu.tools.jenkins.component.SelectComponent;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.task.RunBuild;
 import org.codinjutsu.tools.jenkins.task.callback.RunBuildCallback;
 import org.codinjutsu.tools.jenkins.view.extension.JobParameterRenderer;
@@ -41,13 +56,6 @@ import org.codinjutsu.tools.jenkins.view.util.SpringUtilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 public class BuildParamDialog extends DialogWrapper {
     private static final String LAST_SIZE = "jenkins.build.parameter";
@@ -162,23 +170,27 @@ public class BuildParamDialog extends DialogWrapper {
         System.out.println(JSON.toJSONString(parameters));
         //缓存构建参数的记录
         final AtomicInteger rows = new AtomicInteger(0);
-        for (JobParameter jobParameter : parameters) {
-            final JobParameterRenderer jobParameterRenderer = JobParameterRenderer.findRenderer(jobParameter)
-                    .orElseGet(DefaultRenderer::new);
-            final ProjectJob projectJob = ProjectJob.builder()
-                    .job(job).project(project).lastBuild(job.getLastBuild())
-                    .build();
-            final JobParameterComponent<?> jobParameterComponent = jobParameterRenderer.render(jobParameter,
-                    projectJob);
+        LinkedHashMap<String, JobParameter> validPrameters = parameters.stream()
+                .collect(Collectors.toMap(JobParameter::getName, Function.identity(), (o1, o2) -> {
+                    if (o1.getDescription() != null) {
+                        return o1;
+                    }
+                    if (o2.getDescription() != null) {
+                        return o2;
+                    }
+                    return o1;
+                }, LinkedHashMap::new));
+        validPrameters.forEach((name, jobParameter) -> {
+            final JobParameterRenderer jobParameterRenderer = JobParameterRenderer.findRenderer(jobParameter).orElseGet(DefaultRenderer::new);
+            final ProjectJob projectJob = ProjectJob.builder().job(job).project(project).lastBuild(job.getLastBuild()).build();
+            final JobParameterComponent<?> jobParameterComponent = jobParameterRenderer.render(jobParameter, projectJob);
 
             if (jobParameterComponent.isVisible()) {
                 rows.incrementAndGet();
                 jobParameterComponent.getViewElement().setName(jobParameter.getName());
 
-                final JLabel label = jobParameterRenderer.createLabel(jobParameter)
-                        .map(setJLabelStyles(jobParameterComponent))
-                        .map(BuildParamDialog::appendColonIfMissing)
-                        .orElseGet(JLabel::new);
+                final JLabel label = jobParameterRenderer.createLabel(jobParameter).map(setJLabelStyles(jobParameterComponent))
+                        .map(BuildParamDialog::appendColonIfMissing).orElseGet(JLabel::new);
                 contentPanel.add(label);
                 //fixme 这里需要注意的是如果只有一个组件的时候这样设置会导致组件显示不出来,具体原因未知
                 if (parameters.size() > 1) {
@@ -200,8 +212,7 @@ public class BuildParamDialog extends DialogWrapper {
 
                 inputFields.add(jobParameterComponent);
             }
-        }
-
+        });
         final int columns = 2;
         final int initial = 6;
         final int padding = 6;
