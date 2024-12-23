@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased]
+## [1.0.14]
+### fix
+- 1.当前开放`git`的其他分支之后,`git`分支的名称太长会导致无法看全分支名称
 ## [1.0.13]
 ### fix
 - 1.当`BuildParamDialog`中的表单参数有重复的时候,这里需要去重

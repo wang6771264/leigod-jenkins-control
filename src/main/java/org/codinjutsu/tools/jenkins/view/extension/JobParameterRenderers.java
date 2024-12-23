@@ -13,6 +13,7 @@ import com.intellij.ui.CheckBoxList;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -297,7 +298,9 @@ public final class JobParameterRenderers {
                     .defaultValue(defaultSelect)
                     .choices(choices)
                     .build();
-            return createComboBoxIfChoicesExists(gitParameter, defaultSelect);
+            JobParameterComponent<String> component = createComboBoxIfChoicesExists(gitParameter, defaultSelect);
+            JComponent viewElement = component.getViewElement();
+            return component;
         } else {
             return createComboBoxIfChoicesExists(jobParameter, defaultValue);
         }
