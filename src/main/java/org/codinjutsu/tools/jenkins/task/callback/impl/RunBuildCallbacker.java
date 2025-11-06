@@ -24,8 +24,8 @@ public class RunBuildCallbacker implements RunBuildCallback {
         browserPanel.notifyInfoJenkinsToolWindow(job.getNameToRenderSingleJob() + " build is on going",
                 job.getUrl());
         browserPanel.loadJob(job);
-        final LogToolWindow logToolWindow = new LogToolWindow(browserPanel.getProject());
-        logToolWindow.showLog(BuildTypeEnum.LAST, job);
+//        final LogToolWindow logToolWindow = new LogToolWindow(browserPanel.getProject());
+//        logToolWindow.showLog(BuildTypeEnum.LAST, job);
     }
 
     @Override

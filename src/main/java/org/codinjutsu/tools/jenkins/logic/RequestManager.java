@@ -451,6 +451,7 @@ public class RequestManager implements RequestManagerInterface, Disposable {
             logger.warn("cannot load log for " + logName.get());
             Thread.currentThread().interrupt();
             buildConsoleStreamListener.finished();
+            logger.error(String.format("Finished build log,url:%s,number:%s", build.getUrl(), build.getNumber()));
         }
     }
 

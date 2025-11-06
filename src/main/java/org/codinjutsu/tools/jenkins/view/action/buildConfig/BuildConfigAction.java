@@ -16,27 +16,25 @@
 
 package org.codinjutsu.tools.jenkins.view.action.buildConfig;
 
+import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
+
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
-import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
+import java.util.Optional;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
-import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsSettings;
 import org.codinjutsu.tools.jenkins.view.action.ActionUtil;
+import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.codinjutsu.tools.jenkins.view.ui.BuildConfigDialog;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
-import java.util.function.Consumer;
-
-import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
 
 /**
  * ==========================
@@ -46,13 +44,10 @@ import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
  * 描述：构建参数保存操作
  * ==========================
  */
-public class BuilcConfigAction extends AnAction implements DumbAware {
+public class BuildConfigAction extends AnAction implements DumbAware {
 
     public static final String ACTION_ID = "Jenkins.BuildConfig";
-    public static final int BUILD_STATUS_UPDATE_DELAY = 1;
-    private static final Logger LOG = Logger.getInstance(BuilcConfigAction.class.getName());
-    private static final Consumer<Job> DO_NOTHING = job -> {
-    };
+    private static final Logger LOG = Logger.getInstance(BuildConfigAction.class.getName());
 
     public static boolean isBuildable(@Nullable Job job) {
         return job != null && job.isBuildable();
@@ -83,17 +78,12 @@ public class BuilcConfigAction extends AnAction implements DumbAware {
     @Override
     public void update(@NotNull AnActionEvent event) {
         final boolean isBuildable = ActionUtil.getBrowserPanel(event).map(BrowserPanel::getSelectedJob)
-                .map(BuilcConfigAction::isBuildable).orElse(Boolean.FALSE);
+                .map(BuildConfigAction::isBuildable).orElse(Boolean.FALSE);
         if (event.getPlace().equals(POPUP_PLACE)) {
             event.getPresentation().setVisible(isBuildable);
         } else {
             event.getPresentation().setEnabled(isBuildable);
         }
-    }
-
-    private void notifyOnGoingMessage(BrowserPanel browserPanel, Job job) {
-        browserPanel.notifyInfoJenkinsToolWindow(job.getNameToRenderSingleJob() + " build is on going",
-                job.getUrl());
     }
 
     private void queueRunBuild(@NotNull Project project, @NotNull BrowserPanel browserPanel, @NotNull Job job) {

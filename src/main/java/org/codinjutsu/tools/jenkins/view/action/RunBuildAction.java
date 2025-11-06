@@ -16,13 +16,18 @@
 
 package org.codinjutsu.tools.jenkins.view.action;
 
+import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
+
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import org.codinjutsu.tools.jenkins.enums.BuildTypeEnum;
 import org.codinjutsu.tools.jenkins.logic.ExecutorService;
 import org.codinjutsu.tools.jenkins.logic.JenkinsBackgroundTask;
@@ -30,19 +35,13 @@ import org.codinjutsu.tools.jenkins.logic.JenkinsBackgroundTaskFactory;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
+import org.codinjutsu.tools.jenkins.persistent.JenkinsAppSettings;
 import org.codinjutsu.tools.jenkins.task.callback.impl.RunBuildCallbacker;
 import org.codinjutsu.tools.jenkins.util.GuiUtil;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.codinjutsu.tools.jenkins.view.ui.BuildParamDialog;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-
-import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
 
 public class RunBuildAction extends AnAction implements DumbAware {
 
@@ -91,12 +90,12 @@ public class RunBuildAction extends AnAction implements DumbAware {
         }
     }
 
-    private void notifyOnGoingMessage(BrowserPanel browserPanel, Job job) {
+    public static void notifyOnGoingMessage(BrowserPanel browserPanel, Job job) {
         browserPanel.notifyInfoJenkinsToolWindow(job.getNameToRenderSingleJob() + " build is on going",
                 job.getUrl());
     }
 
-    private void queueRunBuild(@NotNull Project project, @NotNull BrowserPanel browserPanel, @NotNull Job job) {
+    public static void queueRunBuild(@NotNull Project project, @NotNull BrowserPanel browserPanel, @NotNull Job job) {
         final Optional<Build> previousLastBuild = Optional.ofNullable(job.getLastBuild());
         JenkinsBackgroundTaskFactory.getInstance(project).createBackgroundTask("Running build",
                 new JenkinsBackgroundTask.JenkinsTask() {
@@ -141,7 +140,7 @@ public class RunBuildAction extends AnAction implements DumbAware {
                 }).queue();
     }
 
-    private void showRunDialog(@NotNull Project project, @NotNull Job job, @NotNull BrowserPanel browserPanel) {
+    public static void showRunDialog(@NotNull Project project, @NotNull Job job, @NotNull BrowserPanel browserPanel) {
         RequestManagerInterface requestManager = browserPanel.getJenkinsManager();
         BuildParamDialog.showDialog(project, job, JenkinsAppSettings.getSafeInstance(project),
                 requestManager, new RunBuildCallbacker(browserPanel));

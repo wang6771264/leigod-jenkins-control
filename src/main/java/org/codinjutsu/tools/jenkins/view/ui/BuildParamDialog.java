@@ -16,22 +16,15 @@
 
 package org.codinjutsu.tools.jenkins.view.ui;
 
-import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.DimensionService;
 import com.intellij.openapi.util.text.StringUtil;
 import java.awt.Dimension;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -55,12 +48,11 @@ import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
 import org.codinjutsu.tools.jenkins.view.util.SpringUtilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.LoggerFactory;
+
+import static org.codinjutsu.tools.jenkins.view.parameter.renderer.CascadeChoiceParameterRenderer.JOB_NAME;
 
 public class BuildParamDialog extends DialogWrapper {
     private static final String LAST_SIZE = "jenkins.build.parameter";
-    private static final Logger logger = Logger.getInstance(BuildParamDialog.class);
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(BuildParamDialog.class);
     private final Job job;
     private final @NotNull Project project;
     private final JenkinsAppSettings configuration;
@@ -102,8 +94,8 @@ public class BuildParamDialog extends DialogWrapper {
         super.doOKAction();
         //保存构建的参数
         for (JobParameterComponent<?> inputField : inputFields) {
-            //fixme 目前只处理自定义的下拉列表
-            if(!(inputField.getViewElement() instanceof SelectComponent)){
+            //fixme 只需要保存级联的即可
+            if(!Objects.equals(inputField.getJobParameter().getName(), JOB_NAME)){
                 continue;
             }
             String parameter = inputField.getJobParameter().getName();
@@ -167,7 +159,6 @@ public class BuildParamDialog extends DialogWrapper {
     private void addParameterInputs() {
         contentPanel.setLayout(new SpringLayout());
         List<JobParameter> parameters = job.getParameters();
-        System.out.println(JSON.toJSONString(parameters));
         //缓存构建参数的记录
         final AtomicInteger rows = new AtomicInteger(0);
         LinkedHashMap<String, JobParameter> validPrameters = parameters.stream()

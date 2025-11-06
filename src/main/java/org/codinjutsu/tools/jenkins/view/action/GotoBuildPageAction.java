@@ -10,7 +10,6 @@ public class GotoBuildPageAction extends AbstractGotoWebPageAction {
         super("Go to the build page", "Open the build page in a web browser", browserPanel);
     }
 
-
     @NotNull
     @Override
     protected String getUrl() {

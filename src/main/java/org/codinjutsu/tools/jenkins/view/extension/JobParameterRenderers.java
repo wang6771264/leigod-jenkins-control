@@ -13,24 +13,6 @@ import com.intellij.ui.CheckBoxList;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
-import java.awt.Dimension;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.swing.DefaultListModel;
-import javax.swing.Icon;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.text.JTextComponent;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +27,15 @@ import org.codinjutsu.tools.jenkins.view.parameter.JobParameterComponent;
 import org.codinjutsu.tools.jenkins.view.parameter.PasswordComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public final class JobParameterRenderers {
@@ -298,9 +289,7 @@ public final class JobParameterRenderers {
                     .defaultValue(defaultSelect)
                     .choices(choices)
                     .build();
-            JobParameterComponent<String> component = createComboBoxIfChoicesExists(gitParameter, defaultSelect);
-            JComponent viewElement = component.getViewElement();
-            return component;
+			return createComboBoxIfChoicesExists(gitParameter, defaultSelect);
         } else {
             return createComboBoxIfChoicesExists(jobParameter, defaultValue);
         }

@@ -26,7 +26,7 @@ import static org.codinjutsu.tools.jenkins.view.parameter.renderer.CascadeChoice
  * 描述：级联单选组件
  * ==========================
  */
-public abstract class CascadeSelectComponent implements Serializable {
+public abstract class CascadeSelectComponent implements SelectComponent, Serializable {
     /**
      * 支持的符号
      */
@@ -61,6 +61,11 @@ public abstract class CascadeSelectComponent implements Serializable {
 
     protected abstract String getSelectedItem();
 
+    @Override
+    public String selectedItem() {
+        return this.getSelectedItem();
+    }
+    
     protected abstract void addItemListener();
 
     protected abstract void cascadeUpdate(String selectedParentItem);

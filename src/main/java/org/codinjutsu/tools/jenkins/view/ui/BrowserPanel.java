@@ -220,6 +220,12 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
                 .map(JenkinsTreeNode.JobNode::job).orElse(null);
     }
 
+    @Nullable
+    public Job getSelectedBuildHistory() {
+        return jobTree.getLastSelectedPath(JenkinsTreeNode.JobNode.class)
+                .map(JenkinsTreeNode.JobNode::job).orElse(null);
+    }
+
     public List<Job> getAllSelectedJobs() {
         return TreeUtil.collectSelectedObjectsOfType(jobTree.getTree(), JenkinsTreeNode.JobNode.class).stream()
                 .map(JenkinsTreeNode.JobNode::job).collect(Collectors.toList());
@@ -403,6 +409,7 @@ public final class BrowserPanel extends SimpleToolWindowPanel implements Persist
         popupGroup.addSeparator();
         popupGroup.add(new GotoServerAction(this));
         popupGroup.add(new GotoJobPageAction(this));
+        popupGroup.add(new ReplayBuildParamAction(this));
         popupGroup.add(new GotoBuildPageAction(this));
         popupGroup.add(new GotoBuildConsolePageAction(this));
         popupGroup.add(new GotoBuildTestResultsPageAction(this));

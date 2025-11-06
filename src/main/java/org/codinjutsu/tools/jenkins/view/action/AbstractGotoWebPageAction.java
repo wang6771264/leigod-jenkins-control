@@ -20,6 +20,7 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 abstract class AbstractGotoWebPageAction extends AnAction implements DumbAware {
     final BrowserPanel browserPanel;
 
+    private static final Logger LOG = Logger.getInstance(AbstractGotoWebPageAction.class);
 
     AbstractGotoWebPageAction(String label,
                               String description,

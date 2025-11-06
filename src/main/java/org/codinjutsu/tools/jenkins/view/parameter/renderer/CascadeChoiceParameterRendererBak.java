@@ -1,9 +1,15 @@
 package org.codinjutsu.tools.jenkins.view.parameter.renderer;
 
 import com.intellij.openapi.project.Project;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.swing.BoxLayout;
 import org.codinjutsu.tools.jenkins.cache.JobCache;
-import org.codinjutsu.tools.jenkins.component.CascadeListPopupComponent;
 import org.codinjutsu.tools.jenkins.component.CascadeRadioComponent;
+import org.codinjutsu.tools.jenkins.component.CascadeSearchableComboBox;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameter;
 import org.codinjutsu.tools.jenkins.model.jenkins.JobParameterType;
@@ -15,18 +21,11 @@ import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 /**
- * 级联选择参数渲染器
+ *
  */
-public class CascadeChoiceParameterRenderer extends AbstractParameterRenderer implements JobParameterRenderer {
+public class CascadeChoiceParameterRendererBak extends AbstractParameterRenderer implements JobParameterRenderer {
 
     @NonNls
     private static final String TYPE_CLASS = "org.biouno.unochoice.CascadeChoiceParameter";
@@ -45,79 +44,49 @@ public class CascadeChoiceParameterRenderer extends AbstractParameterRenderer im
      */
     private final Map<String, CascadeRadioComponent> cascadeMap = new ConcurrentHashMap<>();
 
-    public CascadeChoiceParameterRenderer() {
+    public CascadeChoiceParameterRendererBak() {
         validTypes.add(CASCADE_CHOICE_PARAMETER_DEFINITION);
     }
 
-    public CascadeChoiceParameterRenderer(Set<JobParameterType> validTypes) {
+    public CascadeChoiceParameterRendererBak(Set<JobParameterType> validTypes) {
         this.validTypes.addAll(validTypes);
     }
 
     @Override
     protected JobParameterComponent<String> getJobParameterComponent(JobParameter jobParameter, ProjectJob projectJob, String defaultValue) {
-        // 如果参数是 JOB_NAME，则获取所有的 job
+        //如果参数是JOB_NAME,则获取所有的job
         final Project project = projectJob.getProject();
         if (jobParameter.getName().equals(JOB_NAME)) {
             final BrowserPanel browserPanel = BrowserPanel.getInstance(project);
             List<Job> allJobs = browserPanel.getAllJobs();
-            List<String> buildJobNames = allJobs.stream()
-                    .map(Job::getName)
+            List<String> buildJobNames = allJobs.stream().map(Job::getName)
                     .filter(name -> name.endsWith("-build"))
                     .toList();
-            
-            // 设置参数选项
+            //这里需要添加级联列表
             jobParameter.setChoices(buildJobNames);
             jobParameter.setDefaultValue(defaultValue);
-            
-            // 创建级联组件：relativePath (Radio)
-            CascadeRadioComponent artifactsCombo = new CascadeRadioComponent(
-                    RELATIVE_PATH,
-                    List.of(), 
-                    projectJob, 
-                    null
-            );
-            
-            // 创建级联组件：BUILD_VER (Radio)
-            CascadeRadioComponent buildVerCombo = new CascadeRadioComponent(
-                    BUILD_VER,
-                    List.of(), 
-                    BoxLayout.X_AXIS, 
-                    projectJob, 
-                    artifactsCombo
-            );
-            
-            // 创建级联组件：JOB_NAME (ListPopup - 替换原来的 ComboBox)
-            CascadeListPopupComponent jobNameCombo = new CascadeListPopupComponent(
-                    JOB_NAME,
-                    projectJob, 
-                    buildVerCombo
-            );
-            
-            // 设置父级关系
+            //如果参数是BUILD_VER和relativePath,则不处理写入一个空的列表
+            CascadeRadioComponent artifactsCombo = new CascadeRadioComponent(RELATIVE_PATH,
+                    List.of(), projectJob, null);
+            CascadeRadioComponent buildVerCombo = new CascadeRadioComponent(BUILD_VER,
+                    List.of(), BoxLayout.X_AXIS, projectJob, artifactsCombo);
+            CascadeSearchableComboBox jobNameCombo = new CascadeSearchableComboBox(JOB_NAME,
+                    projectJob, buildVerCombo);
+            //设置父级的下拉
             buildVerCombo.setParent(jobNameCombo);
             artifactsCombo.setParent(buildVerCombo);
-            
-            // 初始化 JOB_NAME 列表项
-            String recentValue = JobCache.getParamRecentlyValue(projectJob.getJob().getName(), JOB_NAME);
-            jobNameCombo.initItems(buildJobNames, recentValue);
-            
-            // 设置当前参数的下拉组件
+            jobNameCombo.initItems(buildJobNames, JobCache.getParamRecentlyValue(projectJob.getJob().getName(),
+                    JOB_NAME));
+            //设置当前参数的下拉
             jobParameter.setCascadeComboBox(jobNameCombo);
-            
-            // 缓存子级联组件
+            // 为父级联下拉列表添加选项变化监听器
             cascadeMap.put(BUILD_VER, buildVerCombo);
             cascadeMap.put(RELATIVE_PATH, artifactsCombo);
         } else {
-            // 处理 BUILD_VER 或 RELATIVE_PATH 参数
             CascadeRadioComponent cascadeCombo = cascadeMap.get(jobParameter.getName());
-            if (cascadeCombo != null) {
-                jobParameter.setCascadeComboBox(cascadeCombo);
-            } else {
-                // TODO: 处理找不到级联组件的情况
-                // 可以记录日志或抛出异常
-            }
+            //fixme 可能存在没有的情况,后续处理
+            jobParameter.setCascadeComboBox(cascadeCombo);
         }
-        
         return JobParameterRenderers.createCascadeComboBoxIfExists(jobParameter, defaultValue);
     }
 
