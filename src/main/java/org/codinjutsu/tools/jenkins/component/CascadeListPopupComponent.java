@@ -5,7 +5,9 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.ui.popup.PopupStep;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
+import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.ui.popup.list.ListPopupImpl;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.jetbrains.annotations.Nullable;
 
@@ -103,8 +105,14 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
             }
         };
         currentPopup = JBPopupFactory.getInstance().createListPopup(step);
-        // 在文本框下方显示弹出列表
-        currentPopup.showUnderneathOf(textField);
+        // 设置最大可见行数
+        ((ListPopupImpl) currentPopup).setMaxRowCount(10);
+        // 设置尺寸范围
+        currentPopup.setMinimumSize(new Dimension(textField.getWidth(), 100));
+        // 使用 show() 方法让 IntelliJ 自动选择最佳位置
+        RelativePoint relativePoint = new RelativePoint(textField,
+                new Point(0, textField.getHeight()));
+        currentPopup.show(relativePoint);
     }
 
     /**
