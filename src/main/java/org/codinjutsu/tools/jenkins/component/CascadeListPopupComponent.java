@@ -110,8 +110,7 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
         // 设置尺寸范围
         currentPopup.setMinimumSize(new Dimension(textField.getWidth(), 100));
         // 使用 show() 方法让 IntelliJ 自动选择最佳位置
-        RelativePoint relativePoint = new RelativePoint(textField,
-                new Point(0, textField.getHeight()));
+        RelativePoint relativePoint = new RelativePoint(textField, new Point(0, textField.getHeight()));
         currentPopup.show(relativePoint);
     }
 
