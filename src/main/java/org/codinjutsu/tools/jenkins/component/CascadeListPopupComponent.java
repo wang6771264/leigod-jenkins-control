@@ -6,7 +6,6 @@ import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.ui.popup.PopupStep;
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.ui.components.JBTextField;
-import com.intellij.ui.popup.list.ListPopupImpl;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,8 +22,6 @@ import java.util.List;
 public class CascadeListPopupComponent extends CascadeSelectComponent {
 
     private final JBTextField textField;
-    // 新增：屏蔽标志位
-    private volatile boolean isUpdatingProgrammatically = false; 
     private List<String> allItems;
     private String selectedValue;
     private ListPopup currentPopup;
@@ -40,12 +37,12 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
      * 初始化文本框
      */
     private void initTextField() {
-        textField.setEditable(true);
+        textField.setEditable(false);
         textField.setPreferredSize(new Dimension(200, 30));
         textField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showPopup("");
+                showPopup();
             }
         });
     }
@@ -66,19 +63,14 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
         } else if (!items.isEmpty()) {
             // 默认选中第一项
             setSelectedItem(items.get(0));
-            showPopup("");
         }
     }
 
     /**
      * 显示弹出搜索列表
      */
-    private void showPopup(String prefix) {
+    private void showPopup() {
         if (allItems.isEmpty()) {
-            return;
-        }
-        //前置值是空的后者选中则不处理
-        if (prefix == null || isUpdatingProgrammatically) {
             return;
         }
 
@@ -110,9 +102,7 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
                 return false;
             }
         };
-
         currentPopup = JBPopupFactory.getInstance().createListPopup(step);
-        ((ListPopupImpl) currentPopup).getSpeedSearch().updatePattern(prefix);
         // 在文本框下方显示弹出列表
         currentPopup.showUnderneathOf(textField);
     }
@@ -122,10 +112,8 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
      */
     private void setSelectedItem(String item) {
         this.selectedValue = item;
-        this.isUpdatingProgrammatically = true;
         this.textField.setText(item);
         this.textField.setToolTipText(item);
-        this.isUpdatingProgrammatically = false;
     }
 
     @Override

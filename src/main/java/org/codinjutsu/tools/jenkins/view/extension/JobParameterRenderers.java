@@ -4,8 +4,11 @@ import com.google.common.collect.Lists;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.ui.popup.PopupStep;
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -13,6 +16,7 @@ import com.intellij.ui.CheckBoxList;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.ui.popup.list.ListPopupImpl;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -30,6 +34,9 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -96,12 +103,49 @@ public final class JobParameterRenderers {
 
     @NotNull
     public static JobParameterComponent<String> createComboBox(@NotNull JobParameter jobParameter, String defaultValue) {
-        final String[] choices = jobParameter.getChoices().toArray(new String[0]);
-        ComboBox<String> comboBox = new ComboBox<>(choices);
-        if (StringUtil.isNotEmpty(defaultValue)) {
-            comboBox.setSelectedItem(defaultValue);
-        }
-        return new JobParameterComponent<>(jobParameter, comboBox, asString(JComboBox::getSelectedItem));
+        final List<String> choices = jobParameter.getChoices();
+
+        JBTextField textField = new JBTextField(defaultValue);
+        textField.setEditable(false);
+        textField.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        textField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                showPopup(textField, choices, "");
+            }
+        });
+        return new JobParameterComponent<>(jobParameter, textField, component -> textField.getText());
+    }
+
+    private void showPopup(JBTextField textField, List<String> choices, String prefix) {
+        BaseListPopupStep<String> step = new BaseListPopupStep<>(null, choices) {
+            @Override
+            public @Nullable PopupStep<?> onChosen(String selectedValue, boolean finalChoice) {
+                return doFinalStep(() -> {
+                    //填充选择值
+                    textField.setText(selectedValue);
+                });
+            }
+
+            @Override
+            public boolean isSpeedSearchEnabled() {
+                return true;
+            }
+
+            @Override
+            public boolean isAutoSelectionEnabled() {
+                return false;
+            }
+
+            @Override
+            public boolean hasSubstep(String selectedValue) {
+                return false;
+            }
+        };
+        ListPopup currentPopup = JBPopupFactory.getInstance().createListPopup(step);
+        ((ListPopupImpl) currentPopup).getSpeedSearch().updatePattern(prefix);
+        // 在文本框下方显示弹出列表
+        currentPopup.showUnderneathOf(textField);
     }
 
     private static JCheckBox[] convertJCheckBoxList(List<String> choices) {
