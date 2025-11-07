@@ -16,15 +16,12 @@
 
 package org.codinjutsu.tools.jenkins.view.action.buildConfig;
 
-import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
-
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import java.util.Optional;
 import org.codinjutsu.tools.jenkins.logic.RequestManagerInterface;
 import org.codinjutsu.tools.jenkins.model.jenkins.Build;
 import org.codinjutsu.tools.jenkins.model.jenkins.Job;
@@ -35,6 +32,10 @@ import org.codinjutsu.tools.jenkins.view.ui.BrowserPanel;
 import org.codinjutsu.tools.jenkins.view.ui.BuildConfigDialog;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+
+import static org.codinjutsu.tools.jenkins.view.ui.BrowserPanel.POPUP_PLACE;
 
 /**
  * ==========================
@@ -95,7 +96,6 @@ public class BuildConfigAction extends AnAction implements DumbAware {
     private void showBuildConfigDialog(@NotNull Project project, @NotNull Job job, @NotNull BrowserPanel browserPanel) {
         RequestManagerInterface requestManager = browserPanel.getJenkinsManager();
         BuildConfigDialog.showDialog(project, job, JenkinsAppSettings.getSafeInstance(project),
-                JenkinsSettings.getSafeInstance(project),
-                requestManager);
+                JenkinsSettings.getSafeInstance(project), requestManager);
     }
 }
