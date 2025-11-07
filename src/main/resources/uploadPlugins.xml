@@ -19,14 +19,14 @@
             <h2>[1.0.14]</h2>
             <h3>fix</h3>
             <ul>
-                <li>当前开<code>git</code>的其他分支之后<code>git</code>分支的名称太长会导致无法看全分支名称
+                <li>当前开git的其他分支之后git分支的名称太长会导致无法看全分支名称
                 </li>
             </ul>
 
             <h2>[1.0.13]</h2>
             <h3>fix</h3>
             <ul>
-                <li><code>BuildParamDialog</code>中的表单参数有重复的时候,这里需要去重
+                <li>BuildParamDialog中的表单参数有重复的时候,这里需要去重
                 </li>
             </ul>
 
@@ -34,9 +34,9 @@
             <h3>fix</h3>
             <ul>
                 <li>修复目前复制富文本内容时会自动增加一个换行符</li>
-                <li>修复复<code>build_number</code>时,富文本超链接为空的问题
+                <li>修复复build_number时,富文本超链接为空的问题
                 </li>
-                <li>开放选择的分支,由于之<code>deploy</code>打包分支只能在特定范围中选择,当前版本开放所有分支,但是特定范围分支依然在前排
+                <li>开放选择的分支,由于之deploy打包分支只能在特定范围中选择,当前版本开放所有分支,但是特定范围分支依然在前排
                 </li>
             </ul>
         </change-notes>
