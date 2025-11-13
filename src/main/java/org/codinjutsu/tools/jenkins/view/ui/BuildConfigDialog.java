@@ -51,6 +51,8 @@ public class BuildConfigDialog extends DialogWrapper {
     private final @NotNull Project project;
     private final JenkinsAppSettings configuration;
     private final RequestManagerInterface requestManager;
+    //记录第一个可见组件
+    private JobParameterComponent<?> firstComponent;
     private final Collection<JobParameterComponent<?>> inputFields = new LinkedHashSet<>();
     private JPanel contentPane;
     private JPanel contentPanel;
@@ -133,6 +135,9 @@ public class BuildConfigDialog extends DialogWrapper {
             final JobParameterComponent<?> jobParameterComponent = jobParameterRenderer.render(jobParameter, projectJob);
 
             if (jobParameterComponent.isVisible()) {
+                if (firstComponent == null) {
+                    firstComponent = jobParameterComponent; // 记录第一个可见组件
+                }
                 rows.incrementAndGet();
                 jobParameterComponent.getViewElement().setName(jobParameter.getName());
 
@@ -172,6 +177,12 @@ public class BuildConfigDialog extends DialogWrapper {
 
     private void onOK() {
         //TODO 改为保存预置的构建配置
+    }
+
+    @Override
+    public @Nullable JComponent getPreferredFocusedComponent() {
+        // DialogWrapper 会在显示对话框时自动调用此方法并请求焦点
+        return firstComponent != null ? firstComponent.getViewElement() : null;
     }
 
     private void saveLastSize() {

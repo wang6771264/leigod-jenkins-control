@@ -62,6 +62,9 @@ public class BuildParamDialog extends DialogWrapper {
     private JPanel contentPane;
     private JPanel contentPanel;
 
+    //记录第一个可见组件
+    private JobParameterComponent<?> firstComponent;
+
     public BuildParamDialog(@NotNull Project project, Job job, JenkinsAppSettings configuration,
                             RequestManagerInterface requestManager, RunBuildCallback runBuildCallback) {
         super(project);
@@ -177,6 +180,9 @@ public class BuildParamDialog extends DialogWrapper {
             final JobParameterComponent<?> jobParameterComponent = jobParameterRenderer.render(jobParameter, projectJob);
 
             if (jobParameterComponent.isVisible()) {
+                if (firstComponent == null) {
+                    firstComponent = jobParameterComponent; // 记录第一个可见组件
+                }
                 rows.incrementAndGet();
                 jobParameterComponent.getViewElement().setName(jobParameter.getName());
                 final JLabel label = jobParameterRenderer.createLabel(jobParameter).map(setJLabelStyles(jobParameterComponent))
@@ -233,6 +239,12 @@ public class BuildParamDialog extends DialogWrapper {
         DimensionService.getInstance().setSize(LAST_SIZE, getSize(), project);
     }
 
+    @Override
+    public @Nullable JComponent getPreferredFocusedComponent() {
+        // DialogWrapper 会在显示对话框时自动调用此方法并请求焦点
+        return firstComponent != null ? firstComponent.getViewElement() : null;
+    }
+    
     @NotNull
     private Map<String, ?> getParamValueMap() {
         final HashMap<String, Object> valueByNameMap = new HashMap<>();

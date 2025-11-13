@@ -35,6 +35,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -108,6 +110,21 @@ public final class JobParameterRenderers {
         JBTextField textField = new JBTextField(defaultValue);
         textField.setEditable(false);
         textField.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        textField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                SwingUtilities.invokeLater(() -> textField.select(0, 0));
+            }
+        });
+
+        textField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent keyEvent) {
+                final String initialChar = String.valueOf(keyEvent.getKeyChar());
+                showPopup(textField, choices, initialChar);
+            }
+        });
+        
         textField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -117,7 +134,7 @@ public final class JobParameterRenderers {
         return new JobParameterComponent<>(jobParameter, textField, component -> textField.getText());
     }
 
-    private void showPopup(JBTextField textField, List<String> choices, String prefix) {
+    private ListPopup showPopup(JBTextField textField, List<String> choices, String prefix) {
         BaseListPopupStep<String> step = new BaseListPopupStep<>(null, choices) {
             @Override
             public @Nullable PopupStep<?> onChosen(String selectedValue, boolean finalChoice) {
@@ -143,13 +160,13 @@ public final class JobParameterRenderers {
             }
         };
         ListPopup currentPopup = JBPopupFactory.getInstance().createListPopup(step);
-        ((ListPopupImpl) currentPopup).getSpeedSearch().updatePattern(prefix);
         // 在文本框下方显示弹出列表
         currentPopup.showUnderneathOf(textField);
-    }
-
-    private static JCheckBox[] convertJCheckBoxList(List<String> choices) {
-        return convertJCheckBoxList(choices, null);
+        if (prefix != null && !prefix.trim().isEmpty()) {
+            ((ListPopupImpl) currentPopup).getSpeedSearch().type(prefix);
+            ((ListPopupImpl) currentPopup).getSpeedSearch().update();
+        }
+        return currentPopup;
     }
 
     private static JCheckBox[] convertJCheckBoxList(List<String> choices, List<String> selectedChoices) {

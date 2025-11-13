@@ -154,4 +154,8 @@ public class Build {
     public boolean isAfter(Build aBuild) {
         return this.getNumber() > aBuild.getNumber();
     }
+
+    public boolean isSuccess() {
+        return BuildStatusEnum.SUCCESS.equalsByStatus(this.status.getStatus());
+    }
 }

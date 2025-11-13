@@ -1,5 +1,6 @@
 package org.codinjutsu.tools.jenkins.component;
 
+import com.intellij.openapi.actionSystem.DataProvider;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
@@ -13,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -40,11 +43,31 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
      */
     private void initTextField() {
         textField.setEditable(false);
-        textField.setPreferredSize(new Dimension(200, 30));
+        Dimension fixedSize = new Dimension(200, 30);
+        textField.setPreferredSize(fixedSize);
+        textField.setMinimumSize(fixedSize);
+        textField.setMaximumSize(fixedSize);
         textField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 showPopup();
+            }
+        });
+
+        textField.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                SwingUtilities.invokeLater(() -> textField.select(0, 0));
+            }
+        });
+
+        textField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent e) {
+                if (currentPopup == null || !currentPopup.isVisible()) {
+                    // 弹出 popup 并传递当前按键字符
+                    showPopupAndFocus(e);
+                }
             }
         });
     }
@@ -58,10 +81,13 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
 
         if (selectedItem != null && !selectedItem.isEmpty()) {
             setSelectedItem(selectedValue);
-            // 触发级联更新
-            if (child != null) {
-                child.cascadeUpdate(selectedValue);
-            }
+            // 使用 invokeLater 延迟触发级联更新，避免布局冲突
+            SwingUtilities.invokeLater(() -> {
+                // 触发级联更新
+                if (child != null) {
+                    child.cascadeUpdate(selectedValue);
+                }
+            });
         } else if (!items.isEmpty()) {
             // 默认选中第一项
             setSelectedItem(items.get(0));
@@ -71,7 +97,7 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
     /**
      * 显示弹出搜索列表
      */
-    private void showPopup() {
+    private void showPopupAndFocus(KeyEvent keyEvent) {
         if (allItems.isEmpty()) {
             return;
         }
@@ -98,7 +124,7 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
             public boolean isAutoSelectionEnabled() {
                 return false;
             }
-            
+
             @Override
             public boolean hasSubstep(String selectedValue) {
                 return false;
@@ -112,6 +138,23 @@ public class CascadeListPopupComponent extends CascadeSelectComponent {
         // 使用 show() 方法让 IntelliJ 自动选择最佳位置
         RelativePoint relativePoint = new RelativePoint(textField, new Point(0, textField.getHeight()));
         currentPopup.show(relativePoint);
+
+        // 关键：让 popup 的列表获得焦点，然后触发初始字符的输入
+        if (keyEvent != null) {
+            final String initialChar = String.valueOf(keyEvent.getKeyChar());
+
+            SwingUtilities.invokeLater(() -> {
+                if (currentPopup instanceof ListPopupImpl listPopup) {
+                    listPopup.getSpeedSearch().type(initialChar);
+                    listPopup.getSpeedSearch().update();
+                }
+            });
+        }
+    }
+
+    // 更新原来的 showPopup 方法
+    private void showPopup() {
+        showPopupAndFocus(null);
     }
 
     /**

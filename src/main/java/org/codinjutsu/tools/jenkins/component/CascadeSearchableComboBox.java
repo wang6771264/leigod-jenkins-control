@@ -1,10 +1,6 @@
 package org.codinjutsu.tools.jenkins.component;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.ui.popup.PopupFactoryImpl;
-import com.intellij.ui.popup.list.ListPopupImpl;
 import org.codinjutsu.tools.jenkins.model.jenkins.ProjectJob;
 import org.codinjutsu.tools.jenkins.util.SymbolPool;
 
